@@ -1,0 +1,124 @@
+<namespace id="dictionaryData-edit">
+    <ol class="breadcrumb">
+			<li><a href="#">字典类型管理</a></li>
+        <li><a href="#">修改</a></li>
+    </ol>
+	<section class="content" id="editDictionaryDataSection" ms-controller="dictionaryData_edit">
+        <div class="box box-info">
+		    <form role="form"  id="editDictionaryDataForm" class="form-horizontal">
+            <div class="row ">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"></i> 提交
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body">
+   					<div class="form-group">
+	   			 		<label for="dictName" class="col-sm-1 control-label input-sm">字典名称</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="dictName" class="form-control label-form-control input-sm" 
+	   			 			>{{@data.dictName}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="name" class="col-sm-1 control-label input-sm">描述</label>
+	   			 		<div class="col-sm-5">
+	   			 			<input name="name" type="text" class="form-control input-sm" 
+	   			 			placeholder=""  ms-attr="{value:@data.name}">
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="value" class="col-sm-1 control-label input-sm">键值</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="value"  class="form-control label-form-control input-sm" 
+	   			 			>{{@data.value}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="sequence" class="col-sm-1 control-label input-sm">排序</label>
+	   			 		<div class="col-sm-5">
+	   			 			<input name="sequence" type="text" class="form-control input-sm" 
+	   			 			placeholder=""   ms-attr="{value:@data.sequence}">
+	   			 		</div>
+	   			 	</div>
+	   		</div>
+	   		<input type="hidden" name="code"  ms-attr="{value:@data.dictCode}" style="width: 100%" />
+	   		<input type="hidden" name="id" ms-attr="{value:@data.id}" style="width: 100%" />
+   		</form>
+        </div>
+	</section>
+</namespace>
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#dictionaryData-edit').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "dictionaryData_edit",
+    		        data: {}
+    		    })
+    		},
+			init : function() {
+				$('#editDictionaryDataForm').validate({
+					rules : {
+						'name' : {
+							required : true,
+							maxlength : 255
+						},
+						'sequence' : {
+							required : true,
+							number : true,
+							digits : true,
+							min : 1
+						}
+					},submitHandler : function(form) {
+						page.doEdit();
+					}
+				});
+			},
+			doEdit : function() {
+				var submitsForm = {
+					endpoint : "/dictionary/editDictionaryData",
+					formObj : $("#editDictionaryDataForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure:function(data) {
+						alertTool.error(data);
+					}
+				};
+				
+				page.namespace.submitForm(submitsForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml("/pages/dictionary/dictionaryData-list.html");
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/dictionary/getDictionaryDataById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		};
+		
+		page.init();
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+	});
+</script>

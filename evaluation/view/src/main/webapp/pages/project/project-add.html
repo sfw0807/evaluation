@@ -1,0 +1,216 @@
+<namespace id="project-add">
+<ol class="breadcrumb">
+    <li><a href="#">项目</a></li>
+    <li><a href="#">新增</a></li>
+</ol>
+<!-- Main content -->
+<section class="content" id="addProjectSection">
+    <div class="box box-info">
+	    <form role="form" id="addProjectForm" class="form-horizontal">
+        <div class="row ">
+            <div class="col-sm-12">
+                <!-- 右对齐的 btn-group -->
+                <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 提交
+                    </button>
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box-body">
+				<div class="form-group">
+					<label for="name" class="col-sm-1 control-label requiredMask input-sm">项目名称</label>
+					<div class="col-sm-5">
+						<input name="name" type="text" class="form-control input-sm" placeholder="">
+					</div>
+				</div>
+            <div class="form-group">
+                <label for="startDateStr" class="col-sm-1 control-label requiredMask input-sm">开始时间</label>
+                <div class="col-sm-5">
+                    <input  name="startDateStr" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right" id="startDateStr">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="endDateStr" class="col-sm-1 control-label requiredMask input-sm">结束时间</label>
+                <div class="col-sm-5">
+		                <input  name="endDateStr" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right" id="endDateStr">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="score" class="col-sm-1 control-label requiredMask input-sm">项目总分</label>
+                <div class="col-sm-5">
+                    <input name="score" type="text" class="form-control input-sm" placeholder="">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="fcol" class="col-sm-1 control-label requiredMask input-sm">初评流程</label>
+                <div class="col-sm-5"  id="fcol">
+                	
+                	<div>
+	                	<div class="col-sm-3">
+	                	<input class="minimal" name="selfEval"   id="selfEval"   value="0" type="checkbox" />
+	                		自评
+	                	</div>
+	                	<div class="col-sm-9">
+	                		<div class="col-sm-5">
+		                            <input  name="selfEvalStartDate"  id="selfEvalStartDate" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right"   >
+		                        	</div>
+		                        	<div class="col-sm-1">
+										~
+		                        	</div>
+		                        	<div class="col-sm-5">
+		                            <input  name="selfEvalEndDate"  id="selfEvalEndDate"  style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right form_datetime"  >
+		                        	</div>
+	                	</div>
+                	</div>
+                	
+                	<div>
+                		<div class="col-sm-3">
+                	<input class="minimal" name="expertEval"   id="expertEval"   value="0" type="checkbox" />
+                		专家
+                	</div>
+                	<div class="col-sm-9">
+                		<div class="col-sm-5">
+	                            <input  name="expertEvalStartDate"  id="expertEvalStartDate" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right"   >
+	                        	</div>
+	                        	<div class="col-sm-1">
+									~
+	                        	</div>
+	                        	<div class="col-sm-5">
+	                            <input  name="expertEvalEndDate"  id="expertEvalEndDate"  style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right form_datetime"  >
+	                        	</div>
+                	</div>
+                	</div>
+                
+                </div>
+            </div>
+				<div class="form-group">
+					<label for="description" class="col-sm-1 control-label input-sm">备注</label>
+					<div class="col-sm-5">
+						<textarea name="description" class="form-control input-sm" rows="3" placeholder=""></textarea>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label for="evalTargetEntity" class="col-sm-1 control-label input-sm">被评对象</label>
+					<div class="col-sm-5">
+						<!-- Button trigger modal -->
+						<button  id="evalTargetEntityBtn"  type="button" 
+							class="btn btn-primary btn-sm" 
+								>
+								选择
+						</button>
+					</div>
+				</div>
+				
+				<div class="form-group">
+                <label for="dicLocation" class="col-sm-1 control-label requiredMask input-sm">附件目录</label>
+                <div class="col-sm-5">
+                    <input name="dicLocation" type="text" class="form-control input-sm" placeholder="">
+                </div>
+            </div>
+			</div>
+	</form>
+    </div>
+</section>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#project-add').namespace(),
+			init : function() {
+				
+				page.namespace.root.find('#evalTargetEntityBtn').on('click',function(){
+					page.namespace.modal.open(page,
+							{	id:"evalTargetEntityModal",
+								title:"选择被评对象",
+								hidden : function(e,ra){
+									alert("hide modal  "+ JSON.stringify(ra[0]) );
+								}
+							},'/pages/project/project-selectuser.html',{});
+				});
+				
+				page.namespace.root.find('#startDateStr').autoBSNyr().on("click", function(ev){
+					page.namespace.root.find("#startDateStr").datetimepicker("setEndDate", page.namespace.root.find("#endDateStr").val());
+		        });
+				page.namespace.root.find('#endDateStr').autoBSNyr().on("click", function(ev){
+					page.namespace.root.find("#endDateStr").datetimepicker("setStartDate", page.namespace.root.find("#startDateStr").val());
+		        });
+				
+				page.namespace.root.find('#selfEvalStartDate').autoBSNyr().on("click", function(ev){
+		            page.namespace.root.find("#selfEvalStartDate").datetimepicker("setEndDate", page.namespace.root.find("#selfEvalEndDate").val());
+		        });
+		        page.namespace.root.find('#selfEvalEndDate').autoBSNyr().on("click", function(ev){
+		            page.namespace.root.find("#selfEvalEndDate").datetimepicker("setStartDate", page.namespace.root.find("#selfEvalStartDate").val());
+		        }); 
+		        
+		        page.namespace.root.find('#expertEvalStartDate').autoBSNyr().on("click", function(ev){
+		            page.namespace.root.find("#expertEvalStartDate").datetimepicker("setEndDate", page.namespace.root.find("#expertEvalEndDate").val());
+		        });
+		        page.namespace.root.find('#expertEvalEndDate').autoBSNyr().on("click", function(ev){
+		            page.namespace.root.find("#expertEvalEndDate").datetimepicker("setStartDate", page.namespace.root.find("#expertEvalStartDate").val());
+		        }); 
+		        
+		        $([page.namespace.root.find('#selfEval')
+		        	,page.namespace.root.find('#expertEval')]).iCheck({
+				      checkboxClass: 'icheckbox_minimal-blue',
+				      radioClass: 'iradio_minimal-blue'
+				    });
+				
+				page.namespace.root.find('#addProjectForm').validate({
+					rules : {
+						'name' : {
+							required : true,
+							maxlength : 64
+						},
+						'startDateStr' : {
+							required : true,
+							dateISO:true 
+						},
+						'endDateStr' : {
+							required : true,
+							dateISO:true 
+						},
+						'score' : {
+							required : true,
+							number : true
+						},
+						'dicLocation' : {
+							required : true,
+							maxlength : 128
+						}
+					},
+					submitHandler : function(form) {
+						page.doAdd();
+					}
+				});
+			},
+			doAdd : function() {
+				var submitsForm = {
+					endpoint : "/project/saveProject",
+					formObj : page.namespace.root.find("#addProjectForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				};
+
+				page.namespace.submitForm(submitsForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/project/project-list.html');
+			}
+		};
+
+		page.init();
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+	});
+</script>

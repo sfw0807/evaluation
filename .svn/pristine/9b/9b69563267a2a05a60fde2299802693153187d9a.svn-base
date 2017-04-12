@@ -1,0 +1,393 @@
+<namespace id="scoreItem-edit" ms-controller="scoreItem_edit">
+<ol class="breadcrumb">
+    <li><a href="#">得分点</a></li>
+    <li><a href="#">编辑</a></li>
+</ol>
+<!-- Main content -->
+<section class="content" id="editScoreItemSection">
+    <div class="box box-info">
+		<fieldset>
+			<legend>
+				<label for="dataCollectionType" class="col-sm-1 control-label input-sm">基本信息</label>
+			</legend>
+			<form role="form" id="editScoreItemForm" class="form-horizontal">
+				<div class="row ">
+					<div class="col-sm-12">
+						<!-- 右对齐的 btn-group -->
+						<div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+							<button type="submit" class="btn btn-sm btn-primary">
+								<i class="fa fa-floppy-o"></i> 提交
+							</button>
+							<a class="btn btn-sm btn-default" id="btnCancel">
+								<i class="fa fa-align-justify">返回</i>
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="box-body">
+					<div class="form-group">
+						<label for="scoreItemName" class="col-sm-1 control-label requiredMask input-sm">得分项名称</label>
+						<div class="col-sm-5">
+							<input name="scoreItemName" readonly="readonly" type="text" class="form-control input-sm" placeholder="" ms-attr="{value:@data.scoreItemName}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="highestScore" class="col-sm-1 control-label requiredMask input-sm">最高总分</label>
+						<div class="col-sm-5">
+							<input name="highestScore" type="text" class="form-control input-sm" placeholder="" ms-attr="{value:@data.highestScore}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="serialNumber" class="col-sm-1 control-label requiredMask input-sm">编号</label>
+						<div class="col-sm-5">
+							<input name="serialNumber" type="text" class="form-control input-sm" placeholder="" ms-attr="{value:@data.serialNumber}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="dataCollectionType" class="col-sm-1 control-label input-sm">数据采集形式</label>
+						<div class="col-sm-5">
+							<input type="radio" name="dataCollectionType" value="offLine" ms-duplex="@dataCollectionTypes">线下
+							<input type="radio" name="dataCollectionType" value="fillForm" ms-duplex="@dataCollectionTypes">填报
+							<input type="radio" name="dataCollectionType" value="questionNaire" ms-duplex="@dataCollectionTypes">问卷
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="fillPerson" class="col-sm-1 control-label input-sm" >填报角色</label>
+						<div class="col-sm-5">
+							<select id="fillPerson" name="fillPerson" class="form-control select2 input-sm" ms-duplex="@data.fillPerson">
+								<option ms-for="el in @fillPersonOptions" ms-attr="{value:el.id}" ms-text="el.name"></option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="preliminaryType" class="col-sm-1 control-label input-sm">初评类型</label>
+						<div class="col-sm-5">
+							<input type="radio" name="preliminaryType" value="manual" ms-duplex="@preliminaryTypes">人工
+							<input type="radio" name="preliminaryType" value="system" ms-duplex="@preliminaryTypes">系统自动
+						</div>
+					</div>
+					<div class="form-group" id="selfDiv" ms-visible="@data.preliminaryType == 'manual'">
+						<label for="selfPerson" class="col-sm-1 control-label input-sm">自评角色</label>
+						<div class="col-sm-5">
+							<select id="selfPerson" name="selfPerson" class="form-control select2 input-sm" ms-duplex="@data.selfPerson">
+							<option ms-for="el in @selfPersonOptions" ms-attr="{value:el.id}" ms-text="el.name"></option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group" id="preDiv" ms-visible="@data.preliminaryType == 'manual'">
+						<label for="preliminaryExpect" class="col-sm-1 control-label input-sm">初评专家</label>
+						<div class="col-sm-5">
+							<select id="preliminaryExpect" name="preliminaryExpect" class="form-control select2 input-sm" ms-duplex="@data.preliminaryExpect">
+								<option ms-for="el in @preliminaryExpectOptions" ms-attr="{value:el.id}" ms-text="el.name"></option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="finalPerson" class="col-sm-1 control-label input-sm">终评角色</label>
+						<div class="col-sm-5">
+							<select id="finalPerson" name="finalPerson" class="form-control select2 input-sm" ms-duplex="@data.finalPerson">
+								<option ms-for="el in @finalPersonOptions" ms-attr="{value:el.id}" ms-text="el.name"></option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="remark" class="col-sm-1 control-label input-sm">得分项描述</label>
+						<div class="col-sm-5">
+							<textarea name="scoreItemDesc" class="form-control input-sm" rows="3" placeholder="" ms-attr="{value:@data.scoreItemDesc}"></textarea>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="remark" class="col-sm-1 control-label input-sm">备注</label>
+						<div class="col-sm-5">
+							<textarea name="remark" class="form-control input-sm" rows="3" placeholder="" ms-attr="{value:@data.remark}"></textarea>
+						</div>
+					</div>
+				</div>
+
+				<input type="hidden" name="id"   ms-attr="{value:@data.id}" style="width: 100%" />
+				<input type="hidden" id="parentQuota" name="parentQuota"  style="width: 100%" />
+				<input type="hidden" id="projectId" name="projectId"  style="width: 100%" />
+			</form>
+		</fieldset>
+    </div>
+
+	<fieldset>
+		<legend>
+			<label for="dataFillCollectionType" class="col-sm-1 control-label input-sm">填报项设置</label>
+		</legend>
+		<div  class="col-sm-9">
+			<!-- form start -->
+			<form class="form-horizontal" id="fillScoreItemForm" ms-controller="fillSocreItem_edit">
+				<div class="box-body">
+					<div class="row">
+						<div class="col-sm-3">
+							<div class="btn-group">
+								<a class="btn btn-success btn-sm" id="addFillBtn">
+									<span class="glyphicon glyphicon-plus"></span> 新增
+								</a>
+								<button class="btn btn-danger btn-sm" type="button" id="deleteFillBtn">
+									<span class="glyphicon glyphicon-minus"></span> 批量删除
+								</button>
+							</div>
+						</div>
+						<div>
+							<!-- 设置隐藏域的值 -->
+							<input type="hidden" id="scoreItemId" name="scoreItemId" value="">
+						</div>
+					</div>
+				</div>
+			</form>
+
+			<div class="box box-info" style="border-top: 0px;">
+				<div class="box-body" id="fillScoreItemList" style="margin-top: -10px;">
+					<table id="fillScoreItemListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+						<thead>
+						<tr>
+							<th></th>
+							<th>编号</th>
+							<th>类型</th>
+							<th>描述</th>
+							<th>操作</th>
+						</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+</section>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#scoreItem-edit').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "scoreItem_edit",
+    		        data: {},
+    		        fillPersonOptions: {},
+    		        selfPersonOptions :{},
+    		        preliminaryExpectOptions:{},
+    		        finalPersonOptions : {},
+    		        dataCollectionTypes : "",
+    		        preliminaryTypes : ""
+    		    })
+    		},
+			init : function() {
+				page.namespace.root.find('#editScoreItemForm').validate({
+					rules : {
+						'scorepointName' : {
+							required : true,
+							maxlength : 64
+						},
+						'highestScore' : {
+							required : true,
+							number : true
+						},
+						'serialNumber' : {
+							required : true,
+							number : true
+						},
+						'remark' : {
+							required : false,
+							maxlength : 256
+						}
+					},
+					submitHandler : function(form) {
+						page.doEdit();
+					}
+				});
+
+                page.namespace.root.find("#parentQuota").val(page.namespace.getParam("parentQuota"));
+                page.namespace.root.find("#projectId").val(page.namespace.getParam("projectId"));
+			},
+			doEdit : function() {
+				var submitsForm = {
+					endpoint : "/scoreItem/updateScoreItem",
+					formObj : page.namespace.root.find("#editScoreItemForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				};
+
+				page.namespace.submitForm(submitsForm);
+			},
+			doChange : function() {
+				if($(this).val() === "manual") {
+					page.namespace.root.find('#selfDiv').removeAttr("style") ;
+					page.namespace.root.find('#preDiv').removeAttr("style") ;
+				}else {
+					page.namespace.root.find('#selfDiv').attr("style","display:none") ;
+					page.namespace.root.find('#preDiv').attr("style","display:none") ;
+				}
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/scoreItem/scoreItem-list.html') ;
+			},
+			initView:function(){
+                page.namespace.root.find("#scoreItemId").val(page.namespace.getParam("id")) ;
+				page.namespace.getRequest({
+					endpoint : "/scoreItem/getScoreItemById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data = data;
+						 page.model.vm.dataCollectionTypes = data.dataCollectionType ;
+						 page.model.vm.preliminaryTypes = data.preliminaryType ;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			},
+			doSysRoles : function(roleType) {
+				page.namespace.getRequest({
+					endpoint : "/userRole/getUserRoles",
+					data : {"roleType" : roleType},
+					success : function(data) {
+						if(roleType === '1') {
+							page.model.vm.fillPersonOptions = data;
+						}else if(roleType === '2'){
+							page.model.vm.selfPersonOptions = data;
+						}else if(roleType === '3'){
+							page.model.vm.preliminaryExpectOptions = data;
+						}else if(roleType === '4'){
+							page.model.vm.finalPersonOptions = data;
+						}
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		};
+
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.init();
+		page.doSysRoles('1') ;
+		page.doSysRoles('2') ;
+		page.doSysRoles('3') ;
+		page.doSysRoles('4') ;
+		page.initView();
+		
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		page.namespace.root.find('input[name=preliminaryType]').on('click', page.doChange) ;
+
+		// 填报项设置区域
+		var fillPage = {
+			namespace : $('#scoreItem-edit').namespace(),
+			model:{
+				vm:avalon.define({
+					$id: "fillSocreItem_edit",
+					data: {}
+				})
+			},
+			doFillAdd : function() {
+				var scoreItemId = fillPage.namespace.root.find("#scoreItemId").val() ;
+				if(scoreItemId == "") {
+					alertTool.warning("请先保存基本信息!") ;
+					return false ;
+				} else {
+					window.scoreItemIdValue = scoreItemId ;
+					window.projectId = fillPage.namespace.root.find("#projectId").val();
+					fillPage.namespace.modal.open(fillPage,
+						{	id:"scoreItemFillTargetEntityModal",
+							title:"设置填报项",
+							hidden : function(e,ra){
+								fillPage.listTable.ajax.reload();
+//								alert("hide modal"+ JSON.stringify(ra[0]));
+							}
+						},'/pages/scoreItem/scoreItem-addFill.html',{});
+				}
+			},
+			doFillView : function(id) {
+				fillPage.namespace.modal.open(fillPage,
+					{	id:"scoreItemFillViewTargetEntityModal",
+						title:"设置填报项",
+						hidden : function(e,ra){
+							fillPage.listTable.ajax.reload();
+//							alert("hide modal"+ JSON.stringify(ra[0]));
+						}
+					},'/pages/scoreItem/scoreItem-viewFill.html?',{quesId : id});
+			},
+			doFillEdit : function(id) {
+                window.scoreItemIdValue = fillPage.namespace.root.find("#scoreItemId").val() ;
+                window.projectId = fillPage.namespace.root.find("#projectId").val() ;
+				fillPage.namespace.modal.open(fillPage,
+					{	id:"scoreItemFillEditTargetEntityModal",
+						title:"设置填报项",
+						hidden : function(e,ra){
+							fillPage.listTable.ajax.reload();
+//							alert("hide modal"+ JSON.stringify(ra[0]));
+						}
+					},'/pages/scoreItem/scoreItem-editFill.html?',{quesId : id});
+			},
+			doFillDel : function(id) {
+				var HtmlMenuOpt = {
+					endpoint : "/scoreItem/deleteQuestionById",
+					data : {
+						'quesIds' : id
+					},
+					success : function(data) {
+						fillPage.listTable.ajax.reload();
+					}
+				};
+
+				fillPage.namespace.getRequest(HtmlMenuOpt);
+			},
+			doBatchFillDel : function() {
+				var selectRows = fillPage.namespace.root.find('#fillScoreItemListTable').getSelectedRow();
+
+				if (selectRows.length == 0) {
+					alertTool.warning("请选择要删除的记录!");
+					return;
+				}
+				fillPage.namespace.confirm(function(){
+					fillPage.doFillDel(selectRows.join("∷"));
+				});
+			}
+		} ;
+
+		fillPage.listTable = fillPage.namespace.root.find('#fillScoreItemListTable').initDataTable({
+			url : "/scoreItem/getRptQuestion",
+			urlDataFn : function() {
+				return {
+					"scoreItemId" : fillPage.namespace.root.find("#scoreItemId").val()
+				} ;
+			},
+			lengthChange : false,
+			checkbox : true,
+			paging:false,
+			ops : {
+				view : function(id, rowData) {
+					fillPage.doFillView(id);
+				},
+				del : function(id, rowData) {
+					fillPage.doFillDel(id);
+				},
+				edit : function(id, rowData) {
+					fillPage.doFillEdit(id);
+				}
+			},
+			columns : [ {
+				"data" : "questionCode",
+				"width" : "10%"
+			},{
+				"data" : "questionType",
+				"width" : "10%"
+			},{
+				"data" : "questionContent",
+				"width" : "30%"
+			}
+			]
+		});
+
+		avalon.scan(fillPage.namespace.root[0], fillPage.model.vm);
+		fillPage.namespace.root.find('#addFillBtn').on('click', fillPage.doFillAdd);
+		fillPage.namespace.root.find('#deleteFillBtn').on('click', fillPage.doBatchFillDel);
+    });
+</script>

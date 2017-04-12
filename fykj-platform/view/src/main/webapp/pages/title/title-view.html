@@ -1,0 +1,57 @@
+<namespace id="title-view">
+	<ol class="breadcrumb">
+        <li><a href="#">职位信息维护</a></li>
+        <li><a href="#">详细</a></li>
+    </ol>
+    <div class="box box-info">
+    	<form role="form" class="form-horizontal">
+    		<div class="row ">
+                <div class="col-sm-12">
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body">
+            	<div class="form-group">
+                    <label class="col-sm-1 control-label requiredMask input-sm">职位代码</label>
+                    <div class="col-sm-5">
+                        <input name="code" disabled="disabled" type="text" class="form-control input-sm"  placeholder="" th:value="${title.code}" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label requiredMask input-sm">职位名称</label>
+                    <div class="col-sm-5">
+                        <input name="name" disabled="disabled" type="text" class="form-control input-sm"  placeholder="" th:value="${title.name}" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label requiredMask input-sm">职位名称</label>
+                    <div class="col-sm-5">
+                        <input name="cost" disabled="disabled" type="text" class="form-control input-sm"  placeholder="" th:value="${title.cost}" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label input-sm">描述</label>
+                    <div class="col-sm-5">
+                        <textarea name="description" disabled="disabled" rows="3" class="form-control input-sm" th:text="${title.description}" placeholder=""></textarea>
+                    </div>
+                </div>
+            </div>
+    	</form>
+    </div>
+</namespace>
+<script type="text/javascript">
+    $(function() {
+        var page = {
+            namespace : $('#title-view').namespace(),
+            doCancel : function() {
+                page.namespace.skiphtml("/pms/title/toTitleList");
+            }
+        };
+        
+        page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+    });
+</script>

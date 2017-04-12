@@ -1,0 +1,141 @@
+<namespace id="measureItem-edit"  ms-controller="measureItem_edit">
+<ol class="breadcrumb">
+    <li><a href="#">指标项</a></li>
+    <li><a href="#">编辑</a></li>
+</ol>
+<section class="content" id="editMeasureItemSection">
+    <div class="box box-info">
+	    <form role="form" id="editMeasureItemForm" class="form-horizontal">
+        <div class="row ">
+            <div class="col-sm-12">
+                <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 提交
+                    </button>
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="box-body">
+				<div class="form-group">
+					<label for="name" class="col-sm-1 control-label input-sm">
+						指标项名称</label>
+					<div class="col-sm-5">
+						<span id="name" class="form-control label-form-control input-sm"  >
+						{{@data.name}}</span>
+					</div>
+				</div>
+            <div class="form-group">
+                <label for="score" class="col-sm-1 control-label requiredMask input-sm">
+                	总分</label>
+                <div class="col-sm-5">
+                    <input name="score" type="text" class="form-control input-sm" placeholder=""   
+                    ms-attr="{value:@data.score}">
+                </div>
+            </div>
+            
+				<div class="form-group">
+					<label for="description" class="col-sm-1 control-label requiredMask input-sm">
+						备注</label>
+					<div class="col-sm-5">
+						<textarea name="description" class="form-control input-sm" rows="3" 
+							placeholder=" ..."  >{{@data.description}}</textarea>
+					</div>
+				</div>
+			</div>
+		<input type="hidden" name="id"   ms-attr="{value:@data.id}" style="width: 100%" />
+	</form>
+    </div>
+</section>
+</namespace>
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#measureItem-edit').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "measureItem_edit",
+    		        data: {}
+    		    })
+    		},
+			init : function() {
+				
+				page.namespace.root.find('#editMeasureItemForm').validate({
+					rules : {
+						'name' : {
+							required : true,
+							maxlength : 64
+						},
+						'score' : {
+							required : true,
+							number : true
+						},
+						'description' : {
+							required : false,
+							maxlength : 256
+						}
+					},
+					submitHandler : function(form) {
+						page.doEdit();
+					}
+				});
+			},
+			doEdit : function() {
+				var submitSysUserForm = {
+					endpoint : "/measureItem/updateMeasureItem",
+					formObj : page.namespace.root.find("#editMeasureItemForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				};
+
+				page.namespace.submitForm(submitSysUserForm);
+			},
+			doCheckIsExist : function() {
+				page.namespace.getRequest({
+					endpoint : "/scoreItem/isScoreItemExist",
+					data : {"scoreItemName":page.namespace.root.find('input[name=scoreItemName]').val()},
+					success : function(data) {
+						 if(data) {
+							 alertTool.error("得分项已存在！");
+							 return ;
+						 } else {
+							 page.doEdit();
+						 }
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/measureItem/measureItem-list.html');
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/measureItem/getMeasureItemById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		};
+
+		page.init();
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+		
+	});
+</script>

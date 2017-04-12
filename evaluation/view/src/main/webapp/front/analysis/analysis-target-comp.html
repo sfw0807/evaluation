@@ -1,0 +1,418 @@
+<style type="text/css">
+    #targetNameList {
+        padding: 0 0 0 0px;
+        margin: 0;
+        color: #0072B3;
+        height: 50px;
+        width: 95%;
+        line-height: 60px;
+    }
+    
+    p{width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+
+    .red {
+        color: red;
+    }
+
+    .blue {
+        color: #2D92BF;
+		font-weight:bold;
+    }
+
+    .scoreContent {
+        height: 50px;
+        margin: 0 30px 0 30px;
+        line-height: 40px;
+    }
+
+    #headInfo h4 {
+        font-weight: 600;
+    }
+
+    #MonitorInformation_list td {
+        border-right: 1px solid #cccccc;
+    }
+
+    #MonitorInformation_list th {
+        border-right: 1px solid #cccccc;
+        background-color: #f1f1f1;
+        font-weight: normal;
+        color: #2D92BF;
+        text-align: center;
+    }
+
+    .bblue {
+        background-color: #F5FAFC;
+        text-align: center;
+        color: #0072B3;
+    }
+
+    .bwhite {
+        background-color: #FFFFFF;
+    }
+
+    th {
+        text-align: center;
+    }
+
+    #TargetScoreMaintain_list td {
+        text-align: center;
+        overflow: hidden;
+    }
+
+    #scoreBody td {
+        overflow: hidden;
+        vertical-align: middle;
+    }
+
+    #AttachmentBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #StudentCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #TeacherCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #InspectorMaterialBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<style type="text/css">
+
+
+
+
+.item_finish{
+        background-color: #e2f5a9 !important;
+}
+.th_order{}
+.end_inp{}
+.expert_inp{}
+</style>
+
+<div  id="evalTargetScore_T_Any"  style="display: none;">
+<table id="evalTargetScoreTable_Any"
+	class="table table-hover table-bordered lead-list" cellspacing="0"
+	width="100%"   style="table-layout: fixed;"  >
+	<thead  class="trThread">
+		<tr>
+			<th>序号</th>
+			<th>被评对象</th>
+			<th id="evalTargetScoreTable_Any_A" >问卷得分</th>
+			<th>填报得分</th>
+			<th  id="evalTargetScoreTable_Any_A_EXP"></th>
+		</tr>
+	</thead>
+	<tbody id="evalTargetScoreTable_Any_Body"></tbody>
+</table>
+</div>
+<div id="evalTargetScore_C_Any_Con"
+style="width: 100%;background-color: white;padding-left: 10px;margin-top: 10px;  text-align: left
+">
+
+<div  class="listPanel"   style="border: solid 1px #337ab7;">
+
+<div  id="evalTargetScore_C_Any">
+
+<div class="col-sm-12">
+
+<div>
+                <table style="width: 100%">
+                    <tbody><tr>
+                        <td>
+                        	<button class="btn btn-primary btn-sm"  id="r_Btn">返回</button>
+                        </td>
+                    </tr>
+                </tbody></table>
+            </div>
+<input type="hidden"  id="measureId"  value="-1"/>
+<button class="btn btn-primary btn-sm"  id="imageForm" >图形</button>
+<button class="btn btn-primary btn-sm"  id="tableForm" >表格</button>
+<button class="btn btn-primary btn-sm"  id="selectTargetBtn"  >选择学校</button>
+</div>
+<br/>
+<br/>
+<br/>
+<br/>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:400px"></div>
+
+<div  id="evalTargetScoreTable_C_Any">
+
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+$(function(){
+try{
+	
+	function error(info){
+		alert(info);
+	}
+	
+	function success(info){
+		alert(info);
+	}
+	
+	function _do(data,fn){
+		if(data.success){
+			fn(data.data);
+		}else{
+			error(data.errorMessage);			
+		}
+	}
+	
+	var $root=$('#evalTargetScore_C_Any_Con');
+	
+	function _initTemplate(){
+		$root.find('#evalTargetScoreTable_C_Any').empty();
+		$root.find('#evalTargetScoreTable_C_Any').html($('#evalTargetScore_T_Any').html());
+		$root.find('#evalTargetScoreTable_Any_A_EXP').text(measureObj.name);
+		_ready();
+	}
+	
+	function _ready(){
+		
+	}
+	
+	function tdr(lb){
+		return '<td style="    text-align: center;">'+lb+'</td>';
+	}
+	
+	function thr(lb){
+		return '<th class="th_order" >'+lb+'</th>';
+	}
+	
+	function render(data){
+		var thsData=[];
+		var trs='';
+		for( var i=0;i<data.length;i++){
+			var tds='';
+			var v=data[i];
+			trs=trs+'<tr  class="lead-item '
+			+(i%2==0?"":" lead-even ")
+			/*+(isExpert()&&isExpertRole()&&v.expertScore?" item_finish ":"")
+			+(isEnd()&&isEndRole()&&v.endScore?" item_finish ":"")*/
+			+ '">'
+			tds=tds+tdr((i+1));
+			tds=tds+tdr((v.name?v.name:""));
+			tds=tds+tdr((v.wjScore?v.wjScore:""));
+			tds=tds+tdr((v.tbScore?v.tbScore:""));
+			tds=tds+tdr((v.sumScore?v.sumScore:""));
+
+			trs=trs+tds+'</tr>';
+		}
+		$root.find('#evalTargetScoreTable_Any_Body').html(trs);
+		var $table=$root.find('#evalTargetScoreTable_C_Any').find('table');
+
+		
+		$root.find('[name="next"]').on('click',function(){
+			$root.find('#r_Btn').data('id',measureId());
+			setMeasureId($(this).data('id'));
+			_request(_params());
+		});
+		
+		
+	}
+	
+	function _request(params){
+		
+		_initTemplate();
+		
+		$.get("/web/measureItem/getMeasureTargetScores",
+				params,
+				function(data){
+					_do(data,function(d){
+						render(d);
+						ldData(d);
+					})
+				});
+	}
+
+	var $params=$_storage.get(VIEW_ROOT+"/front/analysis/analysis-target-comp.html");
+	var _itemId=$params.measureId;
+	setMeasureId(_itemId);
+	
+	function _params(pms){
+		if(!pms){
+			pms={};
+		}
+		return $.extend({},{
+			projectId : $_params.currentProjectId
+		},{ measureItemId : measureId() },pms);
+	}
+	
+	var _item={};
+	
+	$root.find('#r_Btn').on('click',function(){
+		var url = VIEW_ROOT + "/front/analysis/analysis-item.html" ;
+		$("#frameContainer").load(url, function(){
+		
+		}) ;
+	});
+	
+	function measureId(){
+		return $root.find('#measureId').val();
+	}
+	
+	function setMeasureId(m){
+		$root.find('#measureId').val(m);
+	}
+	
+	function ldData(data){
+		// 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+		
+		if($root.find('#main').is(':hidden')){
+			$root.find('#imageForm').data('rs',data);
+		}else{
+			$root.find('#imageForm').removeData('rs');
+		}
+		
+		var n=[];
+		var val=[];
+		for( var i=0;i<data.length;i++){
+			var v=data[i];
+			n[i]=v.name;
+			val[i]=v.sumScore;
+		}
+		
+        option = {
+        	    tooltip : {
+        	        trigger: 'axis'
+        	    },
+        	    legend: {
+        	        data:['']
+        	    },
+        	    toolbox: {
+        	        show : true,
+        	        feature : {
+        	            mark : {show: true},
+        	            dataView : {show: true, readOnly: false},
+        	            magicType: {show: true, type: ['line', 'bar']},
+        	            restore : {show: true},
+        	            saveAsImage : {show: true}
+        	        }
+        	    },
+        	    calculable : true,
+        	    xAxis : [
+        	        {
+        	            type : 'value',
+        	            boundaryGap : [0, 0.01]
+        	        }
+        	    ],
+        	    yAxis : [
+        	        {
+        	            type : 'category',
+        	            data : n
+        	        }
+        	    ],
+        	    series : [
+        	        {
+        	            name:'',
+        	            type:'bar',
+        	            data : val
+        	        }
+        	    ]
+        	};
+        	                    
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+		
+		
+		
+	}
+	
+	
+	$root.find('#selectTargetBtn').on('click',function(){
+		cjs.modal.open(
+				{	id:"evalTargetSelectModal",
+					title:"选择被评对象",
+					hidden : function(e,ra){
+						console.log("hide modal  "+ JSON.stringify(ra[0]) );
+						if(ra[0].length!=0){
+							_request(_params({evalTargetId : ra[0].join(',')}));
+						}
+					}
+				},'/front/analysis/eval_target_pop.html',{name : 'this is name param'});
+		
+	});
+	
+	var measureObj;
+	
+	$.get(WEB_ROOT+"/measureItem/getMeasureItemById",
+			{"id":measureId()},
+			function(data){
+				_do(data,function(d){
+					measureObj=d;
+					_initTemplate();
+					$root.find('#evalTargetScoreTable_C_Any').hide();
+				})
+			});
+
+	$root.find('#imageForm').on('click',function(){
+		var data;
+		if($root.find('#main').is(':hidden')){
+			data=$root.find('#imageForm').data('rs');
+		}
+		$root.find('#main').css('display','block');
+		if(data)
+		ldData(data);
+		$root.find('#evalTargetScoreTable_C_Any').hide();
+	});
+	
+	$root.find('#tableForm').on('click',function(){
+		$root.find('#main').css('display','none');
+		$root.find('#evalTargetScoreTable_C_Any').show();
+	});
+	
+	
+}catch (e) {
+	console.error(e);
+}
+})
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

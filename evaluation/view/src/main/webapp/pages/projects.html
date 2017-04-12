@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>项目资源管理系统</title>
+		<meta
+			content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+			name="viewport">
+		<link rel="stylesheet" href="../ui/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="../ui/dist/css/AdminLTE.min.css">
+		<link rel="stylesheet" href="../ui/plugins/iCheck/square/blue.css">
+		
+		<script type="text/javascript" src="../ui/plugins/jQuery/jQuery-2.2.0.min.js"></script>
+		<script type="text/javascript" src="../ui/bootstrap/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="../front-ui/self/_base.js"></script>
+	</head>
+	<body class="hold-transition login-page">
+		<div class="row" style="margin-top:60px;  display: none;">
+						<div class="col-xs-12">
+							<button  id="btn" type="button" class="btn btn-primary btn-block btn-flat">登陆</button>
+						</div>
+					</div>
+	</body>
+
+</html>
+
+<script type="text/javascript">
+
+$(function(){
+	$('#btn').on('click',function(){
+		cjs.modal.open(
+				{	id:"proejctSelectModal",
+					title:"选择项目",
+					hidden : function(e,ra){
+						console.log("hide modal  "+ JSON.stringify(ra[0]) );
+					}
+				},'/pages/project/project-select.html',{name : 'this is name param'});
+	});
+	$('#btn').trigger('click');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+</script>

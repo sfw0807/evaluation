@@ -1,0 +1,203 @@
+<namespace id="evalTarget-list"    ms-controller="evalTarget_list">
+	<ol class="breadcrumb">
+		<li><a href="#">组织</a></li>
+		<li><a href="#">列表</a></li>
+	</ol>
+	<section class="content" id="searchEvalTargetSection"  >
+
+		<div class="box box-info">
+			<!-- form start -->
+			<form class="form-horizontal" id="searchEvalTargetForm">
+				<div class="box-body">
+					<div class="row">
+						<div class="col-sm-2">
+							<div class="btn-group">
+								<a class="btn btn-success btn-sm" id="addBtn" func="sysuser-list-add"> 
+								<span class="glyphicon glyphicon-plus"></span> 添加
+								</a>
+								<button class="btn btn-danger btn-sm" type="button" id="deleteBtn" func="sysuser-list-del">
+									<span class="glyphicon glyphicon-minus"></span> 删除
+								</button>
+								<button type="button"  id="selectUserBtn"  class="btn btn-sm btn-primary">
+			                        <i class="fa fa-floppy-o"></i> 提交并选择关联账户
+			                    </button>
+			                    
+							</div>
+						</div>
+						<div class="col-sm-4">
+							<div class="input-group">
+								<span class="input-group-addon">名称</span> 
+								<input type="text" name="name" class="form-control input-sm" id="code" placeholder="项目名称">
+							</div>
+						</div>
+						<div class="col-sm-4">
+							<div class="input-group">
+								<span class="input-group-addon">类型</span> 
+								<select id="type" name="type" class="form-control select2 input-sm">
+                                	<option value=""></option>
+									<option  ms-for="el in @typeNames"  ms-attr="{value:el.value}">
+										{{el.name}}
+									</option>
+								</select>
+								<span
+									class="input-group-btn">
+									<button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+										<i class="fa fa-search"></i> 查询
+									</button>
+								</span>
+								</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<div class="box box-info" style="border-top: 0px;">
+			<div class="box-body" id="evalTargetList" style="margin-top: -10px;">
+				<table id="evalTargetListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th></th>
+							<th>名称</th>
+							<th>编码</th>
+							<th>类型</th>
+							<th>所属组织</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</section>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#evalTarget-list').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "evalTarget_list",
+    		        typeNames:{},
+    		        data: {}
+    		    })
+    		},
+			init : function() {
+				
+		        //page.validate();
+			},
+			
+			initView:function(){
+				page.namespace.getCodes(function(data){
+					page.model.vm.typeNames=data;
+				},"EVAL_TARGET");
+			},
+			
+			doQuery : function() {
+				page.listTable.ajax.reload();
+			},
+			doAdd : function() {
+				page.namespace.skiphtml("/pages/evalTarget/evalTarget-add.html");
+			},
+			doView : function(id) {
+				page.namespace.skiphtml("/pages/evalTarget/evalTarget-view.html?id=" + id);
+			},
+			doEdit : function(id) {
+				page.namespace.skiphtml("/pages/evalTarget/evalTarget-edit.html?id=" + id);
+			},
+			doDel : function(id) {
+				var HtmlMenuOpt = {
+					endpoint : "/evalTarget/deleteEvalTargetById",
+					data : {
+						'ids' : id
+					},
+					success : function(data) {
+						page.listTable.ajax.reload();
+					}
+				};
+
+				page.namespace.getRequest(HtmlMenuOpt);
+			},
+			doBatchDel : function() {
+				var selectRows = page.namespace.root.find('#evalTargetListTable').getSelectedRow();
+
+				if (selectRows.length == 0) {
+					alertTool.warning("请选择要删除的记录!");
+					return;
+				}
+				page.namespace.confirm(function(){
+					page.doDel(selectRows.join(","));
+				});
+			},
+			doRefreshCache : function() {
+				var HtmlMenuOpt = {
+					endpoint : "/evalTarget/loadCache"
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+			}
+		};
+
+		page.listTable = page.namespace.root.find('#evalTargetListTable').initDataTable({
+			url : "/evalTarget/getEvalTargetsByPage",
+			urlDataFn : function() {
+				return page.namespace.root.find("#searchEvalTargetForm").serializeJson();
+			},
+			lengthChange : false,
+			checkbox : true,
+			ops : {
+				view : function(id, rowData) {
+					page.doView(id);
+				},
+				del : function(id, rowData) {
+					page.doDel(id);
+				},
+				edit : function(id, rowData) {
+					page.doEdit(id);
+				}
+			},
+			columns : [ {
+				"data" : "name",
+				"width" : "10%"
+			}, {
+				"data" : "code",
+				"width" : "15%"
+			},{
+				"data" : "typeName",
+				"width" : "15%"
+			},{
+				"data" : "orgName",
+				"width" : "15%"
+			}]
+		});
+
+		page.init();
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+		
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+		page.namespace.root.find('#addBtn').on('click', page.doAdd);
+		page.namespace.root.find('#deleteBtn').on('click', page.doBatchDel);
+		
+		
+		page.namespace.root.find('#selectUserBtn').on('click',function(){
+			
+			var selectRows = page.namespace.root.find('#evalTargetListTable').getSelectedRow();
+			if (selectRows.length == 0) {
+				alertTool.warning("请选择记录!");
+				return;
+			}
+			if (selectRows.length > 1) {
+				alertTool.warning("only one!");
+				return;
+			}
+			page.namespace.modal.open(page,
+					{	id:"selectUserModal",
+						title:"绑定用户",
+						hidden : function(e,ra){
+							//alert("hide modal  "+ JSON.stringify(ra[0]) );
+						}
+					},'/pages/evalTarget/evalTarget-user-pop.html',{evalTargetId : selectRows[0]});
+		});
+		
+		
+	});
+</script>

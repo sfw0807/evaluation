@@ -1,0 +1,211 @@
+<namespace id="evalTarget-user-list" ms-controller="evalTarget_user_list">
+	<ol class="breadcrumb">
+	    <li><a href="#">被评对象</a></li>
+	    <li><a href="#">选择关联账户</a></li>
+	</ol>
+	<!--</section>-->
+	<section class="content" id="searchSysUserSection" ms-controller="sysuser_view">
+		
+		<div class="row ">
+            <div class="col-sm-12">
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+        </div>
+		
+		<div class="col-sm-5">
+			<div>
+				<form class="form-horizontal" id="searchUnbindUserForm">
+				<div class="row">
+                        <div class="col-sm-6 ">
+                            <div class="input-group">
+                                <span class="input-group-addon">名称</span>
+                                <input type="text" name="name" id="name" class="form-control input-sm" placeholder="用户名称">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                            	<span class="input-group-addon">账号</span>
+                                <input type="text" name="userAccount" id="code" class="form-control input-sm" placeholder="用户账号">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+                                        <i class="fa fa-search"></i> 查询
+                                    </button>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+			</form>
+			</div>
+			<div>
+			<table id="sysuserUnbindListTable"
+					class="table dataTable row-border cell-border" cellspacing="0"
+					width="100%">
+					<thead>
+						<tr>
+							<th></th>
+							<th>用户账号</th>
+							<th>用户名称</th>
+							<th>用户描述</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+		
+		<div class="col-sm-2">
+		<button  id="bindUserBtn"  type="button" 
+							class="btn btn-primary btn-sm" >
+								&gt;
+						</button>
+						<br/>
+						<br/>
+						<br/>
+						<br/>
+						<button  id="unbindUserBtn"  type="button" 
+							class="btn btn-primary btn-sm" >
+								&lt;
+						</button>
+		</div>
+		
+		<div class="col-sm-5">
+		<table id="sysuserBindListTable"
+					class="table dataTable row-border cell-border" cellspacing="0"
+					width="100%">
+					<thead>
+						<tr>
+							<th></th>
+							<th>用户账号</th>
+							<th>用户名称</th>
+							<th>用户描述</th>
+						</tr>
+					</thead>
+				</table>
+		</div>
+		
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#evalTarget-user-list').namespace(),
+			model:{
+				vm:avalon.define({
+			        $id: "evalTarget_user_list",
+			        data: {}
+			    })
+			},
+			doQuery : function() {
+				page.userUnbindTable.ajax.reload();
+			},
+			init : function(){
+				page.namespace.modal.registerParent(page,'selectUserModal');
+				page.namespace.modal.registerReturn(page,'selectUserModal',function(){
+					return {id : ' modal page '};
+				});
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/evalTarget/evalTarget-list.html');
+			}
+		}
+		
+		page.init();
+		
+		$root=page.namespace.root;
+		
+		$evalTargetId=page.namespace.modal.param(page,"selectUserModal","evalTargetId");
+
+		page.userUnbindTable = $root.find('#sysuserUnbindListTable').initDataTable({
+			url : "/evalTarget/getUnbindUser",
+			urlDataFn : function() {
+				var obj= $root.find("#searchUnbindUserForm").serializeJson();
+				obj.disabled=1;
+				obj.evalTargetId=$evalTargetId;
+				return obj;
+			},
+			lengthChange : false,
+			checkbox : true,
+			paging:false,
+			columns : [ {
+				"data" : "userAccount",
+				"orderable" : false,
+				"width" : "15%"
+			}, {
+				"data" : "name",
+				"width" : "10%"
+			}, {
+				"data" : "description",
+				"width" : "15%"
+			} ]
+		});
+		
+		
+		page.userBindTable = $root.find('#sysuserBindListTable').initDataTable({
+			url : "/evalTarget/getBindUser",
+			urlDataFn : function() {
+				return {evalTargetId : $evalTargetId};
+			},
+			lengthChange : false,
+			checkbox : true,
+			paging:false,
+			columns : [ {
+				"data" : "userAccount",
+				"orderable" : false,
+				"width" : "15%"
+			}, {
+				"data" : "name",
+				"width" : "10%"
+			}, {
+				"data" : "description",
+				"width" : "15%"
+			} ]
+		});
+		
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+		
+		$root.find('#bindUserBtn').on('click',function(){
+			
+			var selectRows = $root.find('#sysuserUnbindListTable').getSelectedRow();
+			var HtmlMenuOpt = {
+					endpoint : "/evalTarget/bindEvalTargetUser",
+					data : {
+						 'evalTargetId' : $evalTargetId,
+						'userId' : selectRows.join(',')
+					},
+					success : function(data) {
+						alertTool.success("关联成功");
+						page.userBindTable.ajax.reload();
+						page.userUnbindTable.ajax.reload();
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+		
+		});
+		
+		$root.find('#unbindUserBtn').on('click',function(){
+			var selectRows = $root.find('#sysuserBindListTable').getSelectedRow();
+			var HtmlMenuOpt = {
+					endpoint : "/evalTarget/unbindEvalTargetUser",
+					data : {
+						 'evalTargetId' : $evalTargetId,
+						'userId' : selectRows.join(',')
+					},
+					success : function(data) {
+						alertTool.success("解绑成功");
+						page.userBindTable.ajax.reload();
+						page.userUnbindTable.ajax.reload();
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+			
+		});
+		
+		$root.find('#btnCancel').on('click', page.doCancel);
+		
+	});
+</script>

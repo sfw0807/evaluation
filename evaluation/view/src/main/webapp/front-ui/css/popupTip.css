@@ -1,0 +1,75 @@
+#processTip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10000;
+    _position: absolute;
+    _top: expression(eval(document.documentElement.scrollTop));
+    height: 0;
+    overflow: visible;
+    font-family: "微软雅黑";
+}
+
+    #processTip .pro_success, #processTip .pro_warning {
+        margin: 100px auto 0;
+        background: url(Images/in-bg.png);
+        width: 367px;
+        height: 221px;
+        padding-left: 40px;
+        padding-top: 40px;
+        display: none;
+    }
+
+        #processTip .pro_success div {
+            background: url(Images/in-success.gif) no-repeat;
+            padding-left: 80px;
+            line-height: 81px;
+        }
+
+    #processTip .pro_loading {
+        background: url('../Images/preloader.gif') 10px center no-repeat #fff;
+    }
+
+    #processTip .pro_warning div {
+        background: url(Images/in-warn.gif) no-repeat;
+        padding-left: 80px;
+        line-height: 81px;
+    }
+
+.floatBoxBg {
+    display: none;
+    position: fixed;
+    _position: absolute;
+    background: black;
+    top: 0;
+    left: 0;
+    display: none;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    /*background-color: #000;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    width: 100%;
+    height: 1000px;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    -moz-opacity: 0.5;*/
+}
+
+.floatBox {
+    display: none;
+    position: fixed;
+    _position: absolute;
+    /*height: 245px;*/
+    /*width: 300px;*/
+    background: white;
+    /*border: 2px solid #95b8e7;*/
+    z-index: 2;
+    /*padding: 12px;
+    font-size: 13px;
+    overflow-y: scroll;*/
+}

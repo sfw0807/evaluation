@@ -1,0 +1,86 @@
+<namespace id="dictionaryData-view" ms-controller="dictionaryData_view">
+    <ol class="breadcrumb">
+        <li><a href="#">字典明细管理</a></li>
+        <li><a href="#">明细</a></li>
+    </ol>
+	<section class="content" id="viewDictionaryDataSection" ms-controller="dictionaryData_view">
+        <div class="box box-info">
+            <div class="row ">
+            <div class="col-sm-12">
+                <!-- 右对齐的 btn-group -->
+                <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 31px;">
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="box-body">
+   				<form role="form"  id="viewDictionaryDataForm" class="form-horizontal">
+   					<div class="form-group">
+	   			 		<label for="name" class="col-sm-1 control-label input-sm">字典名称</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="name" class="form-control input-sm label-form-control" 
+	   			 			>{{@data.dictName}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="name" class="col-sm-1 control-label input-sm">描述</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="name" class="form-control input-sm label-form-control" 
+	   			 			>{{@data.name}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="code" class="col-sm-1 control-label input-sm">键值</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="code"  class="form-control label-form-control input-sm" 
+	   			 			>{{@data.value}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="code" class="col-sm-1 control-label input-sm">排序</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="code"  class="form-control label-form-control input-sm" 
+	   			 			>{{@data.sequence}}</span>
+	   			 		</div>
+	   			 	</div>
+   				</form>
+        </div>
+	</section>
+</namespace>
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#dictionaryData-view').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "dictionaryData_view",
+    		        dicNames:{},
+    		        data: {}
+    		    })
+    		},
+			doCancel : function() {
+				page.namespace.skiphtml("/pages/dictionary/dictionaryData-list.html");
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/dictionary/getDictionaryDataById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		};
+		
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+	});
+</script>

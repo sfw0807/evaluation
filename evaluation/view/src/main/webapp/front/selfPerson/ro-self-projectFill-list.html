@@ -1,0 +1,342 @@
+<style type="text/css">
+    #targetNameList {
+        padding: 0 0 0 0px;
+        margin: 0;
+        color: #0072B3;
+        height: 50px;
+        width: 95%;
+        line-height: 60px;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .blue {
+        color: #2D92BF;
+		font-weight:bold;
+    }
+
+    .scoreContent {
+        height: 50px;
+        margin: 0 30px 0 30px;
+        line-height: 40px;
+    }
+
+    #headInfo h4 {
+        font-weight: 600;
+    }
+
+    #MonitorInformation_list td {
+        border-right: 1px solid #cccccc;
+    }
+
+    #MonitorInformation_list th {
+        border-right: 1px solid #cccccc;
+        background-color: #f1f1f1;
+        font-weight: normal;
+        color: #2D92BF;
+        text-align: center;
+    }
+
+    .bblue {
+        background-color: #F5FAFC;
+        text-align: center;
+        color: #0072B3;
+    }
+
+    .bwhite {
+        background-color: #FFFFFF;
+    }
+
+    th {
+        text-align: center;
+    }
+
+    #TargetScoreMaintain_list td {
+        text-align: center;
+        overflow: hidden;
+    }
+
+    #scoreBody td {
+        overflow: hidden;
+        vertical-align: middle;
+    }
+
+    #AttachmentBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #StudentCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #TeacherCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #InspectorMaterialBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<style type="text/css" id="treeview-style"> 
+	.treeview .list-group-item{
+		cursor:pointer
+	}
+	
+	.treeview span.indent{
+		margin-left:10px;margin-right:10px
+	}
+	
+	.treeview span.icon{
+		width:12px;margin-right:5px
+	}
+	
+	.treeview .node-disabled{
+		color:silver;cursor:not-allowed
+	}
+	
+	.node-treeview{}
+	
+	.node-treeview:not(.node-disabled):hover{
+		background-color:#F5F5F5;
+	} 
+</style>
+<!-- 中间树形结构开始 -->
+<div id="mainFrameContainer">
+	<div id="mainBody">
+		<div id="" style="width: 100%">
+			<div id="treeContent" style="background-color: white; width: 20%; float: left; margin-right: 0.5%;">
+				<div style="width: 100%; text-align: center">
+	            	<h4>
+		                <img style="cursor: pointer" src="../front-ui/Images/star/refresh.png">
+		                <a id="refreshData" href="javascript:void(0);">刷新指标完成度</a>
+	               </h4>
+	       		</div>
+	       		
+	       		<div id="treeview" style="width: 100%;" class="treeview">
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 中间树形结构结束 -->
+
+<!-- 顶层区域 -->
+<div id=" maincontent" style="width: 79.5%; float: left; margin: 0; background-color: #FFFFFF; padding-bottom: 20px;">
+	<!-- 左侧顶层区域  开始 -->
+	<div id="headInfo" style="padding: 10px; width: 100%; height: 122px; border: 1px;">
+	    <div id="headInfoChild" style="width: 100%; height: 102px; background-color: #F1FAFC;">
+	         <h4 id="targetNameList"><span id="projectName"></span><span id="itemName"></span></h4>
+	        <div style=" height: 2px; width:100%; background-color: #CCCCCC">
+	            <div style="float: left; width: 20%; height: 2px; background-color: #0072B3;"></div>
+	        </div>
+	        <h4 id="targetScoreInfo" style="margin: 0;">
+	            <span class="scoreContent">最高分：<span id="highestScore" class="red">0</span>分</span>
+	            <span class="scoreContent">当前总分：<span id="currentScore" class="red">0</span>分</span>
+	            <span class="scoreContent">被评对象：<span id="targetObjectName" class="red"></span></span>
+	            <!--<span class="scoreContent"><input type="button" id="alertAttach" value="弹出附件框"></span>-->
+	            <!-- <a href="javascript:;" style="float: right; padding: 10px 30px 0px 0px; font: normal 15px Arial; text-decoration:underline;">五星评价佐证材料模板</a> -->
+	        </h4>
+	    </div>
+	</div>
+	
+     <!-- 左侧得分点区域开始 -->
+    <div style="padding: 10px;">
+        <h4 class="blue">得分点</h4>
+        <div style="height: 2px; width: 100%; background-color: #CCCCCC; margin-bottom: 10px;">
+            <div style="float: left; width: 20%; height: 2px; background-color: #2D92BF;"></div>
+        </div>
+        <table id="TargetScoreMaintain_list" border="0" cellspacing="0" cellpadding="0" class="table table-hover table-bordered lead-list">
+            <thead class="trThread">
+            <tr>
+                <th width="5%">序号</th>
+                <th width="30%">得分项描述</th>
+                <th width="15%">填报项</th>
+                <th width="8%">最高分值</th>
+                <th width="8%">自评分</th>
+            </tr>
+            </thead>
+            <tbody id="scoreBody">
+			</tbody>
+		</table>
+	</div>
+	<!-- 左侧得分点区域结束 -->
+</div>
+<!-- 左侧顶层区域  结束 -->
+<script type="text/javascript">
+	$(function(){
+		var page = {
+			currentScore : 0 ,
+			pageData : [] ,
+			getTree : function(){
+	            $.post(WEB_ROOT + "/measureItem/getMeasureItemFrontTree", {"projectId" : page.GetQueryString("projectId")}, function(data){
+	            	page.pageData = data.data;
+	            	page.initTree() ;
+	            }, "json") ;
+			},
+			init : function(){
+				if(window.$_params.currentTargetObj != null) {
+					if(window.$_params.currentTargetObj.name != null) {
+						$("#targetObjectName").text(window.$_params.currentTargetObj.name) ;
+					}
+				}
+				
+				/* if(window.$_params.currentProjectDetail != null){
+					if(window.$_params.currentProjectDetail.score != null) {
+						$("#highestScore").text(window.$_params.currentProjectDetail.score) ;
+					}
+				} */
+			},
+			initTree : function() {
+				$('#treeview').treeview({
+		            data: page.pageData, 
+		            expandIcon: "expand-icon glyphicon glyphicon-chevron-right",
+		            collapseIcon: "expand-icon glyphicon glyphicon-chevron-down",
+		            levels: 5,
+		            onhoverColor: "#E8E8E8",
+		            showBorder: false,
+		            showTags: true,
+		            highlightSelected: true,
+		            highlightSearchResults:false,
+		            multiSelect: false,
+		            onNodeSelected :function(event, data) {// 选中事件
+		            	$("#itemName").empty() ;
+		            	$("#itemName").append("-"+data.text) ;
+		            	// 根据指标项查询得分填报项
+		            	page.showScoreItem(data.id) ;
+		            	// 获取指标向下的最高分
+		            	page.getMeausureHighScore(data.id) ;
+		            }
+		        });
+			},
+			loadProject : function(projectId) {
+				$.post(WEB_ROOT + "/project/getProjectById", {"id" : projectId}, function(data){
+					$("#projectName").text(data.data.name) ;
+	            }, "json") ;
+			},
+			GetQueryString : function(name) {
+				var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+			    var r = window.location.search.substr(1).match(reg);
+			    if(r!=null) return  unescape(r[2]); return null;
+			},
+			showScoreItem : function(parentQuota) {
+				var params = {
+					"parentQuota" : parentQuota,
+					"targetId" : window.$_params.currentTargetObj.id
+				} ;
+				$.post(WEB_ROOT + "/scoreItem/getScoreItemByParentQuota", params, function(data){
+					var html = "" ;
+					for(var i = 0; i < data.length; i++) {
+						html += "<tr class='lead-item lead-even'>" ;
+						html += "<td>"+data[i].serialNumber+"</td>" ;
+						html += "<td style='text-align: left;'>"+data[i].scoreItemName+"</td>" ;
+						if(data[i].reportType) {
+							if(data[i].hasFillItem) {
+								html += "<td><a data-scoreItemId='"+data[i].id+"' data-scoreItemDesc='"+data[i].scoreItemDesc+"' href='javascript:void(0);'>填报</a></td>" ;
+							}else{
+								html += "<td>-</td>" ;
+							}
+						}else {
+								html += "<td>-</td>" ;
+						}
+						
+						html += "<td>"+data[i].highestScore+"</td>" ;
+						html += "<td style='padding:0;'>" ;
+						if(data[i].selfEvaType) {
+							html += "<input readonly='readonly' id='"+data[i].id+"' data-highestScore='"+data[i].highestScore+"' type='number' min='0' name='"+data[i].id+"' style='width:60px;height:30px;text-align:center;' class='form-control' value='"+data[i].selfScore+"'>" ;
+						}else {
+							html += "<input id='"+data[i].id+"' disabled='disabled' type='number' min='0' name='"+data[i].id+"' style='width:60px;height:30px;text-align:center;' class='form-control' value='"+data[i].selfScore+"'>" ;
+						}
+						html += "</td>" ;
+						html += "<td style='display: none;'>"+data[i].id+"</td>" ;
+						html += "</tr>" ;
+					}
+					$("#scoreBody").empty() ;
+					$("#scoreBody").append(html) ;
+	            }, "json") ;
+			}, 
+			saveScoreItemScore : function(){
+				var reg = /^\d+$/;
+				if(!reg.test($(this).val()) && $(this).val() != '') {
+					alert("请输入非负整数！") ;
+					return ;
+				}
+
+				if(parseFloat($(this).attr("data-highestScore")) < parseFloat($(this).val())) {
+					$(this).val($(this).attr("data-highestScore")) ;
+				}
+				
+				// 获取被评对象
+				var params = {} ;
+				params.itemId = $(this).attr("id") ;
+				params.evalTargetId = window.$_params.currentTargetObj.id ;
+				params.score = $(this).val() ;
+				$.post(WEB_ROOT + "/itemScore/updateSelfScore", params, function(data){
+					// 保存得分
+				},"json") ;
+			},
+			doFill : function(){
+				var scoreItemId = $(this).attr("data-scoreItemId") ;
+				var params = {} ;
+				params.scoreItemId = scoreItemId ;
+				params.projectId = window.$_params.currentProjectId ;
+				
+				// 调用Ajax请求判断是编辑还是填报
+				$.post(WEB_ROOT + "/fillScoreItem/getAnswerByScoreId",{"params" : JSON.stringify(params)},function(data){
+					alert(data.rptPubAnswerId) ;
+				},"json") ;
+				/* cjs.modal.open(
+						{	id:"scoreItemFillModel",
+							title:"得分项描述",
+							hidden : function(e,ra){
+								//console.log("hide modal  "+ JSON.stringify(ra[0]) );
+							}
+						},'/front/selfPerson/projectFill-fill-add.html',{
+								scoreItemId : $(this).attr("data-scoreItemId"),
+								scoreItemDesc:$(this).attr("data-scoreItemDesc")
+							}); */
+			}, 
+			alertAttach : function() {
+				cjs.modal.open(
+						{	id:"alertAttachModel",
+							title:"附件列表",
+							hidden : function(e,ra){
+								console.log("hide modal  "+ JSON.stringify(ra[0]) );
+							}
+						},'/front/selfPerson/scoreItem-attach.html',{scoreItemId : $(this).attr("data-scoreItemId"), projectId : page.GetQueryString("projectId")});
+			 },
+			computeCurrScore : function(){
+				page.currentScore = 0 ;
+				$("input[type=number]").each(function() {
+					if($(this).val() != '') {
+						page.currentScore += parseFloat($(this).val()) ;
+					}
+				}) ;
+				$("#currentScore").text(page.currentScore) ;
+			},
+			getMeausureHighScore : function(itemId){
+				$.post(WEB_ROOT + "/measureItem/getMeasureItemById", {"id" : itemId}, function(data){
+					$("#highestScore").text(data.data.score) ;
+				}, "json") ;
+			}
+		} ;
+		
+		page.init() ;
+		// 初始化树
+		page.getTree() ;
+		page.loadProject(page.GetQueryString("projectId")) ;
+		
+		$("#scoreBody").on("change", "input", page.saveScoreItemScore) ;
+		$("#scoreBody").on("click", "a", page.doFill) ;
+		$("#alertAttach").on("click", page.alertAttach) ;
+		
+		setInterval(page.computeCurrScore,2000) ;
+	});
+</script>

@@ -1,0 +1,131 @@
+<namespace id="questionnaire-view">
+    <ol class="breadcrumb">
+        <li><a href="#">问卷</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+    <!-- main content -->
+    <section class="content" id="listQuestionnaireSection">
+        <div class="box box-info">
+            <fieldset>
+                <legend>
+                    <label class="col-sm-1 control-label input-sm">
+                        问卷名称：XXX名称
+                    </label>
+                    <label class="col-sm-1 control-label input-sm">
+                        问卷描述：<span>XXX描述</span>
+                    </label>
+                    <label class="col-sm-1 control-label input-sm">
+                        总分：<span>100</span>
+                    </label>
+                </legend>
+            </fieldset>
+        </div>
+
+        <div class="box-body">
+            <fieldset>
+                <div  class="col-sm-9">
+                    <!-- form start -->
+                    <form class="form-horizontal" id="questionnaireForm" ms-controller="questionnaire_view">
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="btn-group">
+                                        <a class="btn btn-info btn-sm" id="backQuestionnaireBtn">
+                                            <span class="glyphicon glyphicon-tag"></span> 返回
+                                        </a>
+                                    </div>
+                                </div>
+                                <div>
+                                    <!-- 设置隐藏域的值 -->
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="box box-info" style="border-top: 0px;">
+                        <div class="box-body" id="questionnaireList" style="margin-top: -10px;">
+                            <div>
+                                1、十万个为什么<br/>
+                                <span><input type="checkbox">A、为什么一</span><br/>
+                                <input type="checkbox">B、为什么二<br/>
+                                <input type="checkbox">C、为什么三<br/>
+                                <input type="checkbox">D、为什么四<br/>
+                                <a class="btn btn-warning btn-sm">
+                                    <span class="glyphicon glyphicon-edit"></span> 修改
+                                </a>
+                                <button class="btn btn-danger btn-sm" type="button">
+                                    <span class="glyphicon glyphicon-minus"></span> 删除
+                                </button>
+                            </div>
+                            <div>
+                                <span>2、中国古代的诗歌发展在什么时候？</span><br/>
+                                <input type="radio">A、唐朝<br/>
+                                <input type="radio">B、宋朝<br/>
+                                <input type="radio">C、元朝<br/>
+                                <input type="radio">D、明朝<br/>
+                                <a class="btn btn-warning btn-sm">
+                                    <span class="glyphicon glyphicon-edit"></span> 修改
+                                </a>
+                                <button class="btn btn-danger btn-sm" type="button">
+                                    <span class="glyphicon glyphicon-minus"></span> 删除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </section>
+</namespace>
+<script type="text/javascript">
+    $_ready(function() {
+        var page = {
+            namespace : $('#questionnaire-view').namespace(),
+            model:{
+                vm:avalon.define({
+                    $id : "questionnaire_view",
+                    data : {}
+                })
+            },
+            init : function() {
+                // 初始化获取问卷列表
+                page.namespace.getRequest({
+                    endpoint : "/questionnaire/getQuestionnaireList" ,
+                    data : {"projectId" : page.namespace.getParam("projectId")} ,
+                    success : function(data){
+                        page.namespace.root.find("#questionnaireList").empty() ;
+                        // 拼接习题列表
+                        var html = "" ;
+                        if(data != null && data.length > 0) {
+                            for(var i= 0 ; i < data.length; i++) {
+                                html += "<div>"
+                                html += data[i].questionCode + "、" +  data[i].questionContent + "<br/>";
+                                if (data[i].questionType === "1") {// 单选、多选
+                                    for (var j = 0 ; j < data[i].options.length; j++) {
+                                        html += "<span><input type='radio'>"+data[i].options[j].optName+"、"+data[i].options[j].optContent+"</span><br/>" ;
+                                    }
+                                }else if (data[i].questionType === "2"){
+                                    for (var j = 0 ; j < data[i].options.length; j++) {
+                                        html += "<span><input type='checkbox'>"+data[i].options[j].optName+"、"+data[i].options[j].optContent+"</span><br/>" ;
+                                    }
+                                }
+
+                                html += "</div>" ;
+                            }
+                        }
+                        page.namespace.root.find("#questionnaireList").append(html) ;
+                    },
+                    failure : function() {
+                        alertTool.error("系统错误");
+                    }
+                }) ;
+            },
+            backQuestionnaire : function(){
+                page.namespace.skiphtml('/pages/questionnaire/questionnaire-list.html?') ;
+            }
+        } ;
+
+        page.init() ;
+        page.namespace.root.find("#backQuestionnaireBtn").on("click", page.backQuestionnaire) ;
+    });
+</script>

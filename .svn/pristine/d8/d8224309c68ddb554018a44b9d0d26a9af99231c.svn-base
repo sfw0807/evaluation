@@ -1,0 +1,7 @@
+mail.host = mail.fengyuntec.com
+mail.sender = jiraadmin@fengyuntec.com
+mail.username = jiraadmin
+mail.password = @#ggtASD,.123
+mail.subject = \u5BC6\u7801\u627E\u56DE
+mail.message = http://localhost:8080/web/sysuser/toforgetPassword
+mail.timeout=2

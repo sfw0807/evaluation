@@ -1,0 +1,167 @@
+<ul id="analysisTab" class="nav nav-tabs">
+    <li class="active">
+        <a id="tabbBtn1" href="#tab1" data-toggle="tab"
+           onclick='showPage("tab1","/front/analysis/analysis_target_radar_lv1.html")'>总雷达图</a>
+    </li>
+    <li><a href="#tab2" data-toggle="tab" onclick='showPage("tab2","/front/analysis/analysis_target_radar_lv2.html")'>指标雷达图</a>
+    </li>
+    <li><a href="#tab3" data-toggle="tab"
+           onclick='showPage("tab3","/front/analysis/analysis_target_score.html")'>得分汇总表</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="tab1">
+    </div>
+    <div class="tab-pane fade" id="tab2">
+    </div>
+    <div class="tab-pane fade" id="tab3">
+    </div>
+</div>
+
+<script language="javascript">
+
+    function showPage(tabId, url) {
+        url = VIEW_ROOT + url;
+        $('#analysisTab a[href="#' + tabId + '"]').tab('show'); // 显示点击的tab页面
+        $('#' + tabId).load(url); // ajax加载页面
+    }
+    $("#tabbBtn1").click();
+
+    function loadRadarData(divId, data) {
+        var m = [];
+        var val1 = [];
+        var val2 = [];
+        for (var i = 0; i < data.length; i++) {
+            var obj = {};
+            obj['name'] = data[i].name;
+            obj['max'] = 1;
+            m[i] = obj;
+            val1[i] = data[i].scoreRate;
+        }
+        // 基于准备好的dom，初始化echarts图表
+        var myChart = echarts.init(document.getElementById(divId));
+        option = {
+            title: {
+                text: ''
+            },
+            tooltip: {},
+            legend: {
+                data: ['本校得分率', '同类校得分率']
+            },
+            radar: {
+                // shape: 'circle',
+                indicator: m
+            },
+            series: [{
+                name: '',
+                type: 'radar',
+                // areaStyle: {normal: {}},
+                data: [
+                    {
+                        value: val1,
+                        name: '本校得分率'
+                    },
+                    {
+                        value: val2,
+                        name: '同类校得分率'
+                    }
+                ]
+            }]
+        };
+        // 为echarts对象加载数据
+        myChart.setOption(option);
+    }
+
+    function loadTableData(divId, data, showFooter) {
+//        $.getScript(VIEW_ROOT + "/front-ui/js/bootstrap-table/jquery.base64.js");
+        $('#' + divId).bootstrapTable({
+            method: 'get',
+            cache: false,
+            striped: true,                      //是否显示行间隔色
+            showColumns: true,
+            clickToSelect: true,
+//            pagination: true,
+            showFooter: showFooter > 0 ? true : false,
+            columns: [{
+                field: "name",
+                title: "指标",
+                align: "center",
+                sortable: "true",
+                footerFormatter: "总计"
+            }, {
+                field: "score",
+                title: "总分",
+                align: "center",
+                sortable: "true",
+                footerFormatter: scoreSumFormatter
+            }, {
+                field: "finalScore",
+                title: "本校得分",
+                align: "center",
+                sortable: "true",
+                footerFormatter: scoreRateSumFormatter
+            }, {
+                field: "scoreRate",
+                title: "本校得分率",
+                align: "center",
+                sortable: "true"
+            }, {
+                field: "smScoreRate",
+                title: "同类校得分率",
+                align: "center",
+                sortable: "true"
+            }],
+            data: data
+        })
+        ;
+
+        $(window).resize(function () {
+            $('#reportTable').bootstrapTable('resetView');
+        });
+    }
+    function scoreSumFormatter(data) {
+        var sumNum = 0;
+        for(var i = 0; i < data.length; i++){
+            sumNum += parseFloat(data[i].score);
+        }
+        return sumNum;
+    }
+    function scoreRateSumFormatter(data) {
+        var sumNum = 0;
+        for(var i = 0; i < data.length; i++){
+            sumNum += parseFloat(data[i].scoreRate);
+        }
+        if(sumNum <= 0){
+            return "0.0";
+        }else{
+            return sumNum;
+        }
+    }
+    function addChartElement(parentObj, childId, title) {
+        var btnId = "r_Btn" + childId;
+        var titleElement = $('<div ><div style="width:90%; float:left; text-align:center"><span style="margin-left:5%">'
+            + title + '</span></div><div style="width:10%; float:right"><button class="btn btn-primary btn-sm" id="'+ btnId +'">返回</button></div></div>');
+        titleElement.css("padding", "20px");
+        titleElement.appendTo(parentObj);
+        $("#" + btnId).click(function () {
+            var url = VIEW_ROOT + "/front/analysis/analysis-target-select.html" ;
+            $("#frameContainer").load(url, function(){}) ;
+        });
+        var chartElement = $('<div></div>');
+        chartElement.attr("id", childId);
+        chartElement.css("height", "400px");
+        chartElement.appendTo(parentObj);
+    }
+    function addTableElement(parentObj, childId) {
+        var divElement = $('<div></div>');
+        var tableElement = $('<table></table>');
+        tableElement.attr("id", childId);
+        tableElement.appendTo(divElement);
+        divElement.appendTo(parentObj)
+    }
+    $(".btn btn-primary btn-sm").click(function(){
+        var url = VIEW_ROOT + "/front/analysis/analysis-target-select.html" ;
+        $("#frameContainer").load(url, function(){
+
+        }) ;
+    });
+</script>

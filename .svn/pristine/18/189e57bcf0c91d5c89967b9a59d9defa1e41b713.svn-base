@@ -1,0 +1,629 @@
+<namespace id="approve-project">
+    <ol class="breadcrumb">
+        <li><a href="#">项目审批</a></li>
+        <li><a href="#">审核</a></li>
+    </ol>
+    <div class="box box-info">
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">项目基本信息</h3>
+                <div class="btn-group pull-right" style="margin-top: -25px;">
+                    <button type="button" id="passBtn" class="btn btn-sm btn-success">
+                        <i class="glyphicon glyphicon-ok-sign"></i> 通过
+                    </button>
+                    <button type="button" id="rollBackBtn" class="btn btn-sm btn-danger">
+                        <i class="glyphicon glyphicon-remove-sign"></i> 驳回
+                    </button>
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+            </div>
+            <div class="panel-body">
+            	<form class="form-horizontal">
+    				<div class="row">
+    					<div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">项目编号</label>
+                                <div class="col-sm-9">
+                                    <input name="projectCode" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.projectCode}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">项目名称</label>
+                                <div class="col-sm-9">
+                                    <input name="projectName"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.projectName}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">项目类型</label>
+                                <div class="col-sm-9">
+                                    <input name="projectType" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.projectTypeString}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">客户名称</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.customer}">
+                                </div>
+                            </div>
+                        </div>
+    				</div>
+    				
+    				<div class="row">
+    					<div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">合同编号</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.contractCode}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">签订日期</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.contractDate}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">开始日期</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.beginDate}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">结束日期</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.endDate}">
+                                </div>
+                            </div>
+                        </div>
+    				</div>
+
+    				<div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm" style="color: red;">合同金额</label>
+                                <div class="col-sm-9">
+                                    <span id="projectAmt" style="color: red; font-weight:bold;"  class="form-control label-form-control" th:text="${myproject.projectAmt}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm" style="color: red;">人力成本</label>
+                                <div class="col-sm-9">
+                                    <span id="resourceCost" style="color: red; font-weight:bold;"  class="form-control label-form-control"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm" style="color: red;">其他支出</label>
+                                <div class="col-sm-9">
+                                    <span id="expenseCost" style="color: red; font-weight:bold;"  class="form-control label-form-control"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm" style="color: red;">人力占比</label>
+                                <div class="col-sm-9">
+                                    <span id="resourceProp" style="color: red; font-weight:bold;"  class="form-control label-form-control"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    				<input type="hidden" id="projectId" name="projectId" th:value="${myproject.id}" style="width: 100%" />
+    			</form>
+            </div>
+    	</div>
+    	
+    	<div class="panel panel-default" style="margin-top:-20px;margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">现有人力列表</h3>
+            </div>
+            <div class="panel-body">
+            	<table id="resourceInListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>职位</th>
+                        <th>名字</th>
+                        <th>预计开始日期</th>
+                        <th>预计结束日期</th>
+                        <th>实际开始日期</th>
+                        <th>实际结束日期</th>
+                        <th>成本</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+    	</div>
+    	
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">申请资源列表</h3>
+            </div>
+            <div class="panel-body">
+            	<table id="resourceListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>职位</th>
+                        <th>名字</th>
+                        <th>预计开始日期</th>
+                        <th>预计结束日期</th>
+                        <th>实际开始日期</th>
+                        <th>实际结束日期</th>
+                        <th>状态</th>
+                        <th>安排</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        
+        <div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">项目收入</h3>
+            </div>
+            <div class="panel-body">
+            	<table id="inComeListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+	                    <tr>
+	                        <th>年月</th>
+	                        <th>费用</th>
+	                        <th>描述</th>
+	                    </tr>
+                    </thead>
+                </table>
+            </div>
+    	</div>
+    	
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">项目支出</h3>
+            </div>
+            <div class="panel-body">
+            	<table id="expenseListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+	                    <tr>
+	                        <th>年月</th>
+	                        <th>费用</th>
+	                        <th>描述</th>
+	                    </tr>
+                    </thead>
+                </table>
+            </div>
+    	</div>
+    	
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">审批申请及意见</h3>
+            </div>
+            <div class="panel-body">
+            	<form class="form-horizontal">
+            		<div class="row">
+            			<div class="col-sm-6">
+            				<div class="form-group">
+            					<label class="col-sm-1 control-label input-sm" style="text-align:center;">送审备注</label>
+            					<div class="col-sm-11">
+	            					<textarea rows="4" disabled="disabled" class="form-control input-sm" th:text="${myproject.remark}"></textarea>
+	            				</div>
+            				</div>
+                        </div>
+                        <div class="col-sm-6">
+                        	<div class="form-group">
+                        		<label class="col-sm-1 control-label input-sm" style="text-align:center;">审批意见</label>
+                        		<div class="col-sm-11">
+                        			<textarea id="approveRemark" rows="4" class="form-control input-sm" placeholder="请输入审批意见"></textarea>
+                        		</div>
+                        	</div>
+                        </div>
+            		</div>
+            	</form>
+            </div>
+    	</div>
+    </div>
+    
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:600px;">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">请选择要安排的资源</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label input-sm">资源状态</label>
+                                <button type="button" id="queryAllBtn" class="btn btn-sm btn-primary">全部</button>
+                                <button type="button" id="queryEmptyBtn" class="btn btn-sm btn-success">空闲</button>
+                                <button type="button" id="queryArrangeBtn" class="btn btn-sm btn-danger">已安排</button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon">职位</span>
+                                <select id="title" name="title" class="form-control input-sm select2">
+                                    <option selected="selected" value="">全部</option>
+                                    <option th:each="dict : ${title}" th:value="${dict.value}" th:text="${dict.name}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="listTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>状态</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>当前项目</th>
+                            <th>职位</th>
+                            <th>成本</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="btnConfim" type="button" class="btn btn-primary">确认</button>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="relatedId" name="relatedId" style="width: 100%" />
+        <input type="hidden" id="currentRowNum" name="currentRowNum" style="width: 100%" />
+        <input type="hidden" id="estBeginDate" name="estBeginDate" style="width: 100%" />
+        <input type="hidden" id="estEndDate" name="estEndDate" style="width: 100%" />
+        <input type="hidden" id="planStatus" name="planStatus" style="width: 100%" />
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $("#approve-project").namespace(),
+			init : function() {
+				$('#myModal').on('hide.bs.modal', function () {
+		            $("#listTable").dataTable().fnClearTable();
+		            $("#listTable").dataTable().fnDestroy();
+		        });
+				
+				page.getProjectCost();
+			},
+			getProjectCost : function() {
+				var opt = {
+					endpoint : "/pms/project/getProjectCost",
+					data : {
+						'id' : $("#projectId").val()
+					},
+					success : function(data) {
+						$("#resourceCost").html(data.resourceCost);
+						$("#expenseCost").html(data.expenseCost);
+						$("#resourceProp").html(data.resourceProp);
+						
+						page.format();
+					}
+				};
+
+				page.namespace.getRequest(opt);
+			},
+			format : function() {
+				$("#projectAmt").formatCurrency();
+				$("#expenseCost").formatCurrency();
+				$("#resourceCost").formatCurrency();
+			},
+			doArrange : function(id, rowNum) {
+				var rowData = $('#resourceListTable').getSelectedRowData(id);
+				
+				
+				$("#relatedId").val(id);
+				$("#currentRowNum").val(rowNum);
+				
+				$("#title").val(rowData.title);
+				$("#estBeginDate").val(rowData.estBeginDate);
+                $("#estEndDate").val(rowData.estEndDate);
+				
+				$('#listTable').initDataTable({
+                    url : "/pms/resource/getResourcePlan",
+                    urlDataFn : function() {
+                        return {
+                            estBeginDate:$("#estBeginDate").val(),
+                            estEndDate:$("#estEndDate").val(),
+                            title:$("#title").val(),
+                            planStatus: $("#planStatus").val()
+                        };
+                    },
+                    paging: false,
+                    checkbox : true,
+                    destroy : true,
+                    columns : [
+                        {"data" : "planStatus", "width" : "15%",
+                          "render" : function(data, type, row, meta) {
+                                if(data == '0') {
+                                    return '<label class="label label-danger">'+row.planStatusString+'</label>';
+                                } else if(data == '1') {
+                                    return '<label class="label label-success">'+row.planStatusString+'</label>';
+                                } else {
+                                    return '<label class="label label-default">'+row.planStatusString+'</label>';
+                                }
+                           }
+                        }, 
+                        {"data" : "name", "width" : "15%"}, 
+                        {"data" : "genderString", "width" : "10%"},
+                        {"data" : "projectName", "width" : "20%"}, 
+                        {"data" : "titleString", "width" : "20%"}, 
+                        {"data" : "cost", "width" : "10%"}
+                    ]
+                });
+				$("#myModal").modal("show");
+			},
+			doConfim : function() {
+				var checkRowData = $('#listTable').getAllClickedRowData();
+				
+				if (checkRowData.length == 0) {
+                    alertTool.warning("请选择资源!");
+                    return;
+                } else {
+                    if(checkRowData.length > 1) {
+                        alertTool.warning("只能选择一个资源!");
+                        return;
+                    } else {
+                        var table = $('#resourceListTable').DataTable();
+                        var dataSource = table.data().toArray();
+                        for(var i = 0;i < dataSource.length; i++) {
+                            if(dataSource[i].resourceId !=null && dataSource[i].resourceId !=undefined){
+                                if(checkRowData[0].id == dataSource[i].resourceId){
+                                    alertTool.warning("此资源已经选择，不能重复选择同一个资源!");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+				
+				var id = $("#relatedId").val();
+				
+				var rowData = $('#resourceListTable').getSelectedRowData(id);
+				rowData.resourceName = checkRowData[0].name;
+                rowData.resourceId = checkRowData[0].id;
+                rowData.relBeginDate = rowData.estBeginDate;
+                
+                $('#myModal').modal('hide');
+                $('#resourceListTable').dataTable().fnUpdate(rowData.resourceName,parseInt($("#currentRowNum").val()),1,null,false);
+                $('#resourceListTable').dataTable().fnUpdate(rowData.relBeginDate,parseInt($("#currentRowNum").val()),4,null,false);
+			},
+			doClear : function(id, rowNum) {
+                
+                var rowData = $('#resourceListTable').getSelectedRowData(id);
+				rowData.resourceName = "";
+                rowData.resourceId = "";
+                rowData.relBeginDate = "";
+                
+                $('#resourceListTable').dataTable().fnUpdate(rowData.resourceName,parseInt(rowNum),1,null,false);
+                $('#resourceListTable').dataTable().fnUpdate(rowData.relBeginDate,parseInt(rowNum),4,null,false);
+			},
+			doPass : function() {
+				var approveRemark = $('#approveRemark').val();
+				if(approveRemark == null || approveRemark == undefined || approveRemark == "") {
+					$('#approveRemark').focus();
+					alertTool.warning("请填写审批意见");
+					return;
+				}
+				
+				var table = $('#resourceListTable').DataTable();
+                var par = "?projectId="+$("#projectId").val();
+                var dataSource = table.data().toArray();
+                
+                for(var i = 0; i < dataSource.length; i++) {
+                    var resourceId =   dataSource[i].resourceId === null ?"":dataSource[i].resourceId;
+                    var relBeginDate =   dataSource[i].relBeginDate === null ?"":dataSource[i].relBeginDate;
+                	par += "&approve["+ i +"].id="+dataSource[i].id +"&";
+                    par += "approve["+ i +"].resourceId="+ resourceId + "&";
+                    par += "approve["+ i +"].relBeginDate="+ relBeginDate;
+                }
+                var opt = {
+                    endpoint : "/pms/project/approveProjectPass" + par,
+                    data : {approveRemark:$('#approveRemark').val()},
+                    
+                    success : function(data) {
+                        alertTool.success("审批成功!");
+                        page.namespace.skiphtml("/pms/project/toApproveList");
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                    }
+                };
+                page.namespace.getRequest(opt);
+			},
+			doRollBack : function() {
+				var table = $('#resourceListTable').DataTable();
+                var par = "?projectId=" + $("#projectId").val();
+                var dataSource = table.data().toArray();
+                for(var i = 0;i < dataSource.length; i++) {
+                    par += "&approve["+ i +"].id="+dataSource[i].id +"&";
+                    par += "approve["+ i +"].resourceId="+dataSource[i].resourceId + "&";
+                    par += "approve["+ i +"].relBeginDate="+dataSource[i].relBeginDate;
+                }
+                var HtmlMenuOpt = {
+                    endpoint : "/pms/project/approveProjectBack" + par,
+                    data : {approveRemark:$('#approveRemark').val()},
+                    success : function(data) {
+                        alertTool.success("驳回成功!");
+                        page.namespace.skiphtml("/pms/project/toApproveList");
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                    }
+                };
+                page.namespace.getRequest(HtmlMenuOpt);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml("/pms/project/toApproveList");
+			}
+		};
+		
+		// 项目现有人力列表
+		page.resourceInListTable = $('#resourceInListTable').initDataTable({
+            url : "/pms/project/getResourceInProject",
+            urlDataFn : function() {
+                return {id:$("#projectId").val()};
+            },
+            paging: false,
+            checkbox : false,
+            columns : [
+                {
+                    "data" : "titleString",
+                    "width" : "10%"
+                }, {
+                    "data" : "resourceName",
+                    "width" : "10%"
+                },{
+                    "data" : "estBeginDate",
+                    "width" : "10%"
+                }, {
+                    "data" : "estEndDate",
+                    "width" : "10%"
+                } ,{
+                    "data" : "relBeginDate",
+                    "width" : "10%"
+                }, {
+                    "data" : "relEndDate",
+                    "width" : "10%"
+                } , {
+                    "data" : "cost",
+                    "width" : "10%"
+                }
+            ]
+        });
+		
+		// 项目申请人力列表
+		page.resourceListTable = $('#resourceListTable').initDataTable({
+            url : "/pms/project/getProjectResourceWating",
+            urlDataFn : function() {
+                return {id:$("#projectId").val()};
+            },
+            paging: false,
+            checkbox : false,
+            columns : [
+                {
+                    "data" : "titleString",
+                    "width" : "10%"
+                }, {
+                    "data" : "resourceName",
+                    "width" : "10%"
+                },{
+                    "data" : "estBeginDate",
+                    "width" : "10%"
+                }, {
+                    "data" : "estEndDate",
+                    "width" : "10%"
+                } ,{
+                    "data" : "relBeginDate",
+                    "width" : "10%"
+                }, {
+                    "data" : "relEndDate",
+                    "width" : "10%"
+                } , {
+                    "data" : "status",
+                    "width" : "10%",
+                    "render" : function(data, type, row, meta) {
+                        if(data == 'projecting') {
+                            return '<label class="label label-danger">'+ row.statusString+'</label>';
+                        }else if(data == 'processing'){
+                            return '<label class="label label-info">'+ row.statusString+'</label>';
+                        }else{
+                            return '<label class="label label-primary">'+ row.statusString+'</label>';
+                        }
+                    }
+                }, {
+                	"data" : null,
+                	"width" : "10%",
+                	"render" : function(data, type, row, meta) {
+                		var id = data.id;
+                		var html = "<button type=\"button\" onclick=\"doArrange('" + id + "', '" + meta.row + "')\" class=\"btn btn-success btn-xs\"><i class=\"glyphicon glyphicon-ok-sign\"></i> 安排人员</button> ";
+                		html += "<button type=\"button\" onclick=\"doClear('" + id + "', '" + meta.row + "')\" class=\"btn btn-danger btn-xs\"><i class=\"glyphicon glyphicon-remove-sign\"></i> 清空";
+                		return html;
+                	}
+                }
+            ]
+        });
+		
+		// 项目收入列表
+		page.inComeListTable = $('#inComeListTable').initDataTable({
+            url : "/pms/project/getMyProjectIncome",
+            urlDataFn : function() {
+                return {id:$("#projectId").val()};
+            },
+            paging: false,
+            checkbox : false,
+            columns : [
+                {"data" : "inComeDate", "width" : "20%"}, 
+                {"data" : "inComeAmt", "width" : "20%"},
+                {"data" : "description", "width" : "20%"}
+            ]
+        });
+		
+		// 项目支出列表
+		page.expenseListTable = $('#expenseListTable').initDataTable({
+            url : "/pms/project/getMyProjectExpense",
+            urlDataFn : function() {
+                return {id:$("#projectId").val()};
+            },
+            paging: false,
+            checkbox : false,
+            columns : [
+                {"data" : "expenseDate", "width" : "20%"}, 
+                {"data" : "expenseAmt", "width" : "20%"},
+                {"data" : "description", "width" : "20%"}
+            ]
+        });
+		
+		page.init();
+		window.doClear = page.doClear;
+		window.doArrange = page.doArrange;
+		page.namespace.root.find("#btnCancel").on('click', page.doCancel);
+		page.namespace.root.find('#btnConfim').on('click', page.doConfim);
+		
+		page.namespace.root.find('#passBtn').on('click', page.doPass);
+		page.namespace.root.find('#rollBackBtn').on('click', page.doRollBack);
+		
+		$('#queryAllBtn').on('click', function() {
+            $("#planStatus").val('');
+            var table = $('#listTable').DataTable();
+            table.ajax.reload();
+	    });
+		
+	    $('#queryArrangeBtn').on('click', function(){
+	        $("#planStatus").val('0');
+	        var table = $('#listTable').DataTable();
+	        table.ajax.reload();
+	    });
+	    
+	    $('#queryEmptyBtn').on('click', function(){
+	    	$("#planStatus").val('1');
+	        var table = $('#listTable').DataTable();
+	        table.ajax.reload();
+	    });
+	    $('#title').change(function(){
+	        var table = $('#listTable').DataTable();
+	        table.ajax.reload();
+	    });
+	});
+</script>

@@ -1,0 +1,388 @@
+<style type="text/css">
+.th_order{}
+.end_inp{}
+.expert_inp{}
+</style>
+
+<div  id="evalTargetScore_T_Any"  style="display: none;">
+<table id="evalTargetScoreTable_Any"
+	class="table dataTable row-border cell-border " cellspacing="0"
+	width="100%">
+	<thead>
+		<tr>
+			<th>分类</th>
+			<th>名称</th>
+			<th id="evalTargetScoreTable_Any_A">备注</th>
+			<th>自评分</th>
+			<th>专家打分</th>
+			<th>终评打分</th>
+		</tr>
+	</thead>
+	<tbody id="evalTargetScoreTable_Any_Body"></tbody>
+</table>
+</div>
+
+<div  id="evalTargetScore_C_Any">
+
+<div class="col-sm-4">
+	得分点描述：<span id="itemName"></span><br/>
+已评分学校0所, 未评分学校36所
+</div>
+
+<div  class="col-sm-8">
+	<div class="col-sm-4">
+	<div class="input-group">
+								<span class="input-group-addon">被评对象分类</span> 
+								<select id="category" name="category" class="form-control select2 input-sm">
+								</select>
+								</div>
+	</div>
+	<div class="col-sm-4">
+							<div class="input-group">
+								<span class="input-group-addon">被评对象名称</span> 
+								<input type="text"  name="name" class="form-control input-sm" />
+							</div>
+						</div>
+<div class="col-sm-4">
+	最高分为：<span id="maxScore" style="color: red;"></span> 分
+</div>
+</div>
+
+<div  id="evalTargetScoreTable_C_Any">
+
+</div>
+</div>
+<script type="text/javascript">
+$(function(){
+	// 获取页面跳转参数
+	var myV = window.$_storage.get(VIEW_ROOT + "/pages/evalTarget/evalTarget-score.html") ;
+	alert(myV.params) ;
+try{
+	
+	function error(info){
+		alert(info);
+	}
+	
+	function success(info){
+		alert(info);
+	}
+	
+	function _do(data,fn){
+		if(data.success){
+			fn(data.data)
+		}else{
+			error(data.errorMessage)			
+		}
+	}
+	
+	var $root=$('#evalTargetScore_C_Any');
+	
+	function _initTemplate(){
+		$root.find('#evalTargetScoreTable_C_Any').empty();
+		$root.find('#evalTargetScoreTable_C_Any').html($('#evalTargetScore_T_Any').html());
+	}
+	
+	function isExpert(){
+		return true;
+	}
+	
+	function isEnd(){
+		return true;
+	}
+	
+	
+	
+	function tdr(lb){
+		return '<td>'+lb+'</td>';
+	}
+	
+	function thr(lb){
+		return '<th class="th_order">'+lb+'</th>';
+	}
+	
+	function render_th(data){
+		var ths='';
+		for(var i=0; i< data.length;i++){
+			ths=ths+thr(data[i]);
+		}
+		$(ths).insertBefore($root.find('#evalTargetScoreTable_Any_A')) ;
+	}
+	
+	function render(data){
+		var thsData=[];
+		var trs='';
+		for( var i=0;i<data.length;i++){
+			var v=data[i];
+			trs=trs+'<tr>'
+			var tds='';
+			tds=tds+tdr(v.categoryName==null?'':v.categoryName);
+			tds=tds+tdr(v.name);
+			if(v.fillInfos){
+				for( var j=0;j<v.fillInfos.length;j++){
+					var f=v.fillInfos[j];
+					tds=tds+tdr(f.answer);
+					thsData[j]=f.ask;
+				}
+			}
+			tds=tds+tdr(v.remark);
+			tds=tds+tdr((v.selfScore?v.selfScore:""));
+			
+			if(isExpert()){
+				var inp='<input type="number" class=" expert_inp input-sm"' 
+					 +' data-itemid="'+v.itemId+'"'
+					 +' data-evaltargetid="'+v.evalTargetId+'"'
+					 +' value="'+v.expertScore+'"'
+					 +' />';
+				tds=tds+tdr(inp);
+			}else{
+				tds=tds+tdr(v.expertScore);
+			}
+			
+			if(isEnd()){
+				var inp='<input type="number" class=" end_inp input-sm"' 
+					 +' data-itemid="'+v.itemId+'"'
+					 +' data-evaltargetid="'+v.evalTargetId+'"'
+					 +' value="'+v.endScore+'"'
+					 +' />';
+				tds=tds+tdr(inp);
+			}
+			trs=trs+tds+'</tr>';
+		}
+		$root.find('#evalTargetScoreTable_Any_Body').html(trs);
+		
+		render_th(thsData);
+		
+		$root.find('.th_order').on('click',function(e){
+			
+			var st=$(this).data('sort');  // current sortable status.
+			if(st){
+				st=!st;	
+			}else{
+				st=true;
+			}
+			$(this).data('sort',st);
+			var ix=$root.find('th').index($(this));
+			function s(i,v){
+				this.$tr=i;
+				this.v=v;
+			}
+			var $trs=$root.find('tbody > tr');
+			var trs=[];
+			var ns=[];
+			for(var i=0;i<$trs.length;i++){
+				var vl=$($($trs[i]).find('td')[ix]).text();
+				var _s=new s($($trs[i]),vl);
+				trs[i]=_s;
+				ns[i]=vl;
+			}
+			
+			var isN=true;
+			$.each(ns,function(e){
+				if(!$.isNumeric(ns[e])){
+					isN=false;
+				}
+			});
+			if(isN){
+				ns.sort(function(a,b){
+					return (a-b)*(st?1:-1);
+				});
+			}else{
+				ns.sort();
+				if(st){
+					ns.reverse();
+				}
+			}
+			
+			/*
+			ns.sort(function(a,b){
+				if(a<b){
+					return -1 *(st?1:-1)
+				}
+				if(a>b){
+					return 1 *(st?1:-1)
+				}
+				if(a==b){
+					return 0 *(st?1:-1)
+				}
+			});
+			*/
+			
+			var $p;
+			$.each(ns,function(e){
+				for(var i=0;i<trs.length;i++){
+					var _t=trs[i];
+					if(_t.v==ns[e]){
+						if($p){
+							_t.$tr.insertAfter($p);
+						}else{
+							_t.$tr.prependTo($root.find('#evalTargetScoreTable_Any_Body'));
+						}
+						$p=_t.$tr;
+					}
+				}
+			})
+		});
+		
+		$root.find('.end_inp').on('change',function(e){
+			var $this=$(e.target);
+			var val=$this.val();
+			
+			if(""!=val&&!$.isNumeric(val)){
+				error("not a numeric.");
+				return;
+			}
+			
+			if(val>_item.highestScore){
+				$this.val(_item.highestScore);
+			}
+			
+			if(val<0){
+				$this.val(0);
+			}
+			
+			
+			$.post("/web/itemScore/updateEndScore",
+					{
+						'itemId' : $this.data('itemid'),
+						'evalTargetId' : $this.data('evaltargetid'),
+						'score' : val
+					},
+					function(data){
+						_do(data,function(d){
+							success('success');	
+						})
+					});			
+			
+		});
+		
+		
+		$root.find('.expert_inp').on('change',function(e){
+			var $this=$(e.target);
+			var val=$this.val();
+			if(""!=val&&!$.isNumeric(val)){
+				error("not a numeric.");
+				return;
+			}
+			
+			if(val>_item.highestScore){
+				$this.val(_item.highestScore);
+			}
+			
+			if(val<0){
+				$this.val(0);
+			}
+			
+			$.post("/web/itemScore/updateExpertScore",
+					{
+						'itemId' : $this.data('itemid'),
+						'evalTargetId' : $this.data('evaltargetid'),
+						'score' : val
+					},
+					function(data){
+						_do(data,function(d){
+							success('success');	
+						})
+					});			
+			
+		});
+		
+	}
+	
+	function _request(params){
+		
+		_initTemplate();
+		
+		$.get("/web/itemScore/getAllEvalTargetByItem",
+				params,
+				function(data){
+					_do(data,function(d){
+						render(d);
+					})
+				});
+	}
+	
+	$.get(WEB_ROOT+"/dictionary/getDictionaryByCode",
+			{"code":'EVAL_T_CATEGORY'},
+			function(data){
+				_do(data,function(d){
+					var opts='<option value=""></option>';
+					for(var i=0;i<d.length;i++){
+						var item=d[i];
+						opts=opts+'<option value="'+item.value+'">'+item.name+'</option>';
+					}
+					$root.find('#category').html(opts);					
+				})
+			});
+	
+	
+	var _itemId="98504091-608e-4927-b1a4-6c54942a0fcd";
+	
+	function _params(){
+		return {
+			'itemId' : _itemId,
+			//'evalTargetId' : "471eb1f4-00e8-4f48-a708-f52e40b38459",
+			name : $root.find('[name="name"]').val(),
+			category : $root.find('#category').val()
+		}
+	}
+	
+	$root.find('[name="name"]').on('change',function(e){
+		_request(_params());
+	});
+	
+	$root.find('#category').on('change',function(e){
+		_request(_params());
+	});
+	
+	_request(_params());
+	
+	var _item={};
+	
+	$.post(WEB_ROOT+"/scoreItem/getScoreItemById",
+			 {id : _itemId},
+			 function(data){
+				 _do(data,function(d){
+					$root.find('#maxScore').text(d.highestScore);
+					$root.find('#itemName').text(d.scoreItemName);
+					_item=d;
+				 });
+			 });
+	
+	
+}catch (e) {
+}
+})
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

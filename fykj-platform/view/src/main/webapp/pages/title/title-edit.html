@@ -1,0 +1,97 @@
+<namespace id="title-edit">
+	<ol class="breadcrumb">
+        <li><a href="#">职位信息维护</a></li>
+        <li><a href="#">修改</a></li>
+    </ol>
+    <div class="box box-info">
+    	<form role="form" id="editForm" class="form-horizontal">
+    		<div class="row ">
+                <div class="col-sm-12">
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                    	<button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"></i> 提交
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body">
+            	<div class="form-group">
+                    <label class="col-sm-1 control-label requiredMask input-sm">职位代码</label>
+                    <div class="col-sm-5">
+                        <input name="code" disabled="disabled" type="text" class="form-control input-sm"  placeholder="" th:value="${title.code}" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label requiredMask input-sm">职位名称</label>
+                    <div class="col-sm-5">
+                        <input name="name" type="text" class="form-control input-sm"  placeholder="" th:value="${title.name}" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label requiredMask input-sm">职位名称</label>
+                    <div class="col-sm-5">
+                        <input name="cost" type="text" class="form-control input-sm"  placeholder="" th:value="${title.cost}" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label input-sm">描述</label>
+                    <div class="col-sm-5">
+                        <textarea name="description" rows="3" class="form-control input-sm" th:text="${title.description}" placeholder=""></textarea>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="id" th:value="${title.id}" style="width: 100%" />
+    	</form>
+    </div>
+</namespace>
+<script type="text/javascript">
+    $(function() {
+        var page = {
+            namespace : $('#title-edit').namespace(),
+            init : function() {
+            	$("#editForm").validate({
+					rules : {
+						'name' : {
+							required : true,
+							maxlength : 255
+						},
+						'cost' : {
+							required : true,
+							decimal:true
+						},
+						'description' : {
+							maxlength : 100
+						}
+					},submitHandler : function() {
+						page.doEdit();
+					}
+				});
+            },
+            doEdit : function() {
+            	var submitForm = {
+                    endpoint : "/pms/title/update",
+                    formObj : $("#editForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.doCancel();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                    }
+                };
+
+                page.namespace.submitForm(submitForm);
+            },
+            doCancel : function() {
+                page.namespace.skiphtml("/pms/title/toTitleList");
+            }
+        };
+        
+        
+        page.init();
+        page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+    });
+</script>

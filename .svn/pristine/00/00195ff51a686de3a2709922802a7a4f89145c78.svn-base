@@ -1,0 +1,285 @@
+<namespace id="scoreItem-list"    ms-controller="scoreItem_list">
+	<ol class="breadcrumb">
+		<li><a href="#">项目</a></li>
+		<li><a href="#">列表</a></li>
+	</ol>
+	<section class="content" id="searchMeasureItemSection"  >
+		<div  class="col-sm-3">
+			<div class="col-sm-12">
+				<div class="input-group">
+                	<span class="input-group-addon">项目名称</span>
+                        <select id="projectSelectId" name="projectSelectId" class="form-control select2 input-sm">
+						<option  ms-for="el in @projectNames"  ms-attr="{value:el.id}">
+							{{el.name}}
+						</option>
+					</select>
+				</div>					
+			</div>
+			<div class="col-sm-12">
+				<section class="content  sidebar   skin-blue-light  " id="searchMeasureItemSection"  >
+					<ul class="measureItem-menu" id="measureItem-menu">
+					</ul>
+				</section>
+			</div>
+		</div>
+		<div  class="col-sm-9">
+			<div class="box box-info">
+				<!-- form start -->
+				<form class="form-horizontal" id="searchScoreItemForm">
+					<div class="box-body">
+						<div class="row">
+							<div class="col-sm-3">
+								<div class="btn-group">
+									<a class="btn btn-success btn-sm" id="addBtn" func="sysuser-list-add"> 
+									<span class="glyphicon glyphicon-plus"></span> 添加
+									</a>
+									<button class="btn btn-danger btn-sm" type="button" id="deleteBtn" func="sysuser-list-del">
+										<span class="glyphicon glyphicon-minus"></span> 批量删除
+									</button>
+								</div>
+							</div>
+							<div>
+								<input type="hidden" name="parentQuota"  value="" id="parentQuota" >
+								<input type="hidden" name="projectId"  ms-attr="{value:@projectId}" id="projectId" >		
+							</div>
+							
+						</div>
+					</div>
+				</form>
+			</div>
+	
+			<div class="box box-info" style="border-top: 0px;">
+				<div class="box-body" id="scoreItemList" style="margin-top: -10px;">
+					<table id="scoreItemListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th></th>
+								<th>编号</th>
+								<th>名称</th>
+								<th>最高分</th>
+								<th>数据采集形式</th>
+								<th>初评类型</th>
+								<th>备注</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#scoreItem-list').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "scoreItem_list",
+    		        projectNames:{},
+    		        data: {},
+    		        projectId : ""
+    		    })
+    		},
+			init : function() {
+				page.namespace.getRequest({
+					endpoint : "/project/getProjects",
+					data : {},
+					success : function(data) {
+						var defProjectId=data[0].id;
+						// 设置隐藏域默认的projectId
+						page.model.vm.projectId = defProjectId ;
+						page.model.vm.projectNames=data;
+						page.loadMenu(defProjectId);
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+				
+				page.namespace.root.find('#projectSelectId').on('change',function(){
+					var defProjectId=$(this).val();
+					page.loadMenu(defProjectId);
+				})
+			},
+			initView:function(){
+			
+			},
+			loadMenu : function(projectId) {
+				var HtmlMenuOpt = {
+					endpoint : "/measureItem/getMeasureItemTree?projectId="+projectId,
+					success : function(data) {
+						page.namespace.root.find("#measureItem-menu").empty();
+						page.createMenu(data);
+						page.refreshItem(page.getProjectId(),"");
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+			},
+			refreshItem : function(projectId,parentQuota){
+				page.namespace.root.find("#parentQuota").val(parentQuota);
+				page.namespace.root.find("#projectId").val(projectId);
+				page.listTable.ajax.reload();
+			},
+			getProjectId : function(){
+				return page.namespace.root.find('#projectSelectId').val();	
+			},
+			createMenu : function(data) {
+				for ( var o in data) {
+					page.namespace.root.find("#measureItem-menu").append(page.getMenuHtml(data[o]));
+				}
+				page.namespace.root.find("[name='measueItem']")
+					.on('click',function(){
+						page.refreshItem(page.getProjectId(),$(this).data("id"));
+					});
+			},
+			getMenuHtml : function(data) {
+				var html = "<li  class='" + (!!data.expand ? "active" : "") + " treeview'>" 
+				+ "<a href='#'  name='measueItem'  data-id='"+data.id+"'    >" + "<i class='fa fa-folder'></i> <span>"
+				+ data.text + "</span> <i class='fa fa-angle-left pull-right'></i></a>";
+				html += page.getChildHtml(data);
+				return html;
+			},
+			getChildHtml : function(data) {
+				var html = " <ul class=\"treeview-menu\">";
+				var _l_html;
+
+				for ( var o in data.children) {
+					var children = data.children[o];
+					if (!!children.children) {
+						_l_html = "<li style='border-top:1px dotted #ccc; line-height:30px;'>"
+								+"<a href='#'  name='measueItem'  data-id='"+children.entity.id+"'  ><i class=\"fa fa-folder\"></i> " + children.text + "</a>"
+								+ page.getChildHtml(children) + "</li>";
+					} else {
+						_l_html = " <li style='border-top:1px dotted #ccc; line-height:30px;'>"
+								+"<a href='javascript:void(0)'   href-htmlUrl='" + children.entity.url
+								+ "' href-layoutId='" + children.entity.layout + "' name='measueItem'  data-id='"+children.entity.id+"'  ><i class=\"fa fa-files-o\"></i> "
+								+ children.text + "</a></li>"
+					}
+					html += _l_html;
+				}
+				html += "</ul>";
+				return html;
+			},
+			menuhref : function(obj) {
+				$(obj).parent().addClass("active")
+				$(obj).parent().siblings().removeClass("active");
+				var url = $(obj).attr("href-htmlUrl");
+				var layoutId = $(obj).attr("href-layoutId");
+				page.namespace.skiphtml(url) ;
+			},
+			doQuery : function() {
+				page.listTable.ajax.reload();
+			},
+			doAdd : function() {
+				// 判断叶子节点是否是末级指标项
+				var parentQuota = page.namespace.root.find('#parentQuota').val() ;
+				if(parentQuota == "") {
+					alertTool.warning("请选择指标项!");
+					return false ;
+				}else {
+					// Ajax请求判断是否是叶子节点
+					page.namespace.getRequest({
+						endpoint : "/scoreItem/isLastItem",
+						data : {"parentQuotaId":page.namespace.root.find('#parentQuota').val()},
+						success : function(data) {
+							 if(data) {
+								 page.namespace.skiphtml("/pages/scoreItem/scoreItem-add.html"
+											+"?parentQuota="+page.namespace.root.find("#parentQuota").val()
+											+"&projectId="+page.namespace.root.find("#projectId").val()
+									); 
+							 } else {
+								 alertTool.warning("请选择叶子节点！");
+								 return false ;
+							 }
+	 					},
+						failure : function(data) {
+							alertTool.error(data);
+						}
+					});
+				}
+			},
+			doView : function(id) {
+				page.namespace.skiphtml("/pages/scoreItem/scoreItem-view.html?id=" + id);
+			},
+			doEdit : function(id) {
+				page.namespace.skiphtml("/pages/scoreItem/scoreItem-edit.html"
+                    +"?parentQuota="+page.namespace.root.find("#parentQuota").val()
+                    +"&projectId="+page.namespace.root.find("#projectId").val()
+					+"&id=" + id);
+			},
+			doDel : function(id) {
+				var HtmlMenuOpt = {
+					endpoint : "/scoreItem/deleteScoreItemById",
+					data : {
+						'ids' : id
+					},
+					success : function(data) {
+						page.listTable.ajax.reload();
+					}
+				};
+
+				page.namespace.getRequest(HtmlMenuOpt);
+			},
+			doBatchDel : function() {
+				var selectRows = page.namespace.root.find('#scoreItemListTable').getSelectedRow();
+
+				if (selectRows.length == 0) {
+					alertTool.warning("请选择要删除的记录!");
+					return;
+				}
+				page.namespace.confirm(function(){
+					page.doDel(selectRows.join("∷"));
+				});
+			}
+		};
+
+		page.listTable = page.namespace.root.find('#scoreItemListTable').initDataTable({
+			url : "/scoreItem/getScoreItemByPage",
+			urlDataFn : function() {
+				return page.namespace.root.find("#searchScoreItemForm").serializeJson();
+			},
+			lengthChange : false,
+			checkbox : true,
+			ops : {
+				view : function(id, rowData) {
+					page.doView(id);
+				},
+				del : function(id, rowData) {
+					page.doDel(id);
+				},
+				edit : function(id, rowData) {
+					page.doEdit(id);
+				}
+			},
+			columns : [ {
+					"data" : "serialNumber",
+					"width" : "10%"
+				},{
+					"data" : "scoreItemName",
+					"width" : "10%"
+				}, {
+					"data" : "highestScore",
+					"width" : "10%"
+				}, {
+					"data" : "dataCollectionTypeName",
+					"width" : "15%"
+				},{
+					"data" : "preliminaryTypeName",
+					"width" : "10%"
+				},{
+					"data" : "remark",
+					"width" : "30%"
+				}
+			]
+		});
+
+		page.init();
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+		
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+		page.namespace.root.find('#addBtn').on('click', page.doAdd);
+		page.namespace.root.find('#deleteBtn').on('click', page.doBatchDel);
+	});
+</script>

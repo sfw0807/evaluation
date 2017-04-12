@@ -1,0 +1,271 @@
+<style type="text/css">
+    #targetNameList {
+        padding: 0 0 0 0px;
+        margin: 0;
+        color: #0072B3;
+        height: 50px;
+        width: 95%;
+        line-height: 60px;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .blue {
+        color: #2D92BF;
+		font-weight:bold;
+    }
+
+    .scoreContent {
+        height: 50px;
+        margin: 0 30px 0 30px;
+        line-height: 40px;
+    }
+
+    #headInfo h4 {
+        font-weight: 600;
+    }
+
+    #MonitorInformation_list td {
+        border-right: 1px solid #cccccc;
+    }
+
+    #MonitorInformation_list th {
+        border-right: 1px solid #cccccc;
+        background-color: #f1f1f1;
+        font-weight: normal;
+        color: #2D92BF;
+        text-align: center;
+    }
+
+    .bblue {
+        background-color: #F5FAFC;
+        text-align: center;
+        color: #0072B3;
+    }
+
+    .bwhite {
+        background-color: #FFFFFF;
+    }
+
+    th {
+        text-align: center;
+    }
+
+    #TargetScoreMaintain_list td {
+        text-align: center;
+        overflow: hidden;
+    }
+
+    #scoreBody td {
+        overflow: hidden;
+        vertical-align: middle;
+    }
+
+    #AttachmentBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #StudentCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #TeacherCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #InspectorMaterialBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<style type="text/css" id="treeview-style"> 
+	.treeview .list-group-item{
+		cursor:pointer
+	}
+	
+	.treeview span.indent{
+		margin-left:10px;margin-right:10px
+	}
+	
+	.treeview span.icon{
+		width:12px;margin-right:5px
+	}
+	
+	.treeview .node-disabled{
+		color:silver;cursor:not-allowed
+	}
+	
+	.node-treeview{}
+	
+	.node-treeview:not(.node-disabled):hover{
+		background-color:#F5F5F5;
+	} 
+</style>
+<!-- 中间树形结构开始 -->
+<div id="mainFrameContainer">
+	<div id="mainBody">
+		<div id="" style="width: 100%">
+			<div id="treeContent" style="background-color: white; width: 20%; float: left; margin-right: 0.5%;">
+				<div style="width: 100%; text-align: center">
+	            	<h4>
+		                <img style="cursor: pointer" src="../front-ui/Images/star/refresh.png">
+		                <a id="refreshData" href="javascript:void(0);">刷新指标完成度</a>
+	               </h4>
+	       		</div>
+	       		
+	       		<div id="treeview" style="width: 100%;" class="treeview">
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 中间树形结构结束 -->
+
+<!-- 顶层区域 -->
+<div id=" maincontent" style="width: 79.5%; float: left; margin: 0; background-color: #FFFFFF; padding-bottom: 20px;">
+	<!-- 左侧顶层区域  开始 -->
+	<div id="headInfo" style="padding: 10px; width: 100%; height: 122px; border: 1px;">
+	    <div id="headInfoChild" style="width: 100%; height: 102px; background-color: #F1FAFC;">
+	         <h4 id="targetNameList"><span id="projectName"></span><span id="itemName"></span></h4>
+	        <div style=" height: 2px; width:100%; background-color: #CCCCCC">
+	            <div style="float: left; width: 20%; height: 2px; background-color: #0072B3;"></div>
+	        </div>
+	        <h4 id="targetScoreInfo" style="margin: 0;">
+	            <span class="scoreContent">最高分：<span id="highestScore" class="red">0</span>分</span>
+	            <!-- <span class="scoreContent">当前总分：<span id="currentScore" class="red">0</span>分</span> -->
+	            <span class="scoreContent">被评对象：<span id="targetObjectName" class="red"></span></span>
+	            <!-- <a href="javascript:;" style="float: right; padding: 10px 30px 0px 0px; font: normal 15px Arial; text-decoration:underline;">五星评价佐证材料模板</a> -->
+	        </h4>
+	    </div>
+	</div>
+	
+     <!-- 左侧得分点区域开始 -->
+    <div style="padding: 10px;">
+        <h4 class="blue">得分点</h4>
+        <div style="height: 2px; width: 100%; background-color: #CCCCCC; margin-bottom: 10px;">
+            <div style="float: left; width: 20%; height: 2px; background-color: #2D92BF;"></div>
+        </div>
+        <table id="TargetScoreMaintain_list" border="0" cellspacing="0" cellpadding="0" class="table table-hover table-bordered lead-list">
+            <thead class="trThread">
+            <tr>
+                <th width="5%">序号</th>
+                <th width="30%">得分项描述</th>
+                <th width="15%">上级指标</th>
+                <th width="8%">最高分值</th>
+            </tr>
+            </thead>
+            <tbody id="scoreBody">
+			</tbody>
+		</table>
+	</div>
+	<!-- 左侧得分点区域结束 -->
+</div>
+<!-- 左侧顶层区域  结束 -->
+<script type="text/javascript">
+	$(function(){
+		var page = {
+			pageData : [] ,
+			getTree : function(){
+	            $.post(WEB_ROOT + "/measureItem/getMeasureItemFrontTree", {"projectId" : page.GetQueryString("projectId")}, function(data){
+	            	page.pageData = data.data;
+	            	page.initTree() ;
+	            }, "json") ;
+			},
+			init : function(){
+				if(window.$_params.currentTargetObj != null) {
+					$("#targetObjectName").text(window.$_params.currentTargetObj.name) ;
+				}
+				
+				/* if(window.$_params.currentProjectDetail != null){
+					$("#highestScore").text(window.$_params.currentProjectDetail.score) ;
+				} */
+				
+				// 页面跳转返回的参数存储
+				var params = $_storage.get(VIEW_ROOT + "/front/expect/expect-projectFill-list.html") ;
+			},
+			initTree : function() {
+				$('#treeview').treeview({
+		            data: page.pageData, 
+		            expandIcon: "expand-icon glyphicon glyphicon-chevron-right",
+		            collapseIcon: "expand-icon glyphicon glyphicon-chevron-down",
+		            levels: 5,
+		            onhoverColor: "#E8E8E8",
+		            showBorder: false,
+		            showTags: true,
+		            highlightSelected: true,
+		            highlightSearchResults:false,
+		            multiSelect: false,
+		            onNodeSelected :function(event, data) {// 选中事件
+		            	$("#itemName").empty() ;
+		            	$("#itemName").append("-"+data.text) ;
+		            	// 根据指标项查询得分填报项
+		            	page.showScoreItem(data.id) ;
+		            	// 获取指标向下的最高分
+		            	page.getMeausureHighScore(data.id) ;
+		            }
+		        });
+			},
+			loadProject : function(projectId) {
+				$.post(WEB_ROOT + "/project/getProjectById", {"id" : projectId}, function(data){
+					$("#projectName").text(data.data.name) ;
+	            }, "json") ;
+			},
+			GetQueryString : function(name) {
+				var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+			    var r = window.location.search.substr(1).match(reg);
+			    if(r!=null) return  unescape(r[2]); return null;
+			},
+			showScoreItem : function(parentQuota) {
+				$.post(WEB_ROOT + "/scoreItem/getScoreItemByParentQuota", {"parentQuota" : parentQuota}, function(data){
+					var html = "" ;
+					for(var i = 0; i < data.length; i++) {
+						html += "<tr class='lead-item lead-even'>" ;
+						html += "<td>"+data[i].serialNumber+"</td>" ;
+						html += "<td style='text-align: left;'>";
+						if(data[i].initEva || data[i].finalEva) {
+							html += "<a href='javascript:void(0);' data-parentQuotaId='"+data[i].parentQuota+"' data-scoreItemId='"+data[i].id+"'>"+data[i].scoreItemName+"</a>";
+						}else {
+							html += data[i].scoreItemName ;
+						}
+						html += "</td>" ;
+						html += "<td style='text-align: left;'>"+ data[i].parentQuotaName +"</td>" ;
+						html += "<td>"+data[i].highestScore+"</td>" ;
+						html += "<td style='display: none;'>"+data[i].id+"</td>" ;
+						html += "</tr>" ;
+					}
+					$("#scoreBody").empty() ;
+					$("#scoreBody").append(html) ;
+	            }, "json") ;
+			},
+			redirectTo : function() {
+				var url = VIEW_ROOT + "/front/expect/evalTarget-score.html" ;
+				var params = {
+						"scoreItemId" : $(this).attr("data-scoreItemId") ,
+						"parentQuotaId" : $(this).attr("data-parentQuotaId")
+				} ;
+				$_storage.put(url, params) ;
+				$("#frameContainer").load(url, function(){
+				
+				}) ;
+			},
+			getMeausureHighScore : function(itemId){
+				$.post(WEB_ROOT + "/measureItem/getMeasureItemById", {"id" : itemId}, function(data){
+					$("#highestScore").text(data.data.score) ;
+				}, "json") ;
+			}
+		} ;
+		
+		page.init() ;
+		// 初始化树
+		page.getTree() ;
+		page.loadProject(page.GetQueryString("projectId")) ;
+		$("#scoreBody").on("click", "a", page.redirectTo) ;
+	});
+</script>

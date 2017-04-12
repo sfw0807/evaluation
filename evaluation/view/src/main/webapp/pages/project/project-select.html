@@ -1,0 +1,151 @@
+<table id="projectActiveTable"
+	class="table dataTable row-border cell-border " cellspacing="0"
+	width="100%">
+	<thead>
+		<tr>
+			<th>项目名称</th>
+			<th>有效期</th>
+			<th>总分</th>
+			<th>状态</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody id="projectActiveTable_tbody">
+	
+	</tbody>
+</table>
+
+<button  id="inactiveProjectBtn"  type="button" 
+							class="btn btn-primary btn-sm" 
+								>
+								历史项目
+						</button>
+
+<table id="projectInactiveTable"
+	class="table dataTable row-border cell-border " cellspacing="0"
+	width="100%">
+	<thead>
+		<tr>
+			<th>项目名称</th>
+			<th>有效期</th>
+			<th>总分</th>
+			<th>状态</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody id="projectInactiveTable_tbody">
+	
+	</tbody>
+</table>
+
+						
+<script type="text/javascript">
+$(function(){
+	
+	
+	var $activeTable=$('#projectActiveTable');
+	var $inactiveTable=$('#projectInactiveTable');
+	$inactiveTable.hide();
+	
+	var modalId=cjs.modal.modalId($('#projectActiveTable'));
+	cjs.modal.registerReturn(modalId,function(){
+		return { return1 : 'a' , return2 : 'b'};
+	});
+	
+	console.log(JSON.stringify(cjs.modal.params(modalId)));
+	
+	function error(info){
+		alert(info);
+	}
+	
+	function success(info){
+		alert(info);
+	}
+	
+	function _do(data,fn){
+		if(data.success){
+			fn(data.data);
+		}else{
+			error(data.errorMessage);			
+		}
+	}
+	
+	function tdr(lb){
+		return '<td>'+lb+'</td>';
+	}
+	
+	function renderActive(data){
+		var trs='';
+		for( var i=0;i<data.length;i++){
+			var v=data[i];
+			trs=trs+'<tr data-id="'+v.id+'">'
+			var tds='';
+			tds=tds+tdr(v.name);
+			tds=tds+tdr(v.dateScopeStr);
+			tds=tds+tdr(v.score);
+			tds=tds+tdr(v.statusName);
+			tds=tds+tdr('&gt;');
+			trs=trs+tds+'</tr>';
+		}
+		$activeTable.find('#projectActiveTable_tbody').html(trs);
+		$activeTable.find('#projectActiveTable_tbody > tr')
+		.css('cursor', 'pointer')
+		.on('click',function(){
+			window.location.href =VIEW_ROOT+"/front/index.html?projectId="+$(this).data('id');
+			console.log('go... id > '+$(this).data('id'));
+		});
+	}
+	
+	$.get(WEB_ROOT+"/project/getProjectsByPage",
+			{
+				page : 0,
+				size : 1000000,
+				status :'PUBLISH,EXPERT_EVAL,END_EVAL'
+			},
+			function(data){
+				_do(data,function(d){
+					renderActive(d.data);
+				})
+			});
+	
+	
+	function renderInactive(data){
+		var trs='';
+		for( var i=0;i<data.length;i++){
+			var v=data[i];
+			trs=trs+'<tr data-id="'+v.id+'">'
+			var tds='';
+			tds=tds+tdr(v.name);
+			tds=tds+tdr(v.dateScopeStr);
+			tds=tds+tdr(v.score);
+			tds=tds+tdr(v.statusName);
+			tds=tds+tdr('&gt;');
+			trs=trs+tds+'</tr>';
+		}
+		$inactiveTable.find('#projectInactiveTable_tbody').html(trs);
+		$inactiveTable.find('#projectInactiveTable_tbody > tr')
+		.css('cursor', 'pointer')
+		.on('click',function(){
+			window.location.href =VIEW_ROOT+"/front/index.html?projectId="+$(this).data('id');
+			console.log('go... id > '+$(this).data('id'));
+		});
+	}
+	
+	
+	$('#inactiveProjectBtn').on('click',function(){
+		$.get( WEB_ROOT+"/project/getProjectsByPage",
+			{
+				page : 0,
+				size : 1000000,
+				status :'ARCHIVE'
+			},
+			function(data){
+				_do(data,function(d){
+					renderInactive(d.data);
+					$inactiveTable.show();
+				})
+			});
+	});
+	
+})
+</script>

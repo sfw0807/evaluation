@@ -1,0 +1,69 @@
+<div>
+	<ol class="breadcrumb">
+        <li><a href="#">收款明细</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+    <div class="box box-info">
+    	<form role="form" id="editForm" class="form-horizontal">
+    		<div class="row">
+                <div class="col-sm-12">
+                    <div class="btn-group pull-left" style="margin-top: 20px; margin-left: 28px;">
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="box-body">
+    			<div class="form-group">
+                    <label for="projectName" class="col-sm-1 control-label requiredMask input-sm">选择项目</label>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <input id="projectName" disabled="disabled" name="projectName" type="text" class="form-control input-sm" th:value="${invoice.projectName}" />
+                            <span class="input-group-addon"><i id="btnSelect" class="fa fa-folder" style="cursor:pointer;"></i></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceDateStr" class="col-sm-1 control-label requiredMask input-sm">日期</label>
+                    <div class="col-sm-5">
+                        <input id="invoiceDateStr" disabled="disabled" th:value="${invoice.invoiceDate}" name="invoiceDateStr" readonly type="text" class="form-control input-sm pull-right">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceCode" class="col-sm-1 control-label requiredMask input-sm">发票号</label>
+                    <div class="col-sm-5">
+                        <input name="invoiceCode" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${invoice.invoiceCode}">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                	<label for="invoiceAmt" class="col-sm-1 control-label requiredMask input-sm">发票金额</label>
+                	<div class="col-sm-5">
+                		<input name="invoiceAmt" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${invoice.invoiceAmt}">
+                   	</div>
+               	</div>
+               	
+               	<div class="form-group">
+                	<label for="intoAmt" class="col-sm-1 control-label requiredMask input-sm">到款金额</label>
+                	<div class="col-sm-5">
+                		<input name="intoAmt" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${invoice.intoAmt}" >
+                   	</div>
+               	</div>
+    		</div>
+    	</form>
+    </div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		$("#btnCancel").on("click", doCancel);
+	});
+	
+	function doCancel() {
+		httpservice.htmlEnt.skiphtml("/pms/summary/toInvoiceList");
+	}
+</script>

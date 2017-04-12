@@ -1,0 +1,191 @@
+<div id="scoreItemFillDiv">
+	<div id="itemScoreDesc">
+		
+	</div>
+	<div id="selectOptions">
+		
+	</div>
+	<div>
+		<input type="button" id="saveOptions" value="保存">&nbsp;&nbsp;<input type="button" id="cancelOptions" value="取消">
+	</div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	var page = {
+		scoreItemId : "",
+		rptPubAnsId : "" ,
+		init : function(){
+			var modalId=cjs.modal.modalId($('#scoreItemFillDiv'));
+			cjs.modal.registerReturn(modalId,function(){
+				return { return1 : 'a' , return2 : 'b'};
+			});
+			$("#itemScoreDesc").text(cjs.modal.params(modalId).scoreItemDesc) ;
+			return modalId ;
+		},
+		getParams : function(modalId) {
+			// console.log(JSON.stringify(cjs.modal.params(modalId)));
+			return cjs.modal.params(modalId) ;
+		},
+		getScoreItemOptions : function(scoreItemId) {
+			// 获取选项列表
+			$.post(WEB_ROOT + "/fillScoreItem/getFillScoreItemOptions", {"scoreItemId" : scoreItemId} , function(data){
+				var html = "" ;
+				for(var i = 0; i < data.length; i++) {
+					var dataType = data[i].questionType ;
+					// 单选题
+					if(dataType === "1") {
+						html += "<div option-type='singleOption'><span>"+data[i].questionCode+"、"+ data[i].questionContent +"</span>" ;
+						html += "<span>" ;
+						for(var j = 0; j < data[i].options.length; j++) {
+							html += "<div><input type='radio' name='"+data[i].id+"' data-score='"+data[i].options[j].optScore+"' data-rptId='"+data[i].rptId+"' value='"+data[i].options[j].id+"'>"+data[i].options[j].optName + "、"+data[i].options[j].optContent+"</div>";
+						}
+						html += "</span>" ;
+						html += "</div>" ;
+					}else if(dataType === "2") {// 多选题
+						html += "<div option-type='multiOption'><span>"+data[i].questionCode+"、"+ data[i].questionContent +"</span>" ;
+						html += "<span>" ;
+						for(var j = 0; j < data[i].options.length; j++) {
+							html += "<div><input type='checkbox' name='"+data[i].id+"' data-score='"+data[i].options[j].optScore+"' data-rptId='"+data[i].rptId+"' value='"+data[i].options[j].id+"'>"+data[i].options[j].optName + "、"+data[i].options[j].optContent+"</div>";
+						}
+						html += "</span>" ;
+						html += "</div>" ;
+					}else if(dataType === "3") {// 问答题
+						html += "<div option-type='answerOption'><span>"+data[i].questionCode+"、"+ data[i].questionContent +"</span>" ;
+						html += "<br/>作答：<br/>" ;
+						html += "<textarea name='"+data[i].id+"' data-hasIntervalScore='"+data[i].hasIntervalScores+"' data-rptId='"+data[i].rptId+"' rows='5' cols='6' style='margin: 0px; width: 430px; height: 160px;' placeholder='请输入答案...'></textarea>" ;
+						/* if(data[i].hasIntervalScores) {// 问答题是否区间记分
+							html += "<br/>数量：" ;
+							html += "<input type='number' min='0' value='' placeholder='请输入数量'>" ;
+						} */
+						html += "</div>" ;
+					}else {// 附件
+						html += "<div option-type='attachOption'><span>"+data[i].questionCode+"、"+ data[i].questionContent +"</span>" ; 
+						html += "<br/>附件上传：<br/>" ;
+						html += "<a href='javascript:void(0);' data-id='"+data[i].id+"'>附件上传</a>" ;
+						html += "</div>" ;
+					}
+				}
+				html += "<br/>备注：<br/>" ;
+				html += "<textarea id='remarkInfo' rows='5' cols='6' style='margin: 0px; width: 430px; height: 160px;' placeholder='请输入备注...'></textarea>" ;
+				$("#selectOptions").html(html) ;
+				
+				if(data != null && data.length > 0) {
+					var str = {} ;
+					str.targetId = window.$_params.currentTargetObj.id ;
+					str.rptId = data[0].rptId ;
+					str.projectId = window.$_params.currentProjectId ;
+					$.post(WEB_ROOT + "/fillScoreItem/getRptPubAnsId", {jsonStr : JSON.stringify(str)}, function(data){
+						page.rptPubAnsId = data ;
+					}, "json") ;
+				}
+			},"json") ;
+		},
+		doCancel : function(){
+			cjs.modal.close({
+				id : "scoreItemFillModel",
+				skip : false,
+				hidden : function(e){
+					alert('close window ... ');
+				}
+			}) ;
+		},
+		doSaveOptions : function() {
+			/* *********** 组装参数  *********** */
+			var params = {} ;
+			var singleArr = [] ;
+			// 组装单选题
+			$("div[option-type=singleOption]").each(function(){
+				var singleOption = {} ;
+				singleOption.singleId = $(this).find("input[type=radio]:checked").attr("name") ;
+				singleOption.singleOption = $(this).find("input[type=radio]:checked").val() ;
+				singleOption.singleScore = $(this).find("input[type=radio]:checked").attr("data-score") ;
+				singleOption.rptId = $(this).find("input[type=radio]:checked").attr("data-rptId") ;
+				singleArr.push(singleOption) ;
+			}) ;
+
+			// 组装多选题
+			var multiArr1 = [] ;
+			$("div[option-type=multiOption]").each(function(){
+				var multiArr2 = [] ;
+				$(this).find("input[type=checkbox]:checked").each(function(){
+					var multiOption = {} ;
+					multiOption.multiId = $(this).attr("name") ;
+					multiOption.multiScore = $(this).attr("data-score") ;
+					multiOption.multiOption = $(this).val() ;
+					multiOption.rptId = $(this).attr("data-rptId") ;
+					multiArr2.push(multiOption) ;
+				}) ;
+				multiArr1.push(multiArr2) ;
+			});
+			
+			// 组装问答题
+			var answerArr = [] ;
+			var flag = 0 ;
+			$("div[option-type=answerOption]").each(function(){
+				var answerOption = {} ;
+				answerOption.answerId = $(this).find("textarea").attr("name") ;
+				// answerOption.answerNumber = $(this).find("input").val() ;
+				answerOption.answerOption = $(this).find("textarea").val() ; 
+				answerOption.rptId = $(this).find("textarea").attr("data-rptId") ;
+				answerOption.hasIntervalScore = $(this).find("textarea").attr("data-hasIntervalScore") ;
+				
+				if(answerOption.hasIntervalScore === 'true') {
+					var reg = /^\d+$/;
+					if(!reg.test($(this).find("textarea").val()) && $(this).find("textarea").val() != '') {
+						alert("相关问答题请输入非负整数！") ;
+						$(this).find("textarea").val(0) ;
+						flag = 1 ;
+						return false;
+					}
+				}
+				
+				answerArr.push(answerOption) ;
+			}) ;
+			
+			if(flag === 1) {
+				return false ;
+			}
+			
+			// 组装附件
+			
+			params.singleOptions = singleArr ;
+			params.multiOptions = multiArr1 ;
+			params.answerOptions = answerArr ;
+			params.scoreItemId = page.getParams(modalId).scoreItemId ;
+			params.remarkOption = $("#remarkInfo").val() ;
+			params.targetId = window.$_params.currentTargetObj.id ;
+			params.formType = "add" ;
+			
+			// var answerData = '{"singleOptions":[{"singleId":"6f37f5d1-c5fe-4ca5-9ce2-8351b9e16f19","singleOption":"B","singleScore":"2"}],"multiOptions":[[{"multiId":"2e6d9aa1-7360-4b7a-a6af-86114a40a055","multiScore":"1","multiOption":"A"},{"multiId":"2e6d9aa1-7360-4b7a-a6af-86114a40a055","multiScore":"2","multiOption":"B"},{"multiId":"2e6d9aa1-7360-4b7a-a6af-86114a40a055","multiScore":"3","multiOption":"C"},{"multiId":"2e6d9aa1-7360-4b7a-a6af-86114a40a055","multiScore":"4","multiOption":"D"}]],"answerOptions":[{"answerId":"b311c090-0caa-4d1c-854e-091c591c15ee","answerNumber":"12","answerOption":"实打实"},{"answerId":"078f5574-7bc3-4e9f-bede-6b1bc8aba605","answerNumber":"12","answerOption":"舒服舒服"}],"scoreItemId":"552a7377-24b5-43bb-9d16-70db032ba7c0","remarkOption":"备注信息"}' ;
+			// 保存答案信息
+			$.post(WEB_ROOT + "/fillScoreItem/saveScoreItemOptions", {"answerData" : JSON.stringify(params)}, function(data){
+				console.log(data) ;
+				page.doCancel() ;
+			}, "json") ;
+		},
+		fileUploadPage : function(){
+			cjs.modal.open({
+				id:"attachFileUploadModel",
+				title:"附件上传",
+				hidden : function(e,ra){
+					//console.log("hide modal  "+ JSON.stringify(ra[0]) );
+				}
+			},'/front/selfPerson/attach-fileUpload.html',{
+				rptPubAnsId : page.rptPubAnsId,
+				rptQueId : $(this).attr("data-id") ,
+				scoreItemId : page.scoreItemId
+			});
+		}
+	} ;
+
+	var modalId = page.init() ;
+	var params = page.getParams(modalId) ;
+	page.getScoreItemOptions(params.scoreItemId) ;
+	page.scoreItemId = params.scoreItemId ;
+	
+	$("#saveOptions").bind("click", page.doSaveOptions) ;
+	$("#cancelOptions").bind("click", page.doCancel) ;
+	$("#selectOptions").on("click", "a", page.fileUploadPage) ;
+})
+</script>

@@ -1,0 +1,293 @@
+<namespace id="questionnaireEdit">
+    <section class="content" id="editScoreItemFillSection" ms-controller="scoreItemFill_edit">
+        <div class="box box-info">
+            <!-- form start -->
+            <form class="form-horizontal" id="editScoreItemFillForm">
+                <input type="hidden" id="projectId" name="projectId" value="">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- 右对齐的 btn-group -->
+                        <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                            <button id="saveScoreItemFillInfo" type="submit" class="btn btn-sm btn-primary">
+                                <i class="fa fa-floppy-o"></i>提交
+                            </button>
+                            <a class="btn btn-sm btn-default" id="closeItemScoreFillTargetEntityBtn">
+                                <i class="fa fa-align-justify">返回</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="form-group">
+                        <input type="hidden" id="quesId" name="quesId" ms-attr="{value:@data.id}">
+                        <label for="fillType" class="col-sm-1 control-label input-sm">类型</label>
+                        <div class="col-sm-5">
+							<span style="margin-right:20px;">
+								<input type="radio" id="singleFillType" name="fillType" value="1">单选
+							</span>
+                            <span style="margin-right:20px;">
+								<input type="radio" id="doubleFillType" name="fillType" value="2">多选
+							</span>
+                            <span style="margin-right:20px;">
+								<input type="radio" id="answerFillType" name="fillType" value="3">问答
+							</span>
+                            <span style="margin-right:20px;">
+								<input type="radio" id="attachFillType" name="fillType" value="4">附件
+							</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="scoreItemFillSerialNumber" class="col-sm-1 control-label requiredMask input-sm">编号</label>
+                        <div class="col-sm-5">
+                            <input name="scoreItemFillSerialNumber" type="text" class="form-control input-sm" placeholder="" ms-attr="{value:@data.questionCode}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="scoreItemFillDesc" class="col-sm-1 control-label requiredMask input-sm">描述</label>
+                        <div class="col-sm-5">
+                            <textarea name="scoreItemFillDesc" class="form-control input-sm" rows="3" placeholder="" ms-attr="{value:@data.questionContent}"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group" id="quesGetScoreDiv">
+                        <label for="quesGetScore" class="col-sm-1 control-label input-sm">问答记分</label>
+                        <div class="col-sm-5">
+                            <span style="margin-right:20px;"><input type="radio" id="anQuesGetScore" name="quesGetScore" value="1" checked="checked">记分</span>
+                            <span style="margin-right:20px;"><input type="radio" id="anQuesGetNoScore" name="quesGetScore" value="2">不计分</span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="optionDiv">
+                        <label for="options" class="col-sm-1 control-label input-sm">选项
+                            <span class="glyphicon glyphicon-plus" style="margin-left:5px;" id="addOptionBtn"></span>
+                        </label>
+                        <div class="col-sm-5" id="addOptions">
+                        </div>
+                    </div>
+                    <div class="form-group" id="sectionDiv">
+                        <label for="section" class="col-sm-1 control-label input-sm">区间记分
+                            <span class="glyphicon glyphicon-plus" id="addSectionBtn" style="margin-left:5px;"></span>
+                        </label>
+                        <div class="col-sm-5" id="addSections">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</namespace>
+<script type="text/javascript">
+    $_ready(function() {
+        var page = {
+            namespace : $('#questionnaireEdit').namespace(),
+            model : {
+                vm : avalon.define({
+                    $id : "scoreItemFill_edit",
+                    data : {}
+                })
+            },
+            quesId : '' ,
+            projectId : '' ,
+            init : function(){
+                page.namespace.modal.registerParent(page,'questionnaireEditTargetEntityModal');
+                page.namespace.modal.registerReturn(page,'questionnaireEditTargetEntityModal',function(){
+                    return {id : ' modal page '};
+                });
+                page.quesId = page.namespace.modal.param(page,"questionnaireEditTargetEntityModal","quesId") ;
+                page.projectId = page.namespace.modal.param(page,"questionnaireEditTargetEntityModal","projectId") ;
+
+                // 设置隐藏域值
+                page.namespace.root.find("#projectId").val(page.projectId) ;
+                // 设置默认隐藏
+                page.namespace.root.find("#quesGetScoreDiv").attr("style","display:none") ;
+                page.namespace.root.find("#optionDiv").removeAttr("style") ;
+                page.namespace.root.find("#sectionDiv").attr("style","display:none") ;
+
+                //表单提交验证
+                page.namespace.root.find('#editScoreItemFillForm').validate({
+                    rules : {
+                        'scoreItemFillSerialNumber' : {
+                            required : true,
+                            number : true
+                        },
+                        'scoreItemFillDesc' : {
+                            required : true,
+                            maxlength : 512
+                        }
+                    },
+                    submitHandler : function(form) {
+                        page.submitFill() ;
+                    }
+                });
+            },
+            initView : function(){// 初始化回显数据
+                page.namespace.getRequest({
+                    endpoint : "/questionnaire/getQuestionById",
+                    data : {"quesId":page.quesId},
+                    success : function(data) {
+                        page.model.vm.data = data ;
+                        page.initCheck(data.questionType) ;
+                        page.initOptions(data.options) ;
+                        page.initDoOptionsChange(data.questionType, data.hasIntervalScores) ;
+                        if(data.questionType === "3") {// 问答题
+                            page.initAddSections(data.intervalScores) ;
+                        }
+                    },
+                    failure : function(data) {
+                        alertTool.error(data);
+                    }
+                });
+            },
+            initCheck : function(questionType){
+                if(questionType === "1") {
+                    $("#singleFillType").prop("checked", true) ;
+                }else if(questionType === "2"){
+                    $("#doubleFillType").prop("checked", true) ;
+                } else if(questionType === "3") {
+                    $("#answerFillType").prop("checked", true) ;
+                } else{
+                    $("#attachFillType").prop("checked", true) ;
+                }
+            },
+            submitFill : function() {
+                var formV = page.namespace.root.find("#editScoreItemFillForm").serializeJson();
+                var paramsJson = JSON.stringify(formV) ;
+                page.namespace.getRequest({
+                    endpoint : "/questionnaire/saveOrUpdateQuestionnaires",
+                    data : {
+                        "paramsJson":paramsJson
+                    },
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.doCancel();
+                    },
+                    failure : function(data) {
+                        alertTool.error(data);
+                    }
+                });
+            },
+            doCancel : function(){
+                page.namespace.modal.close(page,{
+                    id : "questionnaireEditTargetEntityModal",
+                    skip : false,
+                    hidden : function(e){
+//							alert('select user ');
+                    }
+                });
+            },
+            initOptions : function(options) {
+                if(options != null) {
+                    var html = "" ;
+                    for (var i = 0; i < options.length; i++) {
+                        html += "<div class='input-group'>" ;
+                        html +="<input type='text' name='optionsName' value='"+options[i].optName+"' placeholder='选项'>" ;
+                        html += "<input type='text' name='optionsContent' value='"+options[i].optContent+"' placeholder='内容'>" ;
+                        html += "<input type='number' name='optionsScore' value='"+options[i].optScore+"' min='0' placeholder='得分'>" ;
+                        html += "<a href='javascript:void(0);'>删除</a>" ;
+                        html += "</div>" ;
+                    }
+                    page.namespace.root.find("#addOptions").append(html) ;
+                }
+            },
+            addOptions : function() {
+                var html = "" ;
+                html += "<div class='input-group'>" ;
+                html +="<input type='text' name='optionsName' value='' placeholder='选项'>" ;
+                html += "<input type='text' name='optionsContent' value='' placeholder='内容'>" ;
+                html += "<input type='number' name='optionsScore' value='' min='0' placeholder='得分'>" ;
+                html += "<a href='javascript:void(0);'>删除</a>" ;
+                html += "</div>" ;
+
+                page.namespace.root.find("#addOptions").append(html) ;
+            },
+            delOptions : function(){
+                page.namespace.root.find(this).parent().remove() ;
+            },
+            initAddSections : function(sections){
+                if(sections != null) {
+                    var html = "" ;
+                    for (var i = 0; i < sections.length; i++) {
+                        html += "<div class='input-group'>" ;
+                        html += "<input type='number' name='lowerSection' value='"+sections[i].lowLimit+"' min='0' placeholder='下限'>" ;
+                        html += "<input type='number' name='upperSection' value='"+sections[i].upperLimit+"' min='0' placeholder='上限'>" ;
+                        html += "<input type='number' name='sectionScore' value='"+sections[i].score+"' min='0' placeholder='得分'>" ;
+                        html += "<a href='javascript:void(0);'>删除</a>" ;
+                        html += "</div>" ;
+                    }
+                    page.namespace.root.find("#addSections").append(html) ;
+                }
+            } ,
+            addSections : function() {
+                var html = "" ;
+                html += "<div class='input-group'>" ;
+                html += "<input type='number' name='lowerSection' value='' min='0' placeholder='下限'>" ;
+                html += "<input type='number' name='upperSection' value='' min='0' placeholder='上限'>" ;
+                html += "<input type='number' name='sectionScore' value='' min='0' placeholder='得分'>" ;
+                html += "<a href='javascript:void(0);'>删除</a>" ;
+                html += "</div>" ;
+
+                page.namespace.root.find("#addSections").append(html) ;
+            },
+            delSections : function() {
+                page.namespace.root.find(this).parent().remove() ;
+            },
+            initDoOptionsChange : function(questionType, hasInterval){
+                if(questionType === "1" || questionType === "2") {
+                    page.namespace.root.find("#quesGetScoreDiv").attr("style","display:none") ;
+                    page.namespace.root.find("#optionDiv").removeAttr("style") ;
+                    page.namespace.root.find("#sectionDiv").attr("style","display:none") ;
+                }else if(questionType === "3"){
+                    page.namespace.root.find("#quesGetScoreDiv").removeAttr("style") ;
+                    if(hasInterval) {
+                        page.namespace.root.find("#sectionDiv").removeAttr("style") ;// 区间记分
+                        $("#anQuesGetScore").prop("checked", true) ;
+                        $("#anQuesGetNoScore").prop("checked", false) ;
+                    }else {
+                        page.namespace.root.find("#sectionDiv").attr("style","display:none") ;// 区间不计分
+                        $("#anQuesGetNoScore").prop("checked", true) ;
+                        $("#anQuesGetScore").prop("checked", false) ;
+                    }
+                    page.namespace.root.find("#optionDiv").attr("style","display:none") ;
+                } else {
+                    page.namespace.root.find("#quesGetScoreDiv").attr("style","display:none") ;
+                    page.namespace.root.find("#optionDiv").attr("style","display:none") ;
+                    page.namespace.root.find("#sectionDiv").attr("style","display:none") ;
+                }
+            },
+            doOptionsTypeChange : function() {
+                if(page.namespace.root.find(this).val() === "1"
+                    || page.namespace.root.find(this).val() === "2") {
+                    page.namespace.root.find("#quesGetScoreDiv").attr("style","display:none") ;
+                    page.namespace.root.find("#optionDiv").removeAttr("style") ;
+                    page.namespace.root.find("#sectionDiv").attr("style","display:none") ;
+                }else if(page.namespace.root.find(this).val() === "3"){
+                    page.namespace.root.find("#quesGetScoreDiv").removeAttr("style") ;
+                    page.namespace.root.find("#sectionDiv").removeAttr("style") ;
+                    page.namespace.root.find("#optionDiv").attr("style","display:none") ;
+                } else {
+                    page.namespace.root.find("#quesGetScoreDiv").attr("style","display:none") ;
+                    page.namespace.root.find("#optionDiv").attr("style","display:none") ;
+                    page.namespace.root.find("#sectionDiv").attr("style","display:none") ;
+                }
+            },
+            doQuesGeScoreChange : function(){
+                if(page.namespace.root.find(this).val() === "1") {
+                    page.namespace.root.find("#sectionDiv").removeAttr("style") ;
+                }else{
+                    page.namespace.root.find("#sectionDiv").attr("style","display:none") ;
+                }
+            }
+        };
+
+        page.init();
+        page.initView() ;
+        avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+
+        page.namespace.root.find('#closeItemScoreFillTargetEntityBtn').on('click',page.doCancel);
+        // 动态表单
+        page.namespace.root.find("#addOptionBtn").on("click", page.addOptions) ;
+        page.namespace.root.find("#addSectionBtn").on("click", page.addSections) ;
+        page.namespace.root.find("#addOptions").on("click","a", page.delOptions);
+        page.namespace.root.find("#addSections").on("click","a", page.delSections);
+        page.namespace.root.find('input[name=fillType]').on('click', page.doOptionsTypeChange) ;
+        page.namespace.root.find('input[name=quesGetScore]').on('click', page.doQuesGeScoreChange) ;
+    });
+</script>

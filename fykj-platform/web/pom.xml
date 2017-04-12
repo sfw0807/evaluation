@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.fykj.platform</groupId>
+    <artifactId>fykj-platform</artifactId>
+    <version>1.7.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>fykj-platform-web</artifactId>
+  <packaging>war</packaging>
+  <name>web Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+  
+  	<dependency>
+		<groupId>com.fykj.platform</groupId>
+		<artifactId>fykj-platform-common</artifactId>
+		<version>1.7.1-SNAPSHOT</version>
+	</dependency>
+  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+	     <groupId>javax.servlet</groupId>
+	     <artifactId>javax.servlet-api</artifactId>
+	     <scope>provided</scope>
+	 </dependency>
+	 
+	<dependency>
+	    <groupId>javax.servlet.jsp</groupId>
+	    <artifactId>jsp-api</artifactId>
+	    <version>2.2.1-b03</version>
+	     <scope>provided</scope>
+	</dependency>
+  </dependencies>
+
+   <profiles>
+		<profile>
+			<id>sit</id>
+			<properties>
+				<config.dir>sit</config.dir>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<config.dir>dev</config.dir>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>prd</id>
+			<properties>
+				<config.dir>prd</config.dir>
+			</properties>
+		</profile>
+	</profiles>
+
+  <build>
+    <finalName>web</finalName>
+	<resources>
+		<resource>
+			<directory>src/main/profiles/${config.dir}</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<filtering>true</filtering>
+		</resource>
+	</resources>
+	
+	<plugins>
+		<!-- Maven Tomcat Plugin -->
+		<plugin>
+		  <groupId>org.apache.tomcat.maven</groupId>
+		  <artifactId>tomcat7-maven-plugin</artifactId>
+		  <version>2.2</version>
+		  <configuration>
+		    <!--Deploy to server-->
+		    <url>http://localhost:8080/manager/text</url>
+		    <server>Tomcat8</server>
+		    <username>admin</username>
+		    <password>admin</password>
+		    <path>/</path>
+		    <port>80</port>
+		  </configuration>
+		</plugin>
+		
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<configuration>
+				<skip>true</skip>
+				<testFailureIgnore>true</testFailureIgnore>
+			</configuration>
+		</plugin>
+	</plugins>
+  </build>
+</project>

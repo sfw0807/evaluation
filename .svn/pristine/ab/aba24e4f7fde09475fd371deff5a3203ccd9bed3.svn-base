@@ -1,0 +1,167 @@
+package com.fykj.product.evaluation.modular.evaluating.questionnaire.controller;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.fykj.platform.kernel._c.model.InvokeResult;
+import com.fykj.platform.kernel.parameter.annotation.ParamValidation4Controller;
+import com.fykj.product.evaluation.api.filling.vo.ReportAnswerInVO;
+import com.fykj.product.evaluation.api.filling.vo.ReportAnswerInWraperVO;
+import com.fykj.product.evaluation.api.filling.vo.ReportQuestionOutVO;
+import com.fykj.product.evaluation.api.scoreitem.model.IntervalScore;
+import com.fykj.product.evaluation.api.scoreitem.service.FillScoreItemServiceApi;
+import com.fykj.product.evaluation.api.scoreitem.service.IntervalScoreServiceApi;
+import com.fykj.product.evaluation.common.constant.FillType;
+import com.fykj.product.evaluation.modular.evaluating.questionnaire.service.FillQuestionnaireService;
+import com.fykj.product.evaluation.modular.evaluating.questionnaire.service.QuestionnaireService;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 问卷填报
+ * Created by zhangtian on 2017/4/7.
+ */
+@RestController
+@ParamValidation4Controller
+@RequestMapping(value = "fillQuestionnaire")
+public class FillQuestionnaireController {
+
+    @Autowired
+    private QuestionnaireService questionnaireService ;
+
+    @Autowired
+    private FillQuestionnaireService fillQuestionnaireService;
+
+    @Autowired
+    private IntervalScoreServiceApi intervalScoreServiceApi ;
+
+    /**
+     * 列表显示所有的问卷习题
+     * @param projectId
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "getQuestionnaireList", method = RequestMethod.POST)
+    public List<ReportQuestionOutVO> getQuestionnaireList(@RequestParam String projectId) throws  Exception {
+        List<ReportQuestionOutVO> quesLists = questionnaireService.getRptQuestionByProjectId(projectId);
+        return quesLists;
+    }
+
+    @RequestMapping(value = "saveQuestionnaire", method = RequestMethod.POST)
+    @ResponseBody
+    public InvokeResult saveScoreItemOptions(String answerData) throws Exception {
+        JSONObject jsonObject = JSONObject.parseObject(answerData) ;
+        String formType = jsonObject.getString("formType") ;
+        String rptId = "" ;
+        String targetId = jsonObject.getString("targetId") ;
+        // 保存备注基本信息
+        String scoreItemId = jsonObject.getString("scoreItemId") ;
+        ReportAnswerInWraperVO reportAnswerInWraperVO = new ReportAnswerInWraperVO() ;
+        reportAnswerInWraperVO.setScoreItemId(scoreItemId);
+        // 答题列表
+        List<ReportAnswerInVO> reportAnswerInVOs = new ArrayList<ReportAnswerInVO>() ;
+
+        // 单选题处理
+        JSONArray singleOptions = jsonObject.getJSONArray("singleOptions") ;
+        if(singleOptions != null && !singleOptions.isEmpty()) {
+            for(int i = 0; i < singleOptions.size(); i++) {
+                ReportAnswerInVO reportAnswerInVO = new ReportAnswerInVO() ;
+                if(StringUtils.equals("edit", formType))
+                    reportAnswerInVO.setId(singleOptions.getJSONObject(i).getJSONObject("ansOutVO").getString("id"));
+                reportAnswerInVO.setRptQuestionId(singleOptions.getJSONObject(i).getString("singleId"));
+                if(StringUtils.isNotBlank(singleOptions.getJSONObject(i).getString("rptId")))
+                    rptId = singleOptions.getJSONObject(i).getString("rptId") ;
+                reportAnswerInVO.setScore(singleOptions.getJSONObject(i).getFloatValue("singleScore"));
+                List<String> opt = new ArrayList<String>() ;
+                opt.add(singleOptions.getJSONObject(i).getString("singleOption")) ;
+                reportAnswerInVO.setRptQueOptIds(opt);
+                reportAnswerInVO.setQuestionType(FillType.FILL_SINGLE.getKey());
+                reportAnswerInVO.setScoreItemId(scoreItemId);
+                reportAnswerInVOs.add(reportAnswerInVO);
+            }
+        }
+
+        // 多选题处理
+        JSONArray multiOptions = jsonObject.getJSONArray("multiOptions") ;
+        if(multiOptions != null && !multiOptions.isEmpty()) {
+            for(int i = 0; i < multiOptions.size(); i++) {
+                JSONArray js = multiOptions.getJSONArray(i) ;
+                if(js != null && !js.isEmpty()) {
+                    String answerOutId = "" ;
+                    ReportAnswerInVO reportAnswerInVO = new ReportAnswerInVO() ;
+                    reportAnswerInVO.setRptQuestionId(js.getJSONObject(0).getString("multiId"));
+                    reportAnswerInVO.setScoreItemId(scoreItemId);
+
+                    List<String> opt = new ArrayList<String>() ;
+                    float scoresV = 0 ;
+                    for(int j = 0; j < js.size() ;j++) {
+                        if(StringUtils.isNotBlank(js.getJSONObject(j).getString("rptId")))
+                            rptId = js.getJSONObject(j).getString("rptId") ;
+                        if(StringUtils.equals("edit", formType)) {
+                            if(StringUtils.isNotBlank(js.getJSONObject(j).getJSONObject("ansOutVO").getString("id")))
+                                answerOutId = js.getJSONObject(j).getJSONObject("ansOutVO").getString("id") ;
+                        }
+                        scoresV +=js.getJSONObject(j).getFloatValue("multiScore") ;
+                        opt.add(js.getJSONObject(j).getString("multiOption")) ;
+                    }
+                    reportAnswerInVO.setScore(scoresV);// 累加总分
+                    reportAnswerInVO.setRptQueOptIds(opt);
+                    reportAnswerInVO.setQuestionType(FillType.FILL_MULTI.getKey());
+                    reportAnswerInVO.setId(answerOutId);
+
+                    reportAnswerInVOs.add(reportAnswerInVO);
+                }
+            }
+        }
+
+        // 问答题处理
+        JSONArray answerOptions = jsonObject.getJSONArray("answerOptions") ;
+        if(answerOptions != null && !answerOptions.isEmpty()) {
+            for(int i = 0; i < answerOptions.size(); i++) {
+                ReportAnswerInVO reportAnswerInVO = new ReportAnswerInVO() ;
+                if(StringUtils.equals("edit", formType))
+                    reportAnswerInVO.setId(answerOptions.getJSONObject(i).getJSONObject("ansOutVO").getString("id"));
+                reportAnswerInVO.setRptQuestionId(answerOptions.getJSONObject(i).getString("answerId"));
+                if(StringUtils.isNotBlank(answerOptions.getJSONObject(i).getString("rptId")))
+                    rptId = answerOptions.getJSONObject(i).getString("rptId") ;
+                // 根据题目ID与填报数值匹配区间分数
+                if(answerOptions.getJSONObject(i).getBooleanValue("hasIntervalScore")) {
+                    reportAnswerInVO.setScore(getIntervalScore(answerOptions.getJSONObject(i).getString("answerId") ,answerOptions.getJSONObject(i).getFloatValue("answerOption")));
+                }
+                reportAnswerInVO.setAnswer(answerOptions.getJSONObject(i).getString("answerOption"));
+                reportAnswerInVO.setQuestionType(FillType.FILL_ANSWER.getKey());
+                reportAnswerInVO.setScoreItemId(scoreItemId);
+                reportAnswerInVOs.add(reportAnswerInVO);
+            }
+        }
+        // 附件处理
+
+
+        // 保存填报答案
+        reportAnswerInWraperVO.setAnswers(reportAnswerInVOs);
+        fillQuestionnaireService.saveQuestionnaireOptions(reportAnswerInWraperVO, rptId, targetId); ;
+        return InvokeResult.success(true) ;
+    }
+
+    /**
+     *  getIntervalScore:(根据表单ID获取区间分数).
+     *  @return_type:String
+     *  @author zhangtian
+     *  @param intervalScores
+     *  @return
+     */
+    private float getIntervalScore(String formId, final float numberScore) {
+        List<IntervalScore> intervalScores = intervalScoreServiceApi.getIntervalScoreByScoreFormId(formId) ;
+        float finalScore = 0 ;
+        for(IntervalScore intervalScore : intervalScores) {
+            if(numberScore >= intervalScore.getLowLimit().floatValue()
+                    && numberScore <= intervalScore.getUpperLimit().floatValue()) {
+                finalScore = intervalScore.getScore().floatValue() ;
+            }
+        }
+        return finalScore ;
+    }
+}

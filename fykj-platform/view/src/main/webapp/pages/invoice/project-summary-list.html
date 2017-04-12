@@ -1,0 +1,74 @@
+<div>
+	<ol class="breadcrumb">
+        <li><a href="#">项目概要</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+    <div class="box box-info">
+    	<div class="box box-info" style="border-top: 0px;">
+    		<div class="box-header with-border"></div>
+        	<div class="box-body" style="margin-top: -10px;">
+            	<table id="listTable" class="table dataTable row-border cell-border" cellspacing="0" width="100%">
+            		<thead>
+            			<tr>
+            				<th>项目编号</th>
+            				<th>项目名称</th>
+            				<th>项目类型</th>
+            				<th>项目经理</th>
+            				<th>客户名称</th>
+            				<th>开始时间</th>
+            				<th>结束时间</th>
+            				<th>合同金额</th>
+            				<th>操作</th>
+            			</tr>
+            		</thead>
+           		</table>
+        	</div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+	var listTable;
+	$(function() {
+		listTable = $("#listTable").initDataTable({
+			url : "/pms/project/getMyProjectHasHistory",
+			urlDataFn : function() {
+				return null;
+			},
+			checkbox : false,
+			columns : [
+				{"data" : "projectCode", "width" : "15%"},
+				{"data" : "projectName", "width" : "15%"},
+				{"data" : "projectType", "width" : "10%", "render" : function(data, type, row, meta) {
+					if(data == '01') {
+                        return '<label class="label label-primary">'+row.projectTypeString+'</label>';
+                    } else if(data == '02') {
+                        return '<label class="label label-success">'+row.projectTypeString+'</label>';
+                    } else if(data == '03') {
+                        return '<label class="label label-info">'+row.projectTypeString+'</label>';
+                    } else if(data == '04') {
+                        return '<label class="label label-warning">'+row.projectTypeString+'</label>';
+                    } else if(data == '05') {
+                        return '<label class="label label-danger">'+row.projectTypeString+'</label>';
+                    } else {
+                        return '<label class="label label-default">'+row.projectTypeString+'</label>';
+                    }
+                }},
+				{"data" : "projectManagerName", "width" : "10%"},
+				{"data" : "customer", "width" : "15%"},
+				{"data" : "beginDate", "width" : "10%"},
+				{"data" : "endDate", "width" : "10%"},
+				{"data" : "projectAmt", "width" : "10%"},
+				{"data" : null, "render" : function(data) {
+					var id = data.id;
+					return "<button class=\"btn btn-success btn-xs\" onclick=\"toProjectSummary('"+id+"');\">概要</button>";
+				}}
+			]
+		});
+	});
+	
+	
+	function toProjectSummary(id) {
+		httpservice.htmlEnt.skiphtml("/pms/summary/toProjectSummaryView?id=" + id);
+	}
+</script>

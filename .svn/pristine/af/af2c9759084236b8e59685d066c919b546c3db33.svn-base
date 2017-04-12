@@ -1,0 +1,228 @@
+package com.fykj.product.evaluation.modular.evaluating.evaltarget.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fykj.platform.kernel._c.ServerSessionHolder;
+import com.fykj.platform.kernel._c.model.InvokeResult;
+import com.fykj.platform.kernel._c.model.JPage;
+import com.fykj.platform.kernel._c.model.JPageUtil;
+import com.fykj.platform.kernel._c.model.SimplePageRequest;
+import com.fykj.platform.kernel.parameter.annotation.ParamValidation4Controller;
+import com.fykj.platform.util.Copy;
+import com.fykj.platform.util.JStringUtils;
+import com.fykj.platform.web.model.SimplePageRequestVO;
+import com.fykj.product.evaluation.common.constant.SplitCharacter;
+import com.fykj.product.evaluation.modular.evaluating.Codes.Project.EVAL_TARGET;
+import com.fykj.product.evaluation.modular.evaluating.Codes.Project.EVAL_T_C;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.model.EvalTarget;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.service.EvalTargetService;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.BaseEvalTargetVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.EvalTargetAddInVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.EvalTargetCriteriaInVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.EvalTargetDetailOutVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.EvalTargetEditInVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.EvalTargetRecordOutVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.UserDetailCriteriaInVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.UserDetailVO;
+import com.fykj.sample.cache.DictionaryCache;
+
+/**
+ * @author JIAZJ
+ */
+@Controller
+@RequestMapping("/evalTarget")
+@ParamValidation4Controller
+public class EvalTargetController {
+
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+	@Autowired
+	private DictionaryCache dictionaryCache;
+	
+	
+	@Autowired
+	private EvalTargetService evalTargetService;
+
+	@ResponseBody
+	@RequestMapping("/saveEvalTarget")
+	public InvokeResult saveEvalTarget(EvalTargetAddInVO evalTargetAddInVO) throws Exception {
+		EvalTarget evalTarget = Copy.simpleCopy(evalTargetAddInVO, EvalTarget.class);
+//		evalTarget.setStartDate(JDateUtils.parseDate(evalTargetAddInVO.getStartDateStr()));
+//		evalTarget.setEndDate(JDateUtils.parseDate(evalTargetAddInVO.getEndDateStr()));
+		evalTargetService.saveEvalTarget(evalTarget);
+		return InvokeResult.success(evalTarget.getId());
+	}
+
+	@ResponseBody
+	@RequestMapping("/updateEvalTarget")
+	public InvokeResult updateEvalTarget(EvalTargetEditInVO evalTargetEditInVO) throws Exception {
+		EvalTarget evalTarget = Copy.simpleCopy(evalTargetEditInVO, EvalTarget.class);
+		evalTargetService.updateEvalTarget(evalTarget);
+		return InvokeResult.success(evalTarget.getId());
+	}
+	
+	@ResponseBody
+	@RequestMapping("/getEvalTargetById")
+	public InvokeResult getEvalTargetById(String id) throws Exception {
+		EvalTarget evalTarget = evalTargetService.getEvalTargetById(id);
+		EvalTargetDetailOutVO evalTargetDetailOutVO = null;
+		if (evalTarget != null) {
+			evalTargetDetailOutVO = Copy.simpleCopy(evalTarget,
+					EvalTargetDetailOutVO.class);
+			fillBasicInfo(evalTargetDetailOutVO);
+			
+//			evalTargetDetailOutVO.setStartDateStr(JDateUtils.format(evalTargetDetailOutVO.getStartDate()));
+//			evalTargetDetailOutVO.setEndDateStr(JDateUtils.format(evalTargetDetailOutVO.getEndDate()));
+//			evalTargetDetailOutVO.setStatusName(
+//					dictionaryCache.getDictDataName(P_STATUS.TYPE_NAME,
+//							evalTargetDetailOutVO.getStatus())); 
+		}
+		return InvokeResult.success(evalTargetDetailOutVO);
+	}
+
+	@ResponseBody
+	@RequestMapping("/deleteEvalTargetById")
+	public InvokeResult deleteEvalTargetById(String ids) throws Exception {
+		String[] arr = ids.split(SplitCharacter.SPLIT_COMMA.key);
+		evalTargetService.deleteEvalTargets(arr);
+		return InvokeResult.success(true);
+	}
+	
+	
+	private void fillBasicInfo(BaseEvalTargetVO baseEvalTargetVO){
+		
+		if(EVAL_TARGET.PERS.equals(baseEvalTargetVO.getType())){
+			String orgId=baseEvalTargetVO.getOrgId();
+			if(JStringUtils.isNotNullOrEmpty(orgId)){
+				EvalTarget evalTarget=evalTargetService.getEvalTargetById(orgId);
+				baseEvalTargetVO.setOrgName(evalTarget.getName());
+			}
+		}
+		baseEvalTargetVO.setTypeName(dictionaryCache.getDictDataName(EVAL_TARGET.TYPE_NAME,
+				baseEvalTargetVO.getType()));
+		baseEvalTargetVO.setCategoryName(dictionaryCache.getDictDataName(EVAL_T_C.TYPE_NAME,
+				baseEvalTargetVO.getCategory()));
+		
+	}
+	
+
+	@ResponseBody
+	@RequestMapping("/getEvalTargetsByPage")
+	public InvokeResult getEvalTargetsByPage(EvalTargetCriteriaInVO evalTargetCriteriaInVO,
+			SimplePageRequestVO simplePageRequestVO) throws Exception {
+		JPage<EvalTargetDetailOutVO> page = evalTargetService.getBindEvalTargetOnProject(evalTargetCriteriaInVO,
+				new SimplePageRequest(simplePageRequestVO.getPage(), simplePageRequestVO.getSize()));
+		List<EvalTargetDetailOutVO> content = page.getContent();
+
+		JPageUtil.replaceConent(page, content);
+		return InvokeResult.success(page);
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/getEvalTargets")
+	public InvokeResult getEvalTargets(EvalTargetCriteriaInVO evalTargetCriteriaInVO) throws Exception {
+		return InvokeResult.success(evalTargetService.getEvalTargets(evalTargetCriteriaInVO));
+	}
+
+	
+	
+	@ResponseBody
+	@RequestMapping("/getBindUser")
+	public InvokeResult getBindUser(UserDetailCriteriaInVO userDetailCriteriaInVO,
+			SimplePageRequestVO simplePageRequestVO) throws Exception {
+		JPage<UserDetailVO> page = evalTargetService.getBindUser(userDetailCriteriaInVO, 
+				new SimplePageRequest(simplePageRequestVO.getPage(), simplePageRequestVO.getSize()));
+		return InvokeResult.success(page);
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/getUnbindUser")
+	public InvokeResult getUnbindUser(UserDetailCriteriaInVO userDetailCriteriaInVO,
+			SimplePageRequestVO simplePageRequestVO) throws Exception {
+		JPage<UserDetailVO> page = evalTargetService.getUnbindUser(userDetailCriteriaInVO, 
+				new SimplePageRequest(simplePageRequestVO.getPage(), simplePageRequestVO.getSize()));
+		return InvokeResult.success(page);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bindEvalTargetUser")
+	public InvokeResult bindEvalTargetUser(String evalTargetId,String userId) throws Exception {
+		String[] userIds=JStringUtils.isNotNullOrEmpty(userId)?
+				userId.split(","):new String[]{};
+		evalTargetService.
+				bindEvalTargetUser(evalTargetId, userIds);
+		return InvokeResult.success(true);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/unbindEvalTargetUser")
+	public InvokeResult unbindEvalTargetUser(String evalTargetId,String userId) throws Exception {
+		String[] userIds=JStringUtils.isNotNullOrEmpty(userId)?
+				userId.split(","):new String[]{};
+		evalTargetService.
+			unbindEvalTargetUser(evalTargetId, userIds);
+		return InvokeResult.success(true);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/getEvalTargetByUserId")
+	public InvokeResult getEvalTargetByUserId() throws Exception {
+		String userId = ServerSessionHolder.getSessionUser().getId() ;
+		return InvokeResult.success(evalTargetService.getEvalTargetByUserId(userId));
+	}
+	
+	
+	
+	@ResponseBody
+	@RequestMapping("/getBindEvalTargetOnProject")
+	public InvokeResult getBindEvalTargetOnProject(EvalTargetCriteriaInVO evalTargetCriteriaInVO,
+			SimplePageRequestVO simplePageRequestVO) throws Exception {
+		JPage<EvalTargetDetailOutVO> page = evalTargetService.getBindEvalTargetOnProject(evalTargetCriteriaInVO, 
+				new SimplePageRequest(simplePageRequestVO.getPage(), simplePageRequestVO.getSize()));
+		for(EvalTargetDetailOutVO item:page.getContent()){
+			item.setCategoryName(dictionaryCache.getDictDataName("EVAL_T_CATEGORY",item.getCategory()
+					));
+		}
+		return InvokeResult.success(page);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/getUnbindEvalTargetOnProject")
+	public InvokeResult getUnbindEvalTargetOnProject(EvalTargetCriteriaInVO evalTargetCriteriaInVO,
+			SimplePageRequestVO simplePageRequestVO) throws Exception {
+		JPage<EvalTargetDetailOutVO> page = evalTargetService.getUnbindEvalTargetOnProject(evalTargetCriteriaInVO, 
+				new SimplePageRequest(simplePageRequestVO.getPage(), simplePageRequestVO.getSize()));
+		return InvokeResult.success(page);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bindEvalTargetProject")
+	public InvokeResult bindEvalTargetProject(String evalTargetId,String projectId) throws Exception {
+		String[] evalTargetIds=JStringUtils.isNotNullOrEmpty(evalTargetId)?
+				evalTargetId.split(","):new String[]{};
+		evalTargetService.
+				bindEvalTargetProject(evalTargetIds, projectId);
+		return InvokeResult.success(true);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/unbindEvalTargetProject")
+	public InvokeResult unbindEvalTargetProject(String evalTargetId,String projectId) throws Exception {
+		String[] evalTargetIds=JStringUtils.isNotNullOrEmpty(evalTargetId)?
+				evalTargetId.split(","):new String[]{};
+		evalTargetService.
+				unbindEvalTargetProject(evalTargetIds, projectId);
+		return InvokeResult.success(true);
+	}
+	
+}

@@ -1,0 +1,101 @@
+<namespace id="title-add">
+	<ol class="breadcrumb">
+        <li><a href="#">职位信息维护</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+    <div class="box box-info">
+    	<form role="form" id="addForm"  class="form-horizontal">
+    		<div class="row">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px; margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"> 提交</i> 
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body">
+            	<div class="form-group">
+                    <label for="code" class="col-sm-1 control-label requiredMask input-sm">职位代码</label>
+                    <div class="col-sm-5">
+                        <input name="code" type="text" class="form-control input-sm" placeholder="" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="name" class="col-sm-1 control-label requiredMask input-sm">职位名称</label>
+                    <div class="col-sm-5">
+                        <input name="name" type="text" class="form-control input-sm" placeholder="" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cost" class="col-sm-1 control-label requiredMask input-sm">默认成本</label>
+                    <div class="col-sm-5">
+                        <input name="cost" type="text" class="form-control input-sm" placeholder="单位 : 元/月" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description" class="col-sm-1 control-label input-sm">职位描述</label>
+                    <div class="col-sm-5">
+                        <textarea name="description" rows="3" class="form-control input-sm" placeholder=""></textarea>
+                    </div>
+                </div>
+            </div>
+    	</form>
+    </div>
+</namespace>
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#title-add').namespace(),
+			init : function() {
+				$("#addForm").validate({
+					rules : {
+						'code' : {
+							required : true,
+							maxlength : 255
+						},
+						'name' : {
+							required : true,
+							maxlength : 255
+						},
+						'cost' : {
+							required : true,
+							decimal:true
+						},
+						'description' : {
+							maxlength : 100
+						}
+					},submitHandler : function() {
+						page.doAdd();
+					}
+				});
+			},
+			doAdd : function() {
+				var submitForm = {
+                    endpoint : "/pms/title/save",
+                    formObj : $("#addForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.doCancel();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                    }
+                };
+
+                page.namespace.submitForm(submitForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml("/pms/title/toTitleList");
+			}
+		}
+		
+		page.init();
+		
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+	});
+</script>

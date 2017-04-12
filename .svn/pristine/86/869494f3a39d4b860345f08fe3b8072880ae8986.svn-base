@@ -1,0 +1,181 @@
+<namespace id="dictionaryData-list" ms-controller="dictionaryData_list">
+    <ol class="breadcrumb">
+        <li><a href="#">字典明细管理</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+	<section class="content" id="searchDictionaryDataSection"
+		ms-controller="dictionaryData-list">
+		<div class="box box-info">
+			<form class="form-horizontal" id="searchDictionaryDataForm">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="btn-group">
+                                <a class="btn btn-success btn-sm" id="addBtn">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    添加
+                                </a>
+                                <button class="btn btn-danger btn-sm" type="button" id="deleteBtn" >
+                                    <span class="glyphicon glyphicon-minus"></span> 删除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon">字典名称</span>
+                                <select id="code" name="code" class="form-control select2 input-sm">
+                                	<option value=""></option>
+									<option  ms-for="el in @dicNames"  ms-attr="{value:el.code}">
+										{{el.name}}
+									</option>
+								</select>
+                                
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+                                        <i class="fa fa-search"></i> 查询
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			</form>
+		</div>
+		<div class="box box-info" style="border-top: 0px;">
+			<!--<div class="box-header with-border">-->
+                <!--<div class="btn-group">-->
+                    <!--<a class="btn btn-success btn-sm" id="addBtn">-->
+                        <!--<span class="glyphicon glyphicon-plus"></span>-->
+                        <!--添加-->
+                    <!--</a>-->
+                    <!--<button class="btn btn-danger btn-sm" id="deleteBtn" >-->
+                        <!--<span class="glyphicon glyphicon-minus"></span> 删除-->
+                    <!--</button>-->
+                <!--</div>-->
+
+            <!--</div>-->
+			<div class="box-body" id="dictionaryDataList" style="margin-top: -10px;">
+				<table id="dictionaryDataListTable"
+					class="table dataTable row-border cell-border" cellspacing="0"
+					width="100%">
+					<thead>
+						<tr>
+							<th></th>
+							<th>字典类型</th>
+							<th>描述</th>
+							<th>键值</th>
+							<th>排序</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#dictionaryData-list').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "dictionaryData_list",
+    		        dicNames:{},
+    		        data: {}
+    		    })
+    		},
+			init : function() {
+				
+			},
+			doQuery : function() {
+				page.listTable.ajax.reload();
+			},
+			doView : function(id) {
+				page.namespace.skiphtml("/pages/dictionary/dictionaryData-view.html?id=" + id);
+			},
+			doEdit : function(id) {
+				page.namespace.skiphtml("/pages/dictionary/dictionaryData-edit.html?id=" + id);
+			},
+			doDel : function(id) {
+				var HtmlMenuOpt = {
+					endpoint : "/dictionary/deleteDictionaryData",
+				  	data : {'ids' : id},
+				  	success : function(data) {
+				  		page.listTable.ajax.reload();
+				  	}		
+				};
+				
+				page.namespace.getRequest(HtmlMenuOpt);
+			},
+			doBatchDel : function() {
+				var selectRows = $('#dictionaryDataListTable').getSelectedRow();
+				if(selectRows.length == 0) {
+					alertTool.warning("请选择要删除的记录!");
+					return;
+				}
+				page.namespace.confirm(function(){
+					page.doDel(selectRows.join(","));
+				});
+			},
+			doAdd : function() {
+				page.namespace.skiphtml("/pages/dictionary/dictionaryData-add.html");
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/dictionary/getAllDictionarys",
+					data : {},
+					success : function(data) {
+						 page.model.vm.dicNames=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		};
+		
+		page.listTable = $('#dictionaryDataListTable').initDataTable({
+			url : "/dictionary/getDictionaryDataPage",
+			urlDataFn : function() {
+				return $("#searchDictionaryDataForm").serializeJson();
+			},
+			lengthChange : false,
+			checkbox : true,
+			ops : {
+				view : function(id, rowData) {
+					page.doView(id);
+				},
+				del : function(id, rowData) {
+					page.doDel(id);
+				},
+				edit : function(id, rowData) {
+					page.doEdit(id);
+				}
+			},
+			columns : [{
+				"data" : "dictName",
+				"orderable" : false,
+				"width" : "15%"
+			}, {
+				"data" : "name",
+				"width" : "10%"
+			}, {
+				"data" : "value",
+				"width" : "15%"
+			}, {
+				"data" : "sequence",
+				"width" : "10%"
+			} ]
+		});
+		
+		page.init();
+		
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+		page.namespace.root.find('#deleteBtn').on('click', page.doBatchDel);
+		page.namespace.root.find('#addBtn').on('click', page.doAdd);
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+	});
+</script>

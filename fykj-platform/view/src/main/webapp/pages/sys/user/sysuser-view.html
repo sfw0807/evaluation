@@ -1,0 +1,93 @@
+<namespace id="sysuser-view" ms-controller="sysuser_view">
+	<!--<section class="content-header">-->
+		<!--<h1>-->
+			<!--用户管理<small>明细</small>-->
+		<!--</h1>-->
+		<ol class="breadcrumb">
+			<li><a href="#">用户管理</a></li>
+			<li><a href="#">明细</a></li>
+		</ol>
+	<!--</section>-->
+	<section class="content" id="viewSysUserSection">
+            <div class="box box-info">
+                <div class="row ">
+                    <div class="col-sm-12">
+                        <!-- 右对齐的 btn-group -->
+                        <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 31px;">
+                            <a class="btn btn-sm btn-default" id="btnCancel">
+                                <i class="fa fa-align-justify"> 返回</i>
+                            </a>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+   			 <div class="box-body">
+   			 	<form role="form"  id="viewSysUserForm" class="form-horizontal">
+	   			 	<div class="form-group">
+	   			 		<label for="name" class="col-sm-1 input-sm control-label">用户名称</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="name" class="form-control input-sm label-form-control">{{@data.name}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="userAccount" class="col-sm-1 input-sm control-label">用户账号</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="userAccount" class="form-control input-sm label-form-control">{{@data.userAccount}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="email" class="col-sm-1 input-sm control-label">用户邮箱</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="email" class="form-control input-sm label-form-control">{{@data.email}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="disabled" class="col-sm-1 input-sm control-label">用户状态</label>
+						<div class="col-sm-5">
+	   			 			<span id="userAccount"  class="form-control input-sm label-form-control">{{@data.disabledDict}}</span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="description" class="col-sm-1 input-sm control-label">用户描述</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="description"  class="form-control label-form-control">{{@data.description}}</span>
+	   			 		</div>
+	   			 	</div>
+   			 	</form>
+   			 </div>
+   		<!--</div>-->
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#sysuser-view').namespace(),
+			model:{
+				vm:avalon.define({
+			        $id: "sysuser_view",
+			        data: {}
+			    })
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/sys/user/sysuser-list.html');
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/sysuser/getSysUserById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data=data;
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		}
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		page.initView();
+	});
+</script>

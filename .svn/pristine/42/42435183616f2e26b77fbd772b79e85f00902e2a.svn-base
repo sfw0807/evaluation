@@ -1,0 +1,61 @@
+<namespace id="element-view">
+    <ol class="breadcrumb">
+        <li><a href="#">元素管理</a></li>
+        <li><a href="#">明细</a></li>
+    </ol>
+	<section class="content" id="viewElementSection" ms-controller="element_view">
+        <div class="box box-info">
+            <div class="row ">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 31px;">
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            </div>
+         <div class="box-body">
+   			 	<form role="form"  id="viewElementForm" class="form-horizontal">
+	   			 	<div class="form-group">
+	   			 		<label for="name" class="col-sm-1 control-label input-sm">元素名称</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="name" class="form-control label-form-control input-sm" th:text="${element.name}"></span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="funcId" class="col-sm-1 control-label input-sm">元素标识</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="funcId"  class="form-control label-form-control input-sm" th:text="${element.funcId}"></span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="menuName" class="col-sm-1 control-label input-sm">所属菜单</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="menuName" class="form-control label-form-control input-sm" th:text="${element.menuName}"></span>
+	   			 		</div>
+	   			 	</div>
+	   			 	<div class="form-group">
+	   			 		<label for="description" class="col-sm-1 control-label input-sm">元素描述</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="description"  class="form-control label-form-control input-sm" th:text="${element.description}"></span>
+	   			 		</div>
+	   			 	</div>
+   			 	</form>
+   			 </div>
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#element-view').namespace(),
+			doCancel : function() {
+				page.namespace.skiphtml("/element/toElementList");
+			}
+		}
+		
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+	});
+</script>

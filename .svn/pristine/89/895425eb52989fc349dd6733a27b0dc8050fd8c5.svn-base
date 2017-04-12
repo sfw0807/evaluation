@@ -1,0 +1,700 @@
+
+<style type="text/css">
+    #targetNameList {
+        padding: 0 0 0 0px;
+        margin: 0;
+        color: #0072B3;
+        height: 50px;
+        width: 95%;
+        line-height: 60px;
+    }
+    
+    p{width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+
+    .red {
+        color: red;
+    }
+
+    .blue {
+        color: #2D92BF;
+		font-weight:bold;
+    }
+
+    .scoreContent {
+        height: 50px;
+        margin: 0 30px 0 30px;
+        line-height: 40px;
+    }
+
+    #headInfo h4 {
+        font-weight: 600;
+    }
+
+    #MonitorInformation_list td {
+        border-right: 1px solid #cccccc;
+    }
+
+    #MonitorInformation_list th {
+        border-right: 1px solid #cccccc;
+        background-color: #f1f1f1;
+        font-weight: normal;
+        color: #2D92BF;
+        text-align: center;
+    }
+
+    .bblue {
+        background-color: #F5FAFC;
+        text-align: center;
+        color: #0072B3;
+    }
+
+    .bwhite {
+        background-color: #FFFFFF;
+    }
+
+    th {
+        text-align: center;
+    }
+
+    #TargetScoreMaintain_list td {
+        text-align: center;
+        overflow: hidden;
+    }
+
+    #scoreBody td {
+        overflow: hidden;
+        vertical-align: middle;
+    }
+
+    #AttachmentBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #StudentCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #TeacherCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #InspectorMaterialBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<style type="text/css">
+
+
+
+
+.item_finish{
+        background-color: #e2f5a9 !important;
+}
+.th_order{}
+.end_inp{}
+.expert_inp{}
+</style>
+
+<div  id="evalTargetScore_T_Any"  style="display: none;">
+<table id="evalTargetScoreTable_Any"
+	class="table table-hover table-bordered lead-list" cellspacing="0"
+	width="100%"   style="table-layout: fixed;"  >
+	<thead  class="trThread">
+		<tr>
+			<th>分类</th>
+			<th>名称</th>
+			<th id="evalTargetScoreTable_Any_A"  style="width: 20%">备注</th>
+			<th>自评分</th>
+			<th  id="evalTargetScoreTable_Any_A_EXP">专家打分</th>
+			<th  id="evalTargetScoreTable_Any_A_END">终评打分</th>
+		</tr>
+	</thead>
+	<tbody id="evalTargetScoreTable_Any_Body"></tbody>
+</table>
+</div>
+<div id="evalTargetScore_C_Any_Con"
+style="width: 100%;background-color: white;padding-left: 10px;margin-top: 10px;  text-align: left
+">
+
+<button class="btn btn-primary btn-sm"  id="r_Btn">返回</button>
+
+<div  class="listPanel"   style="border: solid 1px #337ab7;">
+
+<div  id="evalTargetScore_C_Any">
+
+<div class="col-sm-12">
+
+<div>
+                <table style="width: 100%">
+                    <tbody><tr>
+                        <td style="width: 40%">
+                            得分点描述： <label id="itemName"  ></label><br/>
+                        </td>
+                        <td style="width: 18%; padding-left: 20px;">
+                        
+                        <select id="category" name="category" class=" form-control ">
+								</select>
+                            
+                        </td>
+                        <td>
+                            <input type="text"  name="name" class=" form-control "   placeholder="请输入学校名称关键字"/>
+                        </td>
+                        <td>最高分为：<span id="maxScore" style="color: red;"></span>  分</td>
+                    </tr>
+                </tbody></table>
+            </div>
+           <div>
+                已评分学校 <span id="_done"></span> 所,   
+                未评分学校 <span id="_undone"  style="color: red;"></span> 所
+            </div> 
+            <div id="askMAP">
+            
+            </div>
+
+</div>
+
+
+<div  id="evalTargetScoreTable_C_Any">
+
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+$(function(){
+try{
+	
+	function error(info){
+		alert(info);
+	}
+	
+	function success(info){
+		alert(info);
+	}
+	
+	function _do(data,fn){
+		if(data.success){
+			fn(data.data);
+		}else{
+			error(data.errorMessage);			
+		}
+	}
+	
+	var $root=$('#evalTargetScore_C_Any_Con');
+	
+	function _initTemplate(){
+		$root.find('#evalTargetScoreTable_C_Any').empty();
+		$root.find('#evalTargetScoreTable_C_Any').html($('#evalTargetScore_T_Any').html());
+		_ready();
+	}
+	
+	
+	function isSelfRoleType(){
+		return $_params.userInfo.userTypes.includes('2')
+		||$_params.userInfo.userTypes.includes('1');
+	}
+	
+	function isExpertRoleType(){
+		return $_params.userInfo.userTypes.includes('3');
+	}
+	
+	function isEndRoleType(){
+		return $_params.userInfo.userTypes.includes('4');
+	}
+	
+	function isProjectSelf(){
+		return ("SELF_EVAL"==$_params.currentProjectDetail.status
+				||"PUBLISH"==$_params.currentProjectDetail.status);
+	}
+	
+	function isProjectExpert(){
+		return "EXPERT_EVAL"==$_params.currentProjectDetail.status;
+		}
+		
+	function isProjectEnd(){
+		return "END_EVAL"==$_params.currentProjectDetail.status;
+	}
+	
+	function isProjectArch(){
+		return "ARCHIVE"==$_params.currentProjectDetail.status;
+	}
+	
+	function isExpertEditable(){
+		return isProjectExpert()&&isExpertRoleType();
+	}
+	
+	function isExpertReadable(){
+		return (isEndRoleType()&&(isProjectExpert()||isProjectEnd()||isProjectArch()))
+			||(isExpertRoleType()&&(isProjectEnd()||isProjectArch()));
+	}
+	
+	function isExpertHiden(){
+		return isSelfRoleType()||isProjectSelf();
+	}
+	
+	function isEndEditable(){
+		return isEndRoleType()&&isProjectEnd();
+	}
+	
+	function isEndReadable(){
+		return isEndRoleType()&&isProjectArch();
+	}
+	
+	function isEndHiden(){
+		return isSelfRoleType()||isExpertRoleType()
+		||(isEndRoleType()&&(!isProjectEnd()));
+	}
+	
+	function _ready(){
+		
+	}
+	
+	function tdr(lb){
+		return '<td style="    text-align: center;">'+lb+'</td>';
+	}
+	
+	function thr(lb){
+		return '<th class="th_order" >'+lb+'</th>';
+	}
+	
+	function render_th(data){
+		var ths='';
+		for(var i=0; i< data.length;i++){
+			ths=ths+thr(data[i]);
+		}
+		$(ths).insertBefore($root.find('#evalTargetScoreTable_Any_A')) ;
+	}
+	
+	function renderAskMap(data){
+		var str="";
+		for( var i=0;i<data.length;i++){
+			var v=data[i];
+			if(v.fillInfos){
+				for( var j=0;j<v.fillInfos.length;j++){
+					var f=v.fillInfos[j];
+					str=str+f.askKey+" : "+f.ask+"<br/>";
+				}
+			}
+			break;
+		}
+		
+		$root.find('#askMAP').html(str);
+	}
+	
+	function render(data){
+		var thsData=[];
+		var trs='';
+		for( var i=0;i<data.length;i++){
+			var v=data[i];
+			trs=trs+'<tr  class="lead-item '
+			+(i%2==0?"":" lead-even ")
+			/*+(isExpert()&&isExpertRole()&&v.expertScore?" item_finish ":"")
+			+(isEnd()&&isEndRole()&&v.endScore?" item_finish ":"")*/
+			+ '">'
+			var tds='';
+			tds=tds+tdr(v.categoryName==null?'':v.categoryName);
+			tds=tds+tdr(v.name);
+			if(v.fillInfos){
+				for( var j=0;j<v.fillInfos.length;j++){
+					var f=v.fillInfos[j];
+					
+					if(f.answer){
+						
+						if(f.type=="1"){
+							//file
+							var al="";
+							for(var _jj=0;_jj<f.answer.length;_jj++){
+								var _f=f.answer[_jj];
+								var href=WEB_ROOT+'/resource/download?'
+								+'fileName='+_f.fileName
+								+'&file='+_f.filePath;
+								al=al+'<a name="file-link"  href="'+href+'" data-path="'+_f.filePath+'">'+_f.fileName+'</a><br/>';
+							}
+							tds=tds+tdr(al);
+						}else{
+							//tds=tds+tdr('<p   data-toggle="tooltip" data-placement="bottom" ' +' title="'+f.answer+'" >'+f.answer+'</p>');
+							tds=tds+tdr(f.answer);
+						}
+					}
+					else{
+						tds=tds+tdr("");
+					}
+					
+					thsData[j]=f.askKey;
+				}
+			}
+			
+			/*
+			var con=v.remark;
+			if(v.remark.length>15){
+				con=v.remark.substring(0,15)+"...";
+				tds=tds+tdr('<span   data-toggle="tooltip" data-placement="bottom" '
+						+' title="'+v.remark+'" >'+con+'</span>');
+			}
+			else{
+				tds=tds+tdr(v.remark);
+			}*/
+			
+			tds=tds+tdr('<p   data-toggle="tooltip" data-placement="bottom" '
+					+' title="'+(v.remark?v.remark:'')+'" >'+(v.remark?v.remark:'')+'</p>');
+
+			tds=tds+tdr((v.selfScore?v.selfScore:""));
+			
+			if(isExpertEditable()){
+				var inp='<input type="text" '
+					 +' style="width: 50px "'
+					 +' class=" expert_inp  form-control"' 
+					 +' data-itemid="'+v.itemId+'"'
+					 +' data-evaltargetid="'+v.evalTargetId+'"'
+					 +' value="'+(v.expertScore?v.expertScore:"")+'"'
+					 +' />';
+				tds=tds+tdr(inp);
+			}else if(isExpertReadable()){
+				tds=tds+tdr((v.expertScore?v.expertScore:""));
+			}else if(isExpertHiden()){
+				$root.find('#evalTargetScoreTable_Any_A_EXP').remove();
+			}
+			
+			if(isEndEditable()){
+				var inp='<input type="text" ' 
+					 +' style="width: 50px"'
+					 +' class=" end_inp  form-control"' 
+					 +' data-itemid="'+v.itemId+'"'
+					 +' data-evaltargetid="'+v.evalTargetId+'"'
+					 +' value="'+(v.endScore?v.endScore:"")+'"'
+					 +' />';
+				tds=tds+tdr(inp);
+			}else if(isEndReadable()){
+				tds=tds+tdr((v.endScore?v.endScore:""));
+			}else if(isEndHiden()){
+				$root.find('#evalTargetScoreTable_Any_A_END').remove();
+			}
+			trs=trs+tds+'</tr>';
+		}
+		$root.find('#evalTargetScoreTable_Any_Body').html(trs);
+		
+		$root.find('[data-toggle="tooltip"]').tooltip();
+		
+		renderAskMap(data);
+		render_th(thsData);
+		
+		var $table=$root.find('#evalTargetScoreTable_C_Any').find('table');
+		
+		$root.find('.th_order')
+		.css('cursor','pointer')
+		.on('click',function(e){
+			
+			var st=$(this).data('sort');  // current sortable status.
+			if(st){
+				st=!st;	
+			}else{
+				st=true;
+			}
+			$(this).data('sort',st);
+			var ix=$table.find('th').index($(this));
+			function s(i,v){
+				this.$tr=i;
+				this.v=v;
+			}
+			var $trs=$table.find('tbody > tr');
+			var trs=[];
+			var ns=[];
+			for(var i=0;i<$trs.length;i++){
+				var vl=$($($trs[i]).find('td')[ix]).text();
+				var _s=new s($($trs[i]),vl);
+				trs[i]=_s;
+				ns[i]=vl;
+			}
+			
+			var isN=true;
+			$.each(ns,function(e){
+				if(!$.isNumeric(ns[e])){
+					isN=false;
+				}
+			});
+			if(isN){
+				ns.sort(function(a,b){
+					return (a-b)*(st?1:-1);
+				});
+			}else{
+				ns.sort();
+				if(st){
+					ns.reverse();
+				}
+			}
+			
+			/*
+			ns.sort(function(a,b){
+				if(a<b){
+					return -1 *(st?1:-1)
+				}
+				if(a>b){
+					return 1 *(st?1:-1)
+				}
+				if(a==b){
+					return 0 *(st?1:-1)
+				}
+			});
+			*/
+			
+			var _c=1;
+			var $p;
+			$.each(ns,function(e){
+				for(var i=0;i<trs.length;i++){
+					var _t=trs[i];
+					if(_t.v==ns[e]){
+						if(_c%2==0){
+							_t.$tr.addClass("lead-even");
+						}else{
+							_t.$tr.removeClass("lead-even");
+						}
+						if($p){
+							_t.$tr.insertAfter($p);
+						}else{
+							_t.$tr.prependTo($table.find('#evalTargetScoreTable_Any_Body'));
+						}
+						$p=_t.$tr;
+						_c++;
+					}
+				}
+			})
+		});
+		
+		$root.find('.end_inp').on('change',function(e){
+			var $this=$(e.target);
+			var val=$this.val();
+			
+			if(""!=val&&!$.isNumeric(val)){
+				error("not a numeric.");
+				return;
+			}
+			
+			if(val>_item.highestScore){
+				$this.val(_item.highestScore);
+			}
+			
+			if(val<0){
+				$this.val(0);
+			}
+			
+			
+			$.post("/web/itemScore/updateEndScore",
+					{
+						'itemId' : $this.data('itemid'),
+						'evalTargetId' : $this.data('evaltargetid'),
+						'score' : $this.val()
+					},
+					function(data){
+						_do(data,function(d){
+							if(val!=""){
+								$this.parents('tr').addClass('item_finish');
+							}else{
+								$this.parents('tr').removeClass('item_finish');
+							}
+							refreshDone();
+						})
+					});			
+			
+		});
+		
+		
+		$root.find('.expert_inp').on('change',function(e){
+			var $this=$(e.target);
+			var val=$this.val();
+			if(""!=val&&!$.isNumeric(val)){
+				error("not a numeric.");
+				return;
+			}
+			
+			if(val>_item.highestScore){
+				$this.val(_item.highestScore);
+			}
+			
+			if(val<0){
+				$this.val(0);
+			}
+			
+			$.post("/web/itemScore/updateExpertScore",
+					{
+						'itemId' : $this.data('itemid'),
+						'evalTargetId' : $this.data('evaltargetid'),
+						'score' : $this.val()
+					},
+					function(data){
+						_do(data,function(d){
+							if(val!=""){
+								$this.parents('tr').addClass('item_finish');
+							}else{
+								$this.parents('tr').removeClass('item_finish');
+							}
+							refreshDone();
+						})
+					});			
+			
+		});
+		
+		/*
+		$root.find('[name="file-link"]')
+		.attr('href',WEB_ROOT+'/resource/download?'
+				+'fileName=test.txt'
+				+'&file=E:/codetemplates.xml');
+		*/
+	}
+	
+	function _request(params){
+		
+		_initTemplate();
+		
+		$.get("/web/itemScore/getAllEvalTargetByItem",
+				params,
+				function(data){
+					_do(data,function(d){
+						render(d);
+						refreshDone();
+					})
+				});
+	}
+	
+	$.get(WEB_ROOT+"/dictionary/getDictionaryByCode",
+			{"code":'EVAL_T_CATEGORY'},
+			function(data){
+				_do(data,function(d){
+					var opts='<option value="">全部</option>';
+					for(var i=0;i<d.length;i++){
+						var item=d[i];
+						opts=opts+'<option value="'+item.value+'">'+item.name+'</option>';
+					}
+					$root.find('#category').html(opts);					
+				})
+			});
+	
+	
+	var $params=$_storage.get(VIEW_ROOT+"/front/expect/evalTarget-score.html");
+	var _itemId=
+		$_storage.get(VIEW_ROOT+"/front/expect/evalTarget-score.html").scoreItemId;
+
+	function _params(){
+		return {
+			'itemId' : _itemId,
+			//'evalTargetId' : "471eb1f4-00e8-4f48-a708-f52e40b38459",
+			name : $root.find('[name="name"]').val(),
+			category : $root.find('#category').val()
+		}
+	}
+	
+	$root.find('[name="name"]').on('change',function(e){
+		_request(_params());
+	});
+	
+	$root.find('#category').on('change',function(e){
+		_request(_params());
+	});
+	
+	_request(_params());
+	
+	var _item={};
+	
+	$.post(WEB_ROOT+"/scoreItem/getScoreItemById",
+			 {id : _itemId},
+			 function(data){
+				 _do(data,function(d){
+					$root.find('#maxScore').text(d.highestScore);
+					$root.find('#itemName').text(d.scoreItemName);
+					_item=d;
+				 });
+			 });
+	
+	$root.find('#r_Btn').on('click',function(){
+		var url = VIEW_ROOT + "/front/expect/expect-projectFill-list.html" ;
+		var params =$params;
+		$_storage.put(url, params) ;
+		$("#frameContainer").load(url, function(){
+		
+		}) ;
+	});
+	
+	function refreshDone(){
+		var _e=false;
+		var _d=0;
+		var _ud=0;
+		var $table=$root.find('#evalTargetScoreTable_C_Any').find('table');
+		$table.find('tbody > tr').each(function(i,e){
+			var td=$(e).find('td:last-child');
+			var _t;
+			if(td.find('input').length>0){
+				//is input
+				_t=td.find('input').val();
+				_e=true;
+			}else{
+				_t=td.text();
+			}
+			if(_t!=""){
+				_d++;
+			}else{
+				_ud++;
+			}
+		});
+		$root.find('#_undone').text(_ud);
+		$root.find('#_done').text(_d);
+		
+		if(_e){
+			$table.find('tbody > tr').each(function(i,e){
+				var td=$(e).find('td:last-child');
+				var _t;
+				if(td.find('input').length>0){
+					//is input
+					_t=td.find('input').val();
+				}else{
+					_t=td.text();
+				}
+				if(_t!=""){
+					$(e).addClass('item_finish');
+				}
+			});
+		}
+		
+	}
+	
+	
+}catch (e) {
+}
+})
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

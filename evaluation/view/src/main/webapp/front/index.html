@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <title>首页</title>
+    <link rel="shortcut icon" href="../front-ui/Images/icons/favicon.ico">
+    <link href="../front-ui/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../front-ui/css/select2.min.css" rel="stylesheet">
+    <link href="../front-ui/css/bootstrapValidator.min.css" rel="stylesheet">
+    <link href="../front-ui/css/ui-dialog.css" rel="stylesheet">
+    <link href="../front-ui/css/popupTip.css" rel="stylesheet">
+    <link href="../front-ui/css/jquery.leadcontrol.css" rel="stylesheet">
+    <link href="../front-ui/css/default.css" rel="stylesheet">
+    <link href="../front-ui/css/WdatePicker.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../front-ui/js/bootstrap-table/bootstrap-table.css"/>
+    <script src="../front-ui/js/jquery-1.9.1.min.js"></script>
+
+    <script src="../front-ui/js/jquery.form.min.js"></script>
+
+    <script src="../front-ui/js/bootstrap.min.js"></script>
+    <script src="../front-ui/js/select2.full.min.js"></script>
+    <script src="../front-ui/js/bootstrapValidator.min.js"></script>
+    <script src="../front-ui/js/bootstrap-treeview.min.js"></script>
+    <script src="../front-ui/js/dialog-min.js"></script>
+    <script src="../front-ui/js/popupTip.js"></script>
+    <script src="../front-ui/js/ajaxupload.js"></script>
+    <script src="../front-ui/js/plupload.full.min.js"></script>
+    <script src="../front-ui/js/zh_CN.js"></script>
+    <script src="../front-ui/js/WdatePicker.js"></script>
+    <script src="../front-ui/js/kindeditor-min.js"></script>
+    <script src="../front-ui/js/imgpreview.js"></script>
+    <script src="../front-ui/js/ZeroClipboard.min.js"></script>
+    <script src="../front-ui/js/echarts.min.js"></script>
+    <script src="../front-ui/js/echarts.js"></script>
+    <script src="../front-ui/js/core-min.js"></script>
+    <script src="../front-ui/js/base64.js"></script>
+    <script src="../front-ui/js/jquery.leadcontrol.js"></script>
+    <script src="../front-ui/js/loadMenu.js"></script>
+    <script src="../front-ui/self/_base.js"></script>
+    <script src="../ui/dist/self/js/storage.js"></script>
+    <script data-require-id="echarts/chart/bar" src="../front-ui/js/bar.js" async=""></script>
+    <script src="../front-ui/js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="../front-ui/js/bootstrap-table/bootstrap-table-export.js"></script>
+    <script src="../front-ui/js/bootstrap-table/tableExport/tableExport.js"></script>
+    <style type="text/css" id="treeview-style">
+        .treeview .list-group-item {
+            cursor: pointer
+        }
+
+        .treeview span.indent {
+            margin-left: 10px;
+            margin-right: 10px
+        }
+
+        .treeview span.icon {
+            width: 12px;
+            margin-right: 5px
+        }
+
+        .treeview .node-disabled {
+            color: silver;
+            cursor: not-allowed
+        }
+
+        .node-treeview {
+        }
+
+        .node-treeview:not(.node-disabled):hover {
+            background-color: #F5F5F5;
+        }
+    </style>
+    <style>
+        .homeTitlePanel {
+            margin: 20px 0 15px 0;
+        }
+
+        .homeTitle {
+            margin-left: 20px;
+            margin-bottom: -2px;
+            display: inline-block;
+            color: #848484;
+        }
+
+        .homeTitlePanel a {
+            line-height: 17px;
+            font-size: 13px;
+            padding: 0px 7px;
+        }
+
+        .homeMoreTitle {
+            float: right;
+            margin-right: 5px;
+        }
+
+        .table {
+            margin-bottom: 0px;
+        }
+
+        .banner {
+            background: #e7f2f9;
+            height: 48px;
+            line-height: 48px;
+            color: #1e7bc3;
+            font: normal bold 16px/20px 微软雅黑;
+        }
+
+        .iconT1, .iconT2 {
+            background: url(../front-ui/Images/star/iconT.gif) 0 0 no-repeat;
+            height: 48px;
+            padding-left: 60px;
+            padding-top: 15px;
+            display: inline-block;
+            float: left;
+        }
+
+        .iconW {
+            background: url(../front-ui/Images/star/iconT.gif) 0 -162px;
+            display: inline-block;
+            float: right;
+            height: 48px;
+            width: 77px;
+        }
+
+        .iconT2 {
+            background: url(../front-ui/Images/star/iconT.gif) 0 -79px no-repeat;
+        }
+    </style>
+</head>
+<body>
+<!-- 系统头部 -->
+<div class="masterHeader" style="width: 1903px;">
+    <div>
+        <input id="currentUserId" type="hidden" value="">
+        <input id="currentProject" type="hidden" value="">
+        <input id="currentTargetObj" type="hidden" value="">
+    </div>
+    <div class="masterHeaderLeft"></div>
+    <div class="masterHeaderRight">
+
+        <label id="selectProjectsSpan" style="color:#FFF">选择项目</label>
+
+        <span style="color:#FFF"></span> <img src="../front-ui/Images/icons/iconPsword.png" title="修改密码"
+                                              style="margin-left:20px;" onclick="logout()">
+        <!-- <img src="../front-ui/Images/icons/iconExit.png" title="注销" style="margin-left:20px;"> --> </div>
+</div>
+
+<!-- 菜单导航 -->
+<div id="mainMenuContainer" class="menuaccordion"
+     style="width: 180px; background-color:#FFF; position: absolute; height: 2070px;">
+    <!-- <div class="menuFirst1"> <a data-toggle="collapse" href="javascript:;">首页</a> </div>
+    <div class="menuFirst2"> <a data-toggle="collapse" href="http://127.0.0.1/#collapse_1_3" class="" aria-expanded="true">日常填报</a> </div>
+    <div id="collapse_1_3" class="accordion-body collapse in" aria-expanded="true">
+      <div class="menuSecond menuActive">
+        <div class="menubar"> <a href="javascript:;">校园五星填报</a> </div>
+      </div>
+      <div class="menuSecond">
+        <div class="menubar"> <a href="javascript:;">专项评价上传</a> </div>
+      </div>
+    </div>
+    <div class="menuFirst3"> <a data-toggle="collapse" href="http://10.31.0.7/#collapse_1_6" class="collapsed" aria-expanded="false">学校调查问卷管理</a> </div>
+    <div id="collapse_1_6" class="accordion-body collapse " aria-expanded="false">
+      <div class="menuSecond">
+        <div class="menubar"> <a href="javascript:;">学校问卷管理</a> </div>
+      </div>
+    </div>
+    <div class="menuFirst4">
+        <a data-toggle="collapse" href="http://127.0.0.1/#collapse_1_9" class="collapsed" aria-expanded="false">五星评价报告</a>
+    </div>
+    <div id="collapse_1_9" class="accordion-body collapse" aria-expanded="false">
+      <div class="menuSecond">
+        <div class="menubar"> <a href="javascript:;">学校五星评价分析</a> </div>
+      </div>
+      <div class="menuSecond">
+        <div class="menubar"> <a href="javascript:;">五星评价总结</a> </div>
+      </div>
+      <div class="menuSecond">
+        <div class="menubar"> <a href="javascript:;">学校评价报告</a> </div>
+      </div>
+    </div> -->
+</div>
+<!-- 主內容区域 -->
+<div id="frameContainer"
+     style="padding-left: 10px; position: absolute; left: 180px; padding-bottom: 30px; width: 85%; ">
+
+</div>
+</body>
+<script type="text/javascript">
+
+    window.$_params = {};
+    function logout() {
+
+        if (confirm("确定退出吗？")) {
+            $.post(WEB_ROOT + "/login/loginout", function (data) {
+                window.$_params = {};
+                window.$_storage = {};
+                window.location.href = VIEW_ROOT + "/pages/login.html";
+            })
+        }
+
+    }
+
+    //var GBL_PROJECT_STATUS = {"NEW":"新建","PUBLISH":"发布","EXPERT_EVAL":"专家评审","END_EVAL":"终评","ARCHIVE":"归档"};
+
+    //var demoData = {"data":[{"children":[{"children":null,"entity":{"id":"7","pid":"1","name":"系统参数管理","cls":"","layout":"main-bodyindex","url":"/pages/sysparam/sysparam-list.html","sequence":1,"text":"系统参数管理"},"id":"7","pid":"1","text":"系统参数管理"},{"children":[{"children":null,"entity":{"id":"20","pid":"8","name":"字典类型管理","cls":"","layout":"main-bodyindex","url":"/pages/dictionary/dictionary-list.html","sequence":1,"text":"字典类型管理"},"id":"20","pid":"8","text":"字典类型管理"},{"children":null,"entity":{"id":"21","pid":"8","name":"字典明细管理","cls":"","layout":"main-bodyindex","url":"/pages/dictionary/dictionaryData-list.html","sequence":2,"text":"字典明细管理"},"id":"21","pid":"8","text":"字典明细管理"}],"entity":{"id":"8","pid":"1","name":"数据字典管理","cls":null,"layout":"main-bodyindex","url":null,"sequence":2,"text":"数据字典管理"},"id":"8","pid":"1","text":"数据字典管理"}],"entity":{"id":"1","pid":"-1","name":"系统管理","cls":null,"layout":"main-bodyindex","url":null,"sequence":1,"text":"系统管理"},"id":"1","pid":"-1","text":"系统管理"}],"errorMessage":null,"success":true,"token":null};
+    //var demoData = {"data":[{"children":[{"children":null,"entity":{"id":"10","pid":"2","name":"用户管理","cls":"","layout":"main-bodyindex","url":"selfPerson/self-projectFill-list.html","sequence":1,"text":"用户管理"},"id":"10","pid":"2","text":"用户管理"},{"children":null,"entity":{"id":"11","pid":"2","name":"角色管理","cls":"","layout":"main-bodyindex","url":"expect/expect-projectFill-list.html","sequence":2,"text":"角色管理"},"id":"11","pid":"2","text":"角色管理"}],"entity":{"id":"2","pid":"-1","name":"用户角色管理","cls":null,"layout":"main-bodyindex","url":null,"sequence":2,"text":"用户角色管理"},"id":"2","pid":"-1","text":"用户角色管理"},{"children":[{"children":null,"entity":{"id":"12","pid":"3","name":"菜单管理","cls":null,"layout":"main-bodyindex","url":"/pages/menu/menu-list.html","sequence":1,"text":"菜单管理"},"id":"12","pid":"3","text":"菜单管理"},{"children":null,"entity":{"id":"13","pid":"3","name":"资源管理","cls":"","layout":"main-bodyindex","url":"/pages/resource/resource-list.html","sequence":2,"text":"资源管理"},"id":"13","pid":"3","text":"资源管理"}],"entity":{"id":"3","pid":"-1","name":"资源管理","cls":null,"layout":"main-bodyindex","url":null,"sequence":3,"text":"资源管理"},"id":"3","pid":"-1","text":"资源管理"},{"children":[{"children":null,"entity":{"id":"c009d07a-beb7-426f-92cc-91872676515c","pid":"d7d5803b-0b2f-4230-971a-8e8d0f209207","name":"管理","cls":"","layout":"main-bodyindex","url":"/pages/evalTarget/evalTarget-list.html","sequence":1,"text":"管理"},"id":"c009d07a-beb7-426f-92cc-91872676515c","pid":"d7d5803b-0b2f-4230-971a-8e8d0f209207","text":"管理"},{"children":null,"entity":{"id":"3fe2abd0-0266-4035-9032-ba139a33e154","pid":"d7d5803b-0b2f-4230-971a-8e8d0f209207","name":"教育局打分","cls":"","layout":"main-bodyindex","url":"/pages/evalTarget/evalTarget-score.html","sequence":2,"text":"教育局打分"},"id":"3fe2abd0-0266-4035-9032-ba139a33e154","pid":"d7d5803b-0b2f-4230-971a-8e8d0f209207","text":"教育局打分"}],"entity":{"id":"d7d5803b-0b2f-4230-971a-8e8d0f209207","pid":"-1","name":"被评对象管理","cls":"","layout":"main-bodyindex","url":"","sequence":6,"text":"被评对象管理"},"id":"d7d5803b-0b2f-4230-971a-8e8d0f209207","pid":"-1","text":"被评对象管理"},{"children":null,"entity":{"id":"e1198bdd-de32-485b-9f9c-c5c4a98595a9","pid":"-1","name":"评价管理","cls":"","layout":"main-bodyindex","url":"selfPerson/projectFill-list.html","sequence":7,"text":"评价管理"},"id":"e1198bdd-de32-485b-9f9c-c5c4a98595a9","pid":"-1","text":"评价管理"},{"children":[{"children":null,"entity":{"id":"6fd73971-cf10-4b1a-a273-8afb36769322","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","name":"项目维护","cls":"","layout":"main-bodyindex","url":"/pages/project/project-list.html","sequence":1,"text":"项目维护"},"id":"6fd73971-cf10-4b1a-a273-8afb36769322","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","text":"项目维护"},{"children":null,"entity":{"id":"f5c1a509-42c4-4c7c-a827-3d8969f1fb2c","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","name":"指标项维护","cls":"","layout":"main-bodyindex","url":"/pages/measureItem/measureItem-list.html","sequence":2,"text":"指标项维护"},"id":"f5c1a509-42c4-4c7c-a827-3d8969f1fb2c","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","text":"指标项维护"},{"children":null,"entity":{"id":"831690d2-6f4e-48f2-9dc4-d566ccd5ef05","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","name":"指标项树","cls":"","layout":"main-bodyindex","url":"/pages/measureItem/measureItem-list2.html","sequence":3,"text":"指标项树"},"id":"831690d2-6f4e-48f2-9dc4-d566ccd5ef05","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","text":"指标项树"},{"children":null,"entity":{"id":"258a70a7-c22e-4d22-a089-d63c73f64871","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","name":"被评对象","cls":"","layout":"main-bodyindex","url":"/pages/project/project-selectuser.html","sequence":4,"text":"被评对象"},"id":"258a70a7-c22e-4d22-a089-d63c73f64871","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","text":"被评对象"},{"children":null,"entity":{"id":"ddb3ff84-522b-4be4-a5da-d9f042af2ebc","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","name":"得分点维护","cls":"","layout":"main-bodyindex","url":"/pages/scoreItem/scoreItem-list.html","sequence":4,"text":"得分点维护"},"id":"ddb3ff84-522b-4be4-a5da-d9f042af2ebc","pid":"034c55b2-8cf0-4512-8c14-ecf343b92c71","text":"得分点维护"}],"entity":{"id":"034c55b2-8cf0-4512-8c14-ecf343b92c71","pid":"-1","name":"项目管理","cls":"","layout":"main-bodyindex","url":"","sequence":10,"text":"项目管理"},"id":"034c55b2-8cf0-4512-8c14-ecf343b92c71","pid":"-1","text":"项目管理"}],"errorMessage":null,"success":true,"token":null};
+    $.fn.showTree = function (data) {
+
+        /* console.info(data); */
+        var treeData = data.treeData
+        var html = '';
+
+        function renderTree(data, firstClass, id) {
+
+            var tmpHtml = "";
+            for (var i = 0; i < data.length; i++) {
+                if (firstClass) {
+                    tmpHtml += '<div class="menuFirst1"> <a data-toggle="collapse" href="#collapse_' + data[i].entity.id + '" aria-expanded="true">' + data[i].entity.text + '</a> </div>';
+                } else {
+                    if (i == 0) {
+                        //tmpHtml += '<div id="collapse_' + id + '" class="accordion-body collapse in" aria-expanded="true">'
+                        tmpHtml += '<div id="collapse_' + id + '" class="accordion-body collapse" aria-expanded="false" style="height: 0px;">'
+                    }
+
+                    /* if(i == 0) {
+                     tmpHtml += '<div class="menuSecond menuActive">';
+                     } else  {
+                     tmpHtml += '<div class="menuSecond">';
+                     } */
+                    tmpHtml += '<div class="menuSecond">'; //不需要默认选中
+                    tmpHtml += '<div class="menubar" data-url="' + VIEW_ROOT + data[i].entity.url + '" data-menulable="' + data[i].entity.text + '"> <a href="javascript:;">' + data[i].entity.text;
+
+                }
+
+                if (data[i].children) {
+                    tmpHtml += renderTree(data[i].children, false, data[i].entity.id);
+                }
+
+                if (!firstClass) {
+                    tmpHtml += '</a> </div></div>';
+                    if (i == (data.length - 1)) {
+                        tmpHtml += '</div>';
+                    }
+
+                }
+
+            }
+            return tmpHtml;
+        }
+
+        html += renderTree(treeData, true);
+
+        console.info(html);
+        this.append(html);
+
+    };
+
+    function getRedirectUrl(oldUrl) {
+        var pageName = oldUrl.substring(oldUrl.lastIndexOf("/") + 1);
+        var prefix = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1);
+        var newUrl = prefix + 'ro-' + pageName;
+        console.info(newUrl)
+        return newUrl;
+    }
+
+    function checkAccess(menuLable, oldUrl) {
+
+        var proStatus = window.$_params.currentProjectDetail.status;
+        var newUrl = oldUrl;
+        if (proStatus == "PUBLISH") {
+            if (menuLable == "核准评分" || menuLable == "专家评分") {
+                newUrl = getRedirectUrl(oldUrl);
+            }
+        } else if (proStatus == "EXPERT_EVAL") {
+            if (menuLable == "填报自评" || menuLable == "核准评分") {
+                newUrl = getRedirectUrl(oldUrl);
+            }
+        } else if (proStatus == "END_EVAL") {
+            if (menuLable == "填报自评" || menuLable == "专家评分") {
+                newUrl = getRedirectUrl(oldUrl);
+            }
+        }
+
+        return newUrl;
+    }
+
+    function loadMenu() {
+        $.post("/web/sysmenu/loadMenuTreeUser?timestamp=" + Date.parse(new Date()), function (res) {
+            if (res.success == true) {
+                console.info(res.data)
+                $('#mainMenuContainer').showTree({"treeData": res.data});
+            }
+
+            $(".menubar").click(function () {
+
+
+                var url = $(this).data("url");
+                var menulable = $(this).data("menulable");
+
+
+                if (!url) {
+                    alert("该菜单没有配置URL无法访问，请联系管理员!")
+                    return;
+                }
+
+                url = checkAccess(menulable, url);
+
+                $(".menubar").removeClass("menuActive");
+                console.info($(".menuSecond"))
+                $(this).addClass("menuActive");
+                $("#frameContainer").empty();
+                window.$_storage.put(url, {});
+                $("#frameContainer").load(url, function () {
+                    // $(this).fadeIn(100) ;
+                });
+            });
+
+        })
+    }
+
+    $(function () {
+
+        // 获取当前登录用户信息
+        $.post(WEB_ROOT + "/common/data/loginInfo", {}, function (data) {
+            $("#currentUserId").val(data.id);
+            $(".masterHeaderRight > span").text(data.natureName);
+            window.$_params.currentUserId = data.id;
+        }, "json");
+
+        // 获取当前项目信息
+        var GetQueryString = function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+        $("#currentProject").val(GetQueryString("projectId"));
+        window.$_params.currentProjectId = GetQueryString("projectId");
+
+
+        $.post("/web/project/getProjectById?id=" + window.$_params.currentProjectId, function (res) {
+            console.info(res);
+            window.$_params.currentProjectDetail = res.data;
+            loadMenu();
+            //zhongjin
+            if (res.data != null) {
+                $('#selectProjectsSpan').text(res.data.name).css('cursor', 'pointer');
+            }
+        });
+
+        // 获取被评对象
+        $.post(WEB_ROOT + "/evalTarget/getEvalTargetByUserId", {}, function (data) {
+            if (data != null) {
+                if (data.data != null) {
+                    $("#currentTargetObj").val(data.data.id);
+                    window.$_params.currentTargetObj = data.data;
+                }
+            }
+        });
+
+        // 获取在线用户信息
+        $.post(WEB_ROOT + "/userinfo/online", {}, function (data) {
+            if (data != null) {
+                if (data.data != null) {
+                    window.$_params.userInfo = data.data;
+                }
+            }
+        }, "json");
+
+    })
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#selectProjectsSpan').on('click', function () {
+            cjs.modal.open(
+                {
+                    id: "proejctSelectModal",
+                    title: "选择项目",
+                    hidden: function (e, ra) {
+                        console.log("hide modal  " + JSON.stringify(ra[0]));
+                    }
+                }, '/pages/project/project-select.html', {name: 'this is name param'});
+        });
+        $('#btn').trigger('click');
+    });
+
+</script>
+</html>

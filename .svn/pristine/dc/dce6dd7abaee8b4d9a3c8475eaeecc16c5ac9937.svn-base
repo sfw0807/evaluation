@@ -1,0 +1,369 @@
+$.fn.extend({
+	
+	getSelectedRow:function(){
+		var list=$(this.selector).data("datatables-checked");
+		if(list){
+			return list.val();
+		}
+		return [];
+	},
+
+    getAllClickedRowData:function(){
+        var checkedRowData =[];
+        var list=$(this.selector).data("datatables-checked").val();
+        var table = $(this.selector).DataTable();
+        //var allData = table.data().toArray();
+        table.data().each( function (d) {
+            for(var i = 0;i < list.length; i++) {
+                if(d.id == list[i]){
+                    checkedRowData.push(d);
+                }
+            }
+        });
+        return checkedRowData;
+    },
+    getSelectedRowData:function(id){
+        var data = null;
+        var table = $(this.selector).DataTable();
+        table.data().each( function (d) {
+            if(d.id == id){
+                data = d;
+                return data;
+            }
+        });
+        return data;
+    },
+	/**
+	 * {
+				selected:true,
+				checkbox:false,
+				createdRow:function(){},
+				serverSide:true,
+				processing:true,
+				ops:{
+					view:function(id,rowData){
+					},
+					edit:function(id,rowData){
+					},
+					del:function(id,rowData){
+					}
+				},
+				callAfterDrawn:function(data,opts){
+				},
+				createdRow: function ( row, data, index ){
+				}
+		}
+	 */
+	initDataTable : function(options) {
+		
+		var defaultOpts={
+				selected:true,
+				paging : true,
+				checkbox:false,
+				createdRow:function(){}
+		}
+		
+		options=$.extend({},defaultOpts,options);
+		
+		options.serverSide =true;
+		options.processing=true;
+		var _columns=[]
+		var checkboxColumns=[{
+            "orderable":      false,
+            "data":           null,
+            "width":"1%",
+            "title":'<input class="minimal" name="all" value="0" type="checkbox" />',
+            "render": function (data, type, row, meta) {
+                return '<input class="minimal" name="sub" value="' + row.id + '" type="checkbox" />';
+            }
+        }];
+		var opsColumns=[];
+		if(options.ops){
+			
+			var opsGenColumns=[{
+	            "orderable":      false,
+	            "data":           null,
+	            "width":"10%",
+	            "title":'操作',
+	            "render": function (data, type, row, meta) {
+	            	var _ops=options.ops;
+	            	var viewHtml='';
+	            	var rowId=row.id;
+	            	if(_ops.view){
+	            		//viewHtml='<button  data-rowId="'+rowId+'"  id="row_view_btn_'+rowId+'" name="row_view_btn" type="button" class="btn btn-primary btn-sm table_btn">详情</button>';
+	            		viewHtml = '<a style="margin-left:3px;margin-right: 7px;" data-rowId="'+rowId+'" id="row_view_btn_'+rowId+'" name="row_view_btn"><i class="fa fa-eye" title="详细信息"></i></a>';
+	            	}
+	            	var editHtml='';
+	            	if(_ops.edit){
+	            		//editHtml='<button data-rowId="'+rowId+'"  id="row_edit_btn_'+rowId+'" name="row_edit_btn"  type="button" class="btn btn-primary btn-sm table_btn">修改</button>';
+                        editHtml = '<a style="margin-right: 7px;" data-rowId="'+rowId+  '"'+ ' data-rowNum="' +meta.row+  '"'+ ' data-colNum="' +meta.col+  '" id="row_edit_btn_'+rowId+'" name="row_edit_btn"><i class="fa fa-edit" title="修改"></i></a>';
+	            	}
+	            	var delHtml='';
+	            	if(_ops.del){
+	            		//delHtml='<button data-rowId="'+rowId+'"  id="row_del_btn_'+rowId+'" name="row_del_btn"  type="button" class="btn btn-sm table_btn btn-danger">删除</button>';
+                        delHtml = '<a data-rowId="'+rowId+'" id="row_del_btn_'+rowId+'" name="row_del_btn"><i class="fa fa-remove" title="删除"></i></a>';
+	            	}
+	            	
+	            	return viewHtml+editHtml+delHtml;
+	            }
+	        }];
+			opsColumns=opsColumns.concat(opsGenColumns);
+			
+		}
+		
+		
+		
+		if(options.checkbox){
+			_columns=_columns.concat(checkboxColumns).concat(options.columns);
+		}
+		else{
+			_columns=_columns.concat(options.columns);
+		}
+		
+		if(options.ops){
+			_columns=_columns.concat(opsColumns);
+		}
+		
+		function DatatableAjax($datatableDom,options){
+			this. _options=options;
+			this.$wrap=$datatableDom;
+			
+			
+			this.ajaxSuccess=function(data,callback){
+				callback(data);
+				this.onSelected(data);
+				this.onChecked(data);
+				this.onOperation(data);
+				this.onCallAfterDrawn(data);
+			}
+			
+			this.onCallAfterDrawn=function(data){
+				if(this._options.callAfterDrawn){
+					this._options.callAfterDrawn(data,this._options);
+				}
+			}
+			
+			this.onSelected=function(data){
+				if(this._options.selected){
+					$wrap.find('tbody').off( 'click', '>tr');
+	  				$wrap.find('tbody').children('tr').on( 'click', {$table:$wrap}, function () {
+	  			        $(this).toggleClass('selected');
+	  			        $subChk=$(this).find('input[type="checkbox"].minimal').filter('[name="sub"]');
+	  			        if($(this).hasClass('selected')){
+	  			        	$subChk.iCheck('check');
+	  			        }
+	  			        else{
+	  			        	$subChk.iCheck('uncheck');
+	  			        }
+	  			    } );
+	  			}
+			}
+			
+			this.onChecked=function(data){
+				if(this._options.checkbox){
+
+					var $chk=$wrap.find('input[type="checkbox"].minimal');
+		  			var $allChk=$chk.filter('[name="all"]');
+		  			var $subChks=$chk.filter('[name="sub"]');
+                    $wrap.data("datatables-checked",new List());
+  				  	//iCheck for checkbox and radio inputs
+  				    $chk.iCheck({
+  				      checkboxClass: 'icheckbox_minimal-blue',
+  				      radioClass: 'iradio_minimal-blue'
+  				    });
+		  		
+		  		
+  				  $allChk
+                      .on('ifChecked', function(event){
+                        $subChks.iCheck('check');
+                      }
+  				  );
+  				  
+  				 $allChk
+                      .on('ifUnchecked', function(event){
+                        var list=$wrap.data("datatables-checked");
+                        if(list.size()==$subChks.length){
+                            $subChks.iCheck('uncheck');
+                        }
+                      }
+  				  );
+  				  
+		  		
+  				$subChks
+  				  .on('ifChecked', function(event){ 
+  					var id=$(event.target).val();
+  					var list=$wrap.data("datatables-checked");
+  					if(list){
+  						if(!list.exists(id)){
+	  						list.add(id);
+	  					}
+  					}
+  					else{
+  						list=new List();
+  						list.add(id);
+  						$wrap.data("datatables-checked",list);
+  					}
+  					
+  					if(list.size()==$subChks.length){
+  						$allChk.iCheck('check');
+  					}
+  					
+  				  }
+  				  );
+  				 
+  				$subChks
+  				  .on('ifUnchecked', function(event){ 
+  					var id=$(event.target).val();
+  					var list=$wrap.data("datatables-checked");
+  					if(list){
+  						if(list.exists(id)){
+	  						list.remove(id);
+	  					}
+  					}
+  					$allChk.iCheck('uncheck');
+  					}
+  				  );
+					
+				
+		  			
+		  			
+	  			}
+				
+			}
+			
+			this.onOperation=function(data){
+				if(this._options.ops){
+	  				var _ops=this._options.ops;
+	  				if(_ops.view){
+	  					$wrap.find('a[name=row_view_btn]')
+	  						.on("click",function(event){
+		            		_ops.view($(this).data("rowid"),{});
+		            		
+		            		event.stopPropagation();
+		            	});
+	            	}
+	  				
+	            	if(_ops.edit){
+	  					$wrap.find('a[name=row_edit_btn]')
+	  						.on("click",function(event){
+		            		_ops.edit($(this).data("rowid"),{rowNum:$(this).data("rownum"),colNum:$(this).data("colnum")});
+		            		event.stopPropagation();
+		            	});
+	            	}
+	            	
+	            	if(_ops.del){
+	            		$wrap.find('a[name=row_del_btn]')
+	            		.on("click",function(event){
+	            			var _rowid = $(this).data("rowid");
+	            			var jc=$.confirm({
+	            			    title: false,
+	            			    content: '确定删除？',
+	            			    confirm: function(){
+	            			    	_ops.del(_rowid,{});
+	            			    },
+	            			    cancel: function(){
+	            			    },
+	            			    confirmButton: '确定',
+	            			    cancelButton: '撤销',
+	            			    onOpen: function(){
+	            			    }
+	            			});
+	            			jc.passData={rowid:$(event.target).data("rowid")};
+	            			event.stopPropagation();
+	            		});
+	            	}
+	  				
+	  			}
+				
+			}
+			
+			this.ajax=function(data, callback, settings,options,$wrap){
+				//debugger;
+				var HtmlMenuOpt = {
+					endpoint : options.url,
+					data : options.urlDataFn.apply(),
+					success : function(data) {
+						if (data.draw == undefined) {
+							data = {
+								"draw" : 0,
+								"data" : data,
+								"recordsTotal" : data.length,
+								"recordsFiltered" : data.length
+							};
+						}
+
+						new DatatableAjax($wrap, options).ajaxSuccess(data, callback);
+					},
+					page : data.start / data.length,
+					size : data.length == -1 ? 100000 : data.length
+				};
+				httpservice.ajaxEnt.getRequest(HtmlMenuOpt);
+			}
+		}
+		
+		
+		
+//		$wrap=$('#editable');
+		var $wrap=$(this.selector);
+		var dataTableObj= $(this.selector).DataTable({
+			processing : options.processing,
+			serverSide : options.serverSide,
+			paging : options.paging,
+			ajax : function(data, callback, settings){
+				new DatatableAjax().ajax(data, callback, settings,options,$wrap)
+			},
+			createdRow:function( row, data, index ){
+				if(index%2==0){
+					$(row).addClass('trodd');
+				}
+				else{
+					$(row).addClass('treven');
+				}
+				if(options.createdRow){
+					options.createdRow(row, data, index);
+				}
+				
+			},
+			columns : _columns,
+			sPaginationType: "full_numbers",
+			language: {
+				    paginate: {
+				      first: "首页",
+				      last:"尾页",
+				      previous:"前一页",
+				      next:"后一页"
+				    },
+				    info:"显示  _START_  到  _END_ 条记录, 共  _TOTAL_  条记录",
+				    infoEmpty:"没有数据",
+				    lengthMenu: "每页显示 _MENU_ 条记录",
+				    infoFiltered: "(从 _MAX_ 条数据中检索)", 
+				    loadingRecords: "Please wait - loading...",
+				    zeroRecords: "无查询结果",
+				    processing: "处理中..."
+			},
+			dom: 
+			//"<'row'<'col-sm-6'l><'col-sm-6'f>>" +
+			//"<'row'<'col-sm-12'tr>>" +
+			"tr"+	
+			"<'row'<'col-sm-5'l><'col-sm-7'p>>",
+			/* oLanguage: {  
+				"sLengthMenu": "每页显示 _MENU_ 条记录",  
+				"sZeroRecords": "抱歉， 没有找到",  
+				"sInfo": "显示  _START_  到  _END_ 条记录, 共  _TOTAL_  条记录",  
+				"sInfoEmpty": "没有数据",  
+				"sInfoFiltered": "(从 _MAX_ 条数据中检索)", 
+				"oPaginate": {  
+				"sFirst": "首页",  
+				"sPrevious": "前一页",  
+				"sNext": "后一页",  
+				"sLast": "尾页"  
+				},
+			sZeroRecords: "没有检索到数据"
+			},
+			*/
+			bSort:false,
+			searching:false
+		});
+		return dataTableObj;
+	}
+});

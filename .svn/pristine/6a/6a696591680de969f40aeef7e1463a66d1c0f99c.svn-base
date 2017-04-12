@@ -1,0 +1,132 @@
+<namespace id="dictionaryData-add"  ms-controller="dictionaryData_add">
+    <ol class="breadcrumb">
+        <li><a href="#">字典类型管理</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+	<section class="content" id="addDictionaryDataSection" >
+        <div class="box box-info">
+		    <form role="form" id="addDictionaryDataForm" class="form-horizontal">
+            <div class="row ">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"></i> 提交
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body">
+      			<div class="form-group">
+      				<label for="code" class="col-sm-1 control-label requiredMask input-sm">字典名称</label>
+					<div class="col-sm-5">
+						<select id="code" name="code" class="form-control select2 input-sm">
+							<option  ms-for="el in @dicNames"  ms-attr="{value:el.code}">
+								{{el.name}}
+							</option>
+						</select>
+					</div>
+      			</div>
+      			<div class="form-group">
+   			 		<label for="name" class="col-sm-1 control-label requiredMask input-sm">描述</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="name" type="text" class="form-control input-sm" placeholder="" >
+   			 		</div>
+   			 	</div>
+   			 	<div class="form-group">
+   			 		<label for="value" class="col-sm-1 control-label requiredMask input-sm">键值</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="value" type="text" class="form-control input-sm" placeholder="" >
+   			 		</div>
+   			 	</div>
+   			 	<div class="form-group">
+   			 		<label for="sequence" class="col-sm-1 control-label requiredMask input-sm">排序</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="sequence" type="text" class="form-control input-sm" placeholder="" >
+   			 		</div>
+   			 	</div>
+      		</div>
+		</form>
+        </div>
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#dictionaryData-add').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "dictionaryData_add",
+    		        dicNames:{},
+    		        data: {}
+    		    })
+    		},
+			init : function() {
+				$('#addDictionaryDataForm').validate({
+					rules : {
+						'dictName' : {
+							required : true,
+							maxlength : 255
+						},
+						'name' : {
+							required : true,
+							maxlength : 255
+						},
+						'value' : {
+							required : true,
+							maxlength : 255
+						},
+						'sequence' : {
+							required : true,
+							number : true,
+							digits : true,
+							min : 1
+						}
+					},submitHandler : function(form) {
+						page.doAdd();
+					}
+				});
+			},
+			doAdd : function() {
+				var submitsForm = {
+					endpoint : "/dictionary/saveDictionaryData",
+					formObj : $("#addDictionaryDataForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure:function(data) {
+						alertTool.error(data);
+					}
+				};
+				
+				page.namespace.submitForm(submitsForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml("/pages/dictionary/dictionaryData-list.html");
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/dictionary/getAllDictionarys",
+					data : {},
+					success : function(data) {
+						 page.model.vm.dicNames=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		};
+		
+		page.init();
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+	});
+</script>

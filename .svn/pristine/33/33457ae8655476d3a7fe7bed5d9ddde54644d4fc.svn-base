@@ -1,0 +1,4 @@
+<div id="analysis_view"></div>
+<script type="text/javascript">
+    $("#analysis_view").load("/view/front/analysis/analysis_tabls.html");
+</script>

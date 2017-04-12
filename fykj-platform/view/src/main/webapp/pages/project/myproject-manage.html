@@ -1,0 +1,891 @@
+<namespace id="myproject-manage">
+    <ol class="breadcrumb">
+        <li><a href="#">我的项目</a></li>
+        <li><a href="#">项目维护</a></li>
+    </ol>
+    <div class="box box-info">
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+    			<h3 class="panel-title">项目基本信息</h3>
+    			<div class="btn-group pull-right" style="margin-top: -25px;">
+                    <button type="button" class="btn btn-sm btn-primary" id="toApproveBtn">
+                        <i class="fa fa-floppy-o"></i> 送审
+                    </button>
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+    		</div>
+    		<div class="panel-body">
+    			<form class="form-horizontal">
+    				<div class="row">
+    					<div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">项目编号</label>
+                                <div class="col-sm-9">
+                                    <input name="projectCode" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.projectCode}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">项目名称</label>
+                                <div class="col-sm-9">
+                                    <input name="projectName"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.projectName}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">项目类型</label>
+                                <div class="col-sm-9">
+                                    <input name="projectType" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.projectTypeString}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">客户名称</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.customer}">
+                                </div>
+                            </div>
+                        </div>
+    				</div>
+    				
+    				<div class="row">
+    					<div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">合同编号</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.contractCode}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">签订日期</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.contractDate}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">开始日期</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.beginDate}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm">结束日期</label>
+                                <div class="col-sm-9">
+                                	<input name="customer"  disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${myproject.endDate}">
+                                </div>
+                            </div>
+                        </div>
+    				</div>
+    				<div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm" style="color: red;">合同金额</label>
+                                <div class="col-sm-9">
+                                    <span id="projectAmt" style="color: red; font-weight:bold;"  class="form-control label-form-control" th:text="${myproject.projectAmt}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm" style="color: red;">人力成本</label>
+                                <div class="col-sm-9">
+                                    <span id="resourceCost" style="color: red; font-weight:bold;"  class="form-control label-form-control"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm" style="color: red;">其他支出</label>
+                                <div class="col-sm-9">
+                                    <span id="expenseCost" style="color: red; font-weight:bold;"  class="form-control label-form-control"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label input-sm" style="color: red;">人力占比</label>
+                                <div class="col-sm-9">
+                                    <span id="resourceProp" style="color: red; font-weight:bold;"  class="form-control label-form-control"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    				<input type="hidden" id="projectId" name="projectId" th:value="${myproject.id}" style="width: 100%" />
+    			</form>
+    		</div>
+    	</div>
+    	<div class="panel panel-default" style="margin-top:-20px; margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+	    		<h3 class="panel-title">人力资源信息</h3>
+    		</div>
+    		<div class="panel-body">
+    			<form id="resourceForm">
+    				<div class="row">
+    					<div class="col-sm-2" style="padding-right: 0px;" id="titleDiv">
+                            <div class="input-group">
+                                <span class="input-group-addon">职位</span>
+                                <select id="title" name="title" class="form-control select2 input-sm">
+                                	<option value="-1">请选择</option>
+                                    <option th:each="dict : ${title}" th:value="${dict.value}" th:text="${dict.name}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-2" style="padding-right: 0px;" id="modulusDiv">
+                            <div class="input-group">
+                                <span class="input-group-addon">使用率</span>
+                                <input id="modulus" name="modulus" type="text" class="form-control input-sm" placeholder="" >
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-2" style="padding-right: 0px;" >
+                            <div class="input-group">
+                                <span class="input-group-addon">预计开始</span>
+                                <input id="estBeginDateStr" name="estBeginDateStr"  type="text" class="form-control input-sm pull-right " readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-2" style="padding-right: 0px;" >
+                            <div class="input-group">
+                                <span class="input-group-addon">预计结束</span>
+                                <input id="estEndDateStr"  name="estEndDateStr"  type="text" class="form-control input-sm pull-right" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-2 pull-right">
+                            <div class="btn-group pull-right">
+                                <a class="btn btn-success btn-sm" id="addResourceBtn" >
+                                    <span class="glyphicon glyphicon-plus"></span>添加
+                                </a>
+                                <button class="btn btn-primary btn-sm" type="button" style="display: none;" id="saveResourceBtn">
+                                    <span class="fa fa-floppy-o"></span> 修改
+                                </button>
+                                <a class="btn btn-sm btn-default" style="display: none;" id="updateCancel">
+                                    <i class="fa fa-align-justify"> 取消</i>
+                                </a>
+                            </div>
+                        </div>
+    				</div>
+    				<input type="hidden" name="projectId" th:value="${myproject.id}" style="width: 100%" />
+    				<input type="hidden" id="resourceRelationId" name="id" style="width: 100%" />
+    			</form>
+    			
+    			<table id="resourceListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>职位</th>
+                        <th>姓名</th>
+                        <th>使用率</th>
+                        <th>预计开始</th>
+                        <th>预计结束</th>
+                        <th>实际开始</th>
+                        <th>实际结束</th>
+                        <th>成本</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                </table>
+    		</div>
+    	</div>
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">收入信息维护</h3>
+            </div>
+            <div class="panel-body">
+            	<form id="inComeForm">
+            		<div class="row">
+            			<div class="col-sm-2" style="padding-right: 0px;">
+                            <div class="input-group">
+                                <span class="input-group-addon">月份</span>
+                                <input  name="inComeDate"  type="text" class="form-control input-sm pull-right " id="inComeDate" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-2" style="padding-right: 0px;">
+                            <div class="input-group">
+                                <span class="input-group-addon">费用</span>
+                                <input  name="inComeAmt"  type="text" class="form-control input-sm pull-right" id="inComeAmt">
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4" style="padding-right: 0px;">
+                            <div class="input-group">
+                                <span class="input-group-addon">描述</span>
+                                <input id="description"  name="description"  type="text" class="form-control input-sm pull-right">
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3 pull-right">
+                            <div class="btn-group pull-right">
+                                <a class="btn btn-success btn-sm" id="addInComeBtn" >
+                                    <span class="glyphicon glyphicon-plus"></span>添加
+                                </a>
+                                <button class="btn btn-primary btn-sm" type="button" style="display: none;" id="saveInComeBtn">
+                                    <span class="fa fa-floppy-o"></span> 修改
+                                </button>
+                                <a class="btn btn-sm btn-default" style="display: none;" id="incomeCancelBtn">
+                                    <i class="fa fa-align-justify"> 取消</i>
+                                </a>
+                            </div>
+                        </div>
+            		</div>
+            		
+            		<input type="hidden" id="inComeRelationProjectId" name="projectId" th:value="${myproject.id}" style="width: 100%" />
+                    <input type="hidden" id="inComeRelationId" name="id" style="width: 100%" />
+            	</form>
+            	
+            	<table id="inComeListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>年月</th>
+                        <th>费用</th>
+                        <th>描述</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+    	</div>
+    	
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">支出信息维护</h3>
+            </div>
+            <div class="panel-body">
+            	<form id="expenseForm">
+            		<div class="row">
+            			<div class="col-sm-2" style="padding-right: 0px;">
+                            <div class="input-group">
+                                <span class="input-group-addon">月份</span>
+                                <input  name="expenseDate"  type="text" class="form-control input-sm pull-right " id="expenseDate" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-2" style="padding-right: 0px;">
+                            <div class="input-group">
+                                <span class="input-group-addon">费用</span>
+                                <input  name="expenseAmt"  type="text" class="form-control input-sm pull-right" id="expenseAmt">
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4" style="padding-right: 0px;">
+                            <div class="input-group">
+                                <span class="input-group-addon">描述</span>
+                                <input id="expenseDescription"  name="description"  type="text" class="form-control input-sm pull-right">
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-3 pull-right">
+                            <div class="btn-group pull-right">
+                                <a class="btn btn-success btn-sm" id="addExpenseBtn" >
+                                    <span class="glyphicon glyphicon-plus"></span>添加
+                                </a>
+                                <button class="btn btn-primary btn-sm" type="button" style="display: none;" id="saveExpenseBtn">
+                                    <span class="fa fa-floppy-o"></span> 修改
+                                </button>
+                                <a class="btn btn-sm btn-default" style="display: none;" id="expenseCancelBtn">
+                                    <i class="fa fa-align-justify"> 取消</i>
+                                </a>
+                            </div>
+                        </div>
+            		</div>
+            		
+            		<input type="hidden" id="expenseRelationProjectId" name="projectId" th:value="${myproject.id}" style="width: 100%" />
+                    <input type="hidden" id="expenseRelationId" name="id" style="width: 100%" />
+            	</form>
+            	
+            	<table id="expenseListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>年月</th>
+                        <th>费用</th>
+                        <th>描述</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+    	</div>
+    	<div id="approveDiv" class="panel panel-default" style="margin-bottom: 0px; border:none;">
+    		<div class="panel-heading">
+                <h3 class="panel-title">项目审批信息</h3>
+            </div>
+            <div class="panel-body">
+            	<form id="approveForm" class="form-horizontal">
+            		<div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-1 control-label input-sm" style="text-align:center;">送审备注</label>
+                                <div class="col-sm-11">
+                                    <textarea id="remark" rows="4" class="form-control input-sm" th:text="${myproject.remark}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-1 control-label input-sm" style="text-align:center;">审批意见</label>
+                                <div class="col-sm-11">
+                                    <textarea disabled="disabled" rows="4" class="form-control input-sm" th:text="${myproject.approveRemark}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="flowVersion" name="flowVersion" th:value="${myproject.flowVersion}" style="width: 100%" />
+            	</form>
+            </div>
+    	</div>
+    </div>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#myproject-manage').namespace(),
+			init : function() {
+				$('#estBeginDateStr').autoBSNyr().on("click", function(ev){
+		            $("#estBeginDateStr").datetimepicker("setEndDate", $("#estEndDateStr").val());
+		        });
+		        $('#estEndDateStr').autoBSNyr().on("click", function(ev){
+		            $("#estEndDateStr").datetimepicker("setStartDate", $("#estBeginDateStr").val());
+		        });
+		        
+		        $('#expenseDate,#inComeDate').autoBSNy();
+				page.getProjectCost();
+			},
+			getProjectCost : function() {
+				var opt = {
+					endpoint : "/pms/project/getProjectCost",
+					data : {
+						'id' : $("#projectId").val()
+					},
+					success : function(data) {
+						$("#resourceCost").html(data.resourceCost);
+						$("#expenseCost").html(data.expenseCost);
+						$("#resourceProp").html(data.resourceProp);
+						
+						page.format();
+					}
+				};
+
+				page.namespace.getRequest(opt);
+			},
+			format : function() {
+				$("#projectAmt").formatCurrency();
+				$("#expenseCost").formatCurrency();
+				$("#resourceCost").formatCurrency();
+			},
+			doResourceAdd : function() {
+				var title = $('#title').val();
+				if (title == null || title == undefined || title == "" || title == "-1") {
+                    alertTool.warning("请选择职位!");
+                    return;
+                }
+				
+				var modulus = $("#modulus").val();
+				if(modulus == null || modulus == undefined || modulus　== "") {
+					alertTool.warning("请输入资源使用率!");
+					return;
+				} else {
+					var reg = /^\d+(\.\d{1,2})?$/;
+                    if(!reg.test(modulus))
+                    {
+                    	alertTool.warning("请填写整数或者小数(支持小数点后两位)!");
+                        return;
+                    }
+                    
+                    if(modulus > 1) {
+                    	alertTool.warning("使用率最大值为1!");
+                        return;
+                    }
+				}
+				
+				var estBeginDate = $('#estBeginDateStr').val();
+                if(estBeginDate == null || estBeginDate == undefined || estBeginDate == ""){
+                    alertTool.warning("请选择预计开始日期!");
+                    return;
+                }
+                
+                var estEndDate = $('#estEndDateStr').val();
+                if(estEndDate == null || estEndDate == undefined || estEndDate == ""){
+                    alertTool.warning("请选择预计结束日期!");
+                    return;
+                }
+                
+                var submitForm = {
+                    endpoint : "/pms/project/saveProjectResource",
+                    formObj : $("#resourceForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.resourceListTable.ajax.reload();
+                        $('#estBeginDateStr').val("");
+                        $('#estEndDateStr').val("");
+                        page.getProjectCost();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                        $('#estBeginDateStr').val("");
+                        $('#estEndDateStr').val("");
+                    }
+                };
+                page.namespace.submitForm(submitForm);
+			},
+			doResourceDel : function(id) {
+				var opt = {
+		            endpoint : "/pms/project/deleteMyProjectResource",
+		            data : {
+		                'ids' : id
+		            },
+		            success : function(data) {
+		            	alertTool.success("操作成功!");
+		                page.resourceListTable.ajax.reload();
+		                page.getProjectCost();
+		            }
+		        };
+
+				page.namespace.getRequest(opt);
+			},
+			doSaveResource : function() {
+				var estBeginDateStr = $('#estBeginDateStr').val();
+				if(estBeginDateStr == null || estBeginDateStr == undefined || estBeginDateStr == ""){
+                    alertTool.warning("请选择预计开始日期!");
+                    return;
+                }
+				
+				var estEndDateStr = $('#estEndDateStr').val();
+                if(estEndDateStr == null || estEndDateStr == undefined || estEndDateStr == ""){
+                    alertTool.warning("请选择预计结束日期!");
+                    return;
+                }
+                
+                var submitForm = {
+                    endpoint : "/pms/project/editMyProjectResource",
+                    formObj : $("#resourceForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.resourceListTable.ajax.reload();
+                        page.showResourceAdd();
+                        page.getProjectCost();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                    }
+                };
+                
+                page.namespace.submitForm(submitForm);
+			},
+			showResourceAdd : function() {
+				// 显示职位和使用率
+				$("#titleDiv").show();
+				$("#modulusDiv").show();
+                
+                // 操作按钮
+                $('#addResourceBtn').show();
+                $('#saveResourceBtn').hide();
+                $('#updateCancel').hide();
+                
+                // 清空预计开始结束时间
+                $('#estBeginDateStr').val("");
+                $('#estEndDateStr').val("");
+			},
+			showResourceUpdate : function (id) {
+				var rowdata = $('#resourceListTable').getSelectedRowData(id);
+				
+				// 隐藏职位和使用率
+				$("#titleDiv").hide();
+				$("#modulusDiv").hide();
+				$("#resourceRelationId").val(rowdata.id);
+				
+				// 设置预计开始结束时间
+				$('#estBeginDateStr').val(rowdata.estBeginDate);
+                $('#estEndDateStr').val(rowdata.estEndDate);
+                
+                // 按钮控制
+                $('#addResourceBtn').hide();
+                $('#saveResourceBtn').show();
+                $('#updateCancel').show();
+			},
+			
+			doInComeAdd : function() {
+				
+				var inComeDate = $('#inComeDate').val()
+				if (inComeDate == null || inComeDate == undefined || inComeDate == "") {
+                    alertTool.warning("请选择年月!");
+                    return;
+                }
+				
+				var inComeAmt = $('#inComeAmt').val();
+                if(inComeAmt == null || inComeAmt == undefined || inComeAmt == ""){
+                    alertTool.warning("请填写费用!");
+                    return;
+                } else {
+                    var reg = /^\d+(\.\d{1,2})?$/;
+                    if(!reg.test(inComeAmt))
+                    {
+                        alertTool.warning("请填写整数或者小数(支持小数点后两位)!");
+                        return;
+                    }
+                }
+                
+                var submitForm = {
+                    endpoint : "/pms/project/saveMyProjectIncome",
+                    formObj : $("#inComeForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.inComeListTable.ajax.reload();
+
+                        page.showInComeAdd();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                        page.showInComeAdd();
+                    }
+                };
+                page.namespace.submitForm(submitForm);
+			},
+			doSaveInCome : function() {
+				var inComeDate = $('#inComeDate').val()
+				if (inComeDate == null || inComeDate == undefined || inComeDate == "") {
+                    alertTool.warning("请选择年月!");
+                    return;
+                }
+				
+				var inComeAmt = $('#inComeAmt').val();
+                if(inComeAmt == null || inComeAmt == undefined || inComeAmt == ""){
+                    alertTool.warning("请填写费用!");
+                    return;
+                } else {
+                    var reg = /^\d+(\.\d{1,2})?$/;
+                    if(!reg.test(inComeAmt))
+                    {
+                        alertTool.warning("请填写整数或者小数(支持小数点后两位)!");
+                        return;
+                    }
+                }
+                
+                var submitForm = {
+                    endpoint : "/pms/project/editMyProjectIncome",
+                    formObj : $("#inComeForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.inComeListTable.ajax.reload();
+                        page.showInComeAdd();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                        page.showInComeAdd();
+                    }
+                };
+                page.namespace.submitForm(submitForm);
+            },
+            doInComeDel : function(id) {
+            	var opt = {
+                    endpoint : "/pms/project/deleteMyProjectIncome",
+                    data : {
+                        'ids' : id
+                    },
+                    success : function(data) {
+                        page.inComeListTable.ajax.reload();
+                    }
+                };
+            	
+                page.namespace.getRequest(opt);
+            },
+			showInComeAdd : function() {
+				$('#addInComeBtn').show();
+				$('#saveInComeBtn').hide();
+                $('#incomeCancelBtn').hide();
+				
+				$('#inComeDate').val("");
+                $('#inComeAmt').val("");
+                $('#description').val("");
+			},
+			showInComeUpdate : function(id) {
+				var rowdata = $('#inComeListTable').getSelectedRowData(id);
+				
+                $('#inComeDate').val(rowdata.inComeDate);
+                $('#inComeAmt').val(rowdata.inComeAmt);
+                $('#description').val(rowdata.description);
+                $('#inComeRelationId').val(rowdata.id);
+
+                $('#addInComeBtn').hide();
+                $('#saveInComeBtn').show();
+                $('#incomeCancelBtn').show();
+			},
+			
+			doExpenseAdd : function() {
+				var expenseDate = $('#expenseDate').val();
+				if (expenseDate == null || expenseDate == undefined || expenseDate == "") {
+                    alertTool.warning("请选择年月!");
+                    return;
+                }
+
+				var expenseAmt = $('#expenseAmt').val();
+				if(expenseAmt == null || expenseAmt == undefined || expenseAmt == "") {
+                    alertTool.warning("请填写费用!");
+                    return;
+                }else {
+                    var reg=/^\d+(\.\d{1,2})?$/;
+                    if(!reg.test($('#expenseAmt').val()))
+                    {
+                        alertTool.warning("请填写整数或者小数(支持小数点后两位)!");
+                        return;
+                    }
+                }
+                var submitForm = {
+                    endpoint : "/pms/project/saveMyProjectExpense",
+                    formObj : $("#expenseForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.expenseListTable.ajax.reload();
+                        page.showExpenseAdd();
+                        page.getProjectCost();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                        page.showExpenseAdd();
+                    }
+                };
+                page.namespace.submitForm(submitForm);
+			},
+			doSaveExpense : function() {
+				var expenseDate = $('#expenseDate').val();
+				if (expenseDate == null || expenseDate == undefined || expenseDate == "") {
+                    alertTool.warning("请选择年月!");
+                    return;
+                }
+
+				var expenseAmt = $('#expenseAmt').val();
+				if(expenseAmt == null || expenseAmt == undefined || expenseAmt == "") {
+                    alertTool.warning("请填写费用!");
+                    return;
+                }else {
+                    var reg=/^\d+(\.\d{1,2})?$/;
+                    if(!reg.test($('#expenseAmt').val()))
+                    {
+                        alertTool.warning("请填写整数或者小数(支持小数点后两位)!");
+                        return;
+                    }
+                }
+				
+                var submitForm = {
+                    endpoint : "/pms/project/editMyProjectExpense",
+                    formObj : $("#expenseForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.expenseListTable.ajax.reload();
+                        page.showExpenseAdd();
+                        page.getProjectCost();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                        page.showExpenseAdd();
+                    }
+                };
+                page.namespace.submitForm(submitForm);
+			},
+			doExpenseDel : function(id) {
+                var opt = {
+                    endpoint : "/pms/project/deleteMyProjectExpense",
+                    data : {
+                        'ids' : id
+                    },
+                    success : function(data) {
+                        page.expenseListTable.ajax.reload();
+                        page.getProjectCost();
+                    }
+                };
+                page.namespace.getRequest(opt);
+            },
+			showExpenseAdd : function() {
+				$('#addExpenseBtn').show();
+				$('#saveExpenseBtn').hide();
+                $('#expenseCancelBtn').hide();
+				
+				$('#expenseDate').val("");
+                $('#expenseAmt').val("");
+                $('#expenseDescription').val("");			
+			},
+			showExpenseUpdate : function(id) {
+				var rowdata = $('#expenseListTable').getSelectedRowData(id);
+				
+                $('#expenseDate').val(rowdata.expenseDate);
+                $('#expenseAmt').val(rowdata.expenseAmt);
+                $('#expenseDescription').val(rowdata.description);
+                
+                $('#expenseRelationId').val(rowdata.id);
+
+                $('#addExpenseBtn').hide();
+                $('#expenseCancelBtn').show();
+                $('#saveExpenseBtn').show();
+			},
+			doToApprove : function() {
+				var remark = $("#remark").val();
+				
+				if(remark == null || remark == undefined || remark == "") {
+					alertTool.warning("请填写送审信息!");
+					$("#remark").focus();
+                    return;
+				}
+				
+				$('#myModal').modal('hide');
+				
+				var opt = {
+                    endpoint : "/pms/project/sendToApprove",
+                    data : {
+                        'id' : $("#projectId").val(),
+                        'remark': remark
+                    },
+                    success : function(data) {
+                        alertTool.success("送审成功!");
+                       
+                        page.namespace.skiphtml('/pms/project/toMyProjectList');
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                    }
+                };
+                page.namespace.getRequest(opt);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml("/pms/project/toMyProjectList");
+			}
+		}
+		
+		page.init();
+		
+		// 项目资源列表
+		page.resourceListTable = $('#resourceListTable').initDataTable({
+            url : "/pms/project/getMyProjectResource",
+            urlDataFn : function() {
+                return {id:$("#projectId").val()};
+            },
+            paging: false,
+            checkbox : false,
+            columns : [
+                {"data" : "titleString", "width" : "10%"}, 
+                {"data" : "resourceName", "width" : "10%"},
+                {"data" : "modulus", "width" : "10%"},
+                {"data" : "estBeginDate", "width" : "10%"}, 
+                {"data" : "estEndDate", "width" : "10%"},
+                {"data" : "relBeginDate", "width" : "10%"}, 
+                {"data" : "relEndDate", "width" : "10%"},
+                {"data" : "cost", "with" : "10%"},
+                {
+                    "data" : "status",
+                    "width" : "10%",
+                    "render" : function(data, type, row, meta) {
+                        if(data == 'projecting') {
+                            return '<label class="label label-danger">'+ row.statusString+'</label>';
+                        }else if(data == 'processing'){
+                            return '<label class="label label-info">'+ row.statusString+'</label>';
+                        }else{
+                            return '<label class="label label-primary">'+ row.statusString+'</label>';
+                        }
+                    }
+                }, {
+                	"data" : null,
+                	"width" : "10%",
+                	"render" : function(data, type, row, meta) {
+                		var id = data.id;
+                		
+                		var html = "<a style=\"margin-right: 7px;\" name=\"row_edit_btn\"><i class=\"fa fa-edit\" title=\"修改\" onclick=\"doResourceEdit('" + id + "');\"></i></a>";
+ 
+                		if(row.status == "processing") {
+                			
+                			html += "<a name=\"row_del_btn\"><i class=\"fa fa-remove\" title=\"删除\" onclick=\"doResourceDel('" + id + "');\"></i></a>";
+                		}
+                		
+                		if(row.status == "projectout") {
+                			html = "";
+                		}
+                		
+                		return html;
+                	}
+                }
+            ]
+        });
+		
+		// 项目收入列表
+		page.inComeListTable = $('#inComeListTable').initDataTable({
+            url : "/pms/project/getMyProjectIncome",
+            urlDataFn : function() {
+                return {id:$("#inComeRelationProjectId").val()};
+            },
+            paging: false,
+            checkbox : false,
+            ops : {
+                del : function(id, rowData) {
+                    page.doInComeDel(id);
+                },
+                edit : function(id, rowData) {
+                    page.showInComeUpdate(id);
+                }
+            },
+            columns : [
+                {"data" : "inComeDate", "width" : "20%"}, 
+                {"data" : "inComeAmt", "width" : "20%"},
+                {"data" : "description", "width" : "20%"}
+            ]
+        });
+		
+		// 项目支出列表
+		page.expenseListTable = $('#expenseListTable').initDataTable({
+            url : "/pms/project/getMyProjectExpense",
+            urlDataFn : function() {
+                return {id:$("#expenseRelationProjectId").val()};
+            },
+            paging: false,
+            checkbox : false,
+            ops : {
+                del : function(id, rowData) {
+                    page.doExpenseDel(id);
+                },
+                edit : function(id, rowData) {
+                    page.showExpenseUpdate(id);
+                }
+            },
+            columns : [
+                {"data" : "expenseDate", "width" : "20%"}, 
+                {"data" : "expenseAmt", "width" : "20%"},
+                {"data" : "description", "width" : "20%"}
+            ]
+        });
+		
+		
+		window.doResourceEdit = page.showResourceUpdate;
+		window.doResourceDel = page.doResourceDel;
+		
+		page.namespace.root.find("#addResourceBtn").on('click', page.doResourceAdd);
+		page.namespace.root.find("#saveResourceBtn").on('click', page.doSaveResource);
+		page.namespace.root.find("#updateCancel").on('click', page.showResourceAdd);
+		
+		page.namespace.root.find("#addInComeBtn").on('click', page.doInComeAdd);
+		page.namespace.root.find("#saveInComeBtn").on('click', page.doSaveInCome);
+		page.namespace.root.find("#incomeCancelBtn").on('click', page.showInComeAdd);
+		
+		page.namespace.root.find("#addExpenseBtn").on('click', page.doExpenseAdd);
+		page.namespace.root.find("#saveExpenseBtn").on('click', page.doSaveExpense);
+		page.namespace.root.find("#expenseCancelBtn").on('click', page.showExpenseAdd);
+		
+		page.namespace.root.find("#toApproveBtn").on('click', page.doToApprove);
+		page.namespace.root.find("#btnCancel").on('click', page.doCancel);
+	});
+</script>

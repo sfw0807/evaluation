@@ -1,0 +1,142 @@
+<namespace id="element-list">
+    <ol class="breadcrumb">
+        <li><a href="#">元素管理</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+	<section class="content" id="searchElementSection" ms-controller="element_view">
+		<div class="box box-info">
+			<form class="form-horizontal" id="searchElementForm">
+				<div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="btn-group">
+                                <a class="btn btn-success btn-sm" id="addBtn" func="sysuser-list-add">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    添加
+                                </a>
+                                <button class="btn btn-danger btn-sm" type="button" id="deleteBtn" func="sysuser-list-del">
+                                    <span class="glyphicon glyphicon-minus"></span> 删除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <span class="input-group-addon">页面名称</span>
+                                <input type="text" name="name" id="name" class="form-control input-sm" placeholder="页面名称">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <span class="input-group-addon">页面标识</span>
+                                <input type="text" name="funcId" id="code" class="form-control input-sm" placeholder="页面标识">
+                                 <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+                                        <i class="fa fa-search"></i> 查询
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+				</div>
+			</form>
+		</div>
+		<div class="box box-info" style="border-top: 0px;">
+			<div class="box-body" id="elementList"  style="margin-top: -10px;">
+				<table id="elementListTable"
+					class="table dataTable row-border cell-border" cellspacing="0"
+					width="100%">
+					<thead>
+						<tr>
+							<th></th>
+							<th>页面元素名称</th>
+							<th>页面元素标识</th>
+							<th>所在菜单名称</th>
+							<th>页面元素描述</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#element-list').namespace(),
+			doQuery : function() {
+				page.listTable.ajax.reload();
+			},
+			doAdd : function() {
+				page.namespace.skiphtml('/element/toElementAdd');
+			},
+			doBatchDel : function() {
+				var selectRows = $('#elementListTable').getSelectedRow();
+				
+				if(selectRows.length == 0) {
+					alertTool.warning("请选择要删除的记录!");
+					return;
+				}
+				
+				page.doDel(selectRows.join(","));
+			},
+			doView : function(id) {
+				page.namespace.skiphtml('/element/toElementView?id='+id);
+			},
+			doDel : function(id) {
+				var HtmlMenuOpt = {
+					endpoint : "/element/deleteElement",
+				  	data : {'ids' : id},
+				  	success : function(data) {
+				  		page.listTable.ajax.reload();
+				  	}		
+				};
+				
+				page.namespace.getRequest(HtmlMenuOpt);
+			},
+			doEdit : function(id) {
+				page.namespace.skiphtml('/element/toElementEdit?id='+id);
+			}
+		}
+		
+		page.listTable = $('#elementListTable').initDataTable({
+			url : "/element/getElementPage",
+			urlDataFn : function() {
+				return $("#searchElementForm").serializeJson();
+			},
+			lengthChange : false,
+			checkbox : true,
+			ops : {
+				view : function(id, rowData) {
+					page.doView(id);
+				},
+				del : function(id, rowData) {
+					page.doDel(id);
+				},
+				edit : function(id, rowData) {
+					page.doEdit(id);
+				}
+			},
+			columns : [ {
+				"data" : "name",
+				"orderable" : false,
+				"width" : "15%"
+			}, {
+				"data" : "funcId",
+				"orderable" : false,
+				"width" : "15%"
+			}, {
+				"data" : "menuName",
+				"width" : "10%"
+			}, {
+				"data" : "description",
+				"width" : "15%"
+			}]
+		});
+		
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+		page.namespace.root.find("#addBtn").on('click', page.doAdd);
+		page.namespace.root.find("#deleteBtn").on('click', page.doBatchDel);
+	});
+</script>

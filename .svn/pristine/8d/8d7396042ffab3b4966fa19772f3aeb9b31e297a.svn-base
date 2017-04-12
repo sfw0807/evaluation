@@ -1,0 +1,140 @@
+<namespace id="sysuser-add">
+    <ol class="breadcrumb">
+        <li><a href="#">用户管理</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+	<section class="content" id="addSysUserSection" ms-controller="sysuser_add">
+        <div class="box box-info">
+		    <form role="form" id="addSysUserForm"  class="form-horizontal">
+            <div class="row ">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"></i> 提交
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body">
+      			<div class="form-group">
+      				<label for="name" class="col-sm-1 control-label requiredMask input-sm">用户名称</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="name" type="text" class="form-control input-sm" placeholder="" >
+   			 		</div>
+      			</div>
+      			<div class="form-group">
+   			 		<label for="userAccount" class="col-sm-1 control-label requiredMask input-sm">用户账号</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="userAccount" type="text" class="form-control input-sm" placeholder="" >
+   			 		</div>
+   			 	</div>
+   			 	<div class="form-group">
+   			 		<label for="email" class="col-sm-1 control-label requiredMask input-sm">用户邮箱</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="email" type="text" class="form-control input-sm" placeholder="" >
+   			 		</div>
+   			 	</div>
+   			 	<div class="form-group">
+   			 		<label for="disabled" class="col-sm-1 control-label requiredMask input-sm">用户状态</label>
+					<div class="col-sm-5">
+						<select name="disabled" class="form-control input-sm select2">
+							<option selected="selected" value="-1">请选择</option>
+							<option ms-for="el in @data" ms-attr="{value:el.value}" ms-text="el.name"></option>
+						</select>
+					</div>
+   			 	</div>
+   			 	<div class="form-group">
+   			 		<label for=description class="col-sm-1 control-label input-sm">用户描述&nbsp&nbsp</label>
+   			 		<div class="col-sm-5">
+   			 			<textarea name="description" rows="3" class="form-control input-sm" placeholder=""></textarea>
+   			 		</div>
+   			 	</div>
+      		</div>
+
+        </form>
+        </div>
+	</section>
+</namespace>
+
+<script type="text/javascript">
+$(function() {
+	var page = {
+		namespace : $('#sysuser-add').namespace(),
+		model:{
+			vm:avalon.define({
+		        $id: "sysuser_add",
+		        data: {}
+		    })
+		},
+		init : function() {
+			$("#addSysUserForm").validate({
+				rules : {
+					'name' : {
+						required : true,
+						maxlength : 255
+					},
+					'userAccount' : {
+						required : true,
+						maxlength : 255
+					},
+					'email' : {
+						required : true,
+						maxlength : 255
+					},
+					'disabled' : {
+						required : true,
+						valueNotEquals : '-1'
+					},
+					'description' : {
+						required : false,
+						maxlength : 255
+					}
+				},submitHandler : function(form) {
+					page.doAdd();
+				}
+			});
+		},
+		doAdd : function() {
+			var submitSysUserForm = {
+				endpoint : "/sysuser/saveSysUser",
+				formObj : $("#addSysUserForm"),
+				success : function(data) {
+					alertTool.success("操作成功!");
+					page.doCancel();
+				},
+				failure:function(data) {
+					alertTool.error(data);
+				}
+			};
+			
+			page.namespace.submitForm(submitSysUserForm);
+		},
+		doCancel : function() {
+			page.namespace.skiphtml("/pages/sys/user/sysuser-list.html");
+		},
+		getStatus : function(){
+			page.namespace.getRequest({
+				endpoint : "/dictionary/getDictionaryByCode",
+				data : {"code":"USER_DISABLED"},
+				success : function(data) {
+					 page.model.vm.data=data;
+				},
+				failure : function(data) {
+					alertTool.error(data);
+				}
+			});
+		}
+	}
+	
+	avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+	page.getStatus() ;
+	page.init();
+	
+	page.namespace.root.find("#btnCancel").on('click', page.doCancel);
+});
+</script>

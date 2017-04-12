@@ -1,0 +1,107 @@
+<namespace id="sysrole-type-add">
+	
+    <ol class="breadcrumb">
+        <li><a href="#">角色管理</a></li>
+        <li><a href="#">分配类型</a></li>
+    </ol>
+	<section class="content" id="addSysRoleType" ms-controller="sysrole_type_add">
+        <div class="box box-info">
+		    <form role="form" id="addSysRoleTypeForm"  class="form-horizontal">
+            <div class="row ">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"></i> 提交
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+             <div class="box-body">
+                <div class="form-group">
+                    <label for="name" class="col-sm-1 control-label input-sm">角色类型</label>
+                    <div class="col-sm-5">
+	                    <select id="roleType" name="roleType" class="form-control select2 input-sm" ms-duplex="@selectRole.roleType">
+							<option ms-for="el in @roleType" ms-attr="{value:el.id}" ms-text="el.name"></option>
+						</select>
+	                </div>
+                </div>
+             </div>
+             
+             <input type="hidden" id="id" name="id"  style="width: 100%" />
+             <input type="hidden" id="sysRoleId" name="sysRoleId"  style="width: 100%" />
+		</form>
+        </div>
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#sysrole-type-add').namespace(),
+			model:{
+				vm:avalon.define({
+			        $id: "sysrole_type_add",
+			        roleType : [
+			                   	{"id":"-1","name":"请选择"},
+			                   	{"id":"0","name":"管理员角色"},
+			                   	{"id":"1","name":"填报角色"},
+			                   	{"id":"2","name":"自评角色"},
+			                   	{"id":"3","name":"专家角色"},
+			                   	{"id":"4","name":"终评角色"}
+			                   ],
+			      	selectRole : {}
+			    })
+			},
+			init : function() {
+				var sysRoleId = page.namespace.getParam("sysRoleId") ;
+				page.namespace.root.find("#sysRoleId").val(sysRoleId);
+				
+				$('#addSysRoleTypeForm').validate({
+					submitHandler : function(form) {
+						page.doAddType();
+					}
+				});
+				
+				page.namespace.getRequest({
+					endpoint : "/sysRoleType/getSysRoleTypeByRoleId",
+					data : {"roleId" : sysRoleId},
+					success : function(data) {
+						page.model.vm.selectRole = data ;
+						page.namespace.root.find("#id").val(data.id)
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			},
+			doAddType : function() {
+				var submitSysRoleForm = {
+					endpoint : "/sysRoleType/mergeSysRoleType",
+					formObj : $('#addSysRoleTypeForm'),
+					success : function(data) {
+						alertTool.success('操作成功');
+						page.doCancel();
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				}
+				
+				page.namespace.submitForm(submitSysRoleForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/sys/role/sysrole-list.html');
+			}
+		};
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);
+		page.init();
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+	});
+</script>

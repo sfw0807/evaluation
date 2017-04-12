@@ -1,0 +1,116 @@
+<namespace id="project-view"   ms-controller="project_view">
+<ol class="breadcrumb">
+    <li><a href="#">XM</a></li>
+    <li><a href="#">明细</a></li>
+</ol>
+<section class="content" id="viewProjectSection"   >
+    <div class="box box-info">
+        <div class="row ">
+            <div class="col-sm-12">
+                <!-- 右对齐的 btn-group -->
+                <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 31px;">
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-body">
+        <form role="form" id="viewProjectForm" class="form-horizontal">
+            <div class="form-group">
+                <label for="name" class="col-sm-1 control-label input-sm">项目名称</label>
+                <div class="col-sm-5">
+                    <span id="name" class="form-control label-form-control input-sm"  >{{@data.name}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="startDateStr" class="col-sm-1 control-label input-sm">开始时间</label>
+                <div class="col-sm-5">
+                    <span id=startDateStr class="form-control label-form-control input-sm"  >{{@data.startDateStr}}</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="endDateStr" class="col-sm-1 control-label input-sm">结束时间</label>
+                <div class="col-sm-5">
+                    <span id="endDateStr" class="form-control label-form-control input-sm"  >{{@data.endDateStr}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="score" class="col-sm-1 control-label input-sm">总分</label>
+                <div class="col-sm-5">
+                    <span id="score" class="form-control label-form-control input-sm"  >{{@data.score}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="statusName" class="col-sm-1 control-label input-sm">状态</label>
+                <div class="col-sm-5">
+                    <span id="statusName" class="form-control label-form-control input-sm"  >{{@data.statusName}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description" class="col-sm-1 control-label input-sm">备注</label>
+                <div class="col-sm-5">
+                    <span id="description" class="form-control label-form-control input-sm" 
+                     >{{@data.description}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="dicLocation" class="col-sm-1 control-label input-sm">附件目录</label>
+                <div class="col-sm-5">
+                    <span id="dicLocation" class="form-control label-form-control input-sm"  >{{@data.dicLocation}}</span>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#project-view').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "project_view",
+    		        data: {}
+    		    })
+    		},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/project/project-list.html');
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/project/getProjectById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		};
+		
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+		
+	});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

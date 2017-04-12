@@ -1,0 +1,187 @@
+<namespace id="myproject-list">
+    <ol class="breadcrumb">
+        <li><a href="#">我的项目</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+    <div class="box box-info" >
+        <form class="form-horizontal" id="searchForm">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="btn-group">
+                            <a class="btn btn-success btn-sm" id="manageBtn" >
+                                <span class="glyphicon glyphicon-wrench"></span>项目维护
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">名称</span>
+                            <input type="text" name="projectName" class="form-control input-sm" id="projectName" placeholder="项目名称">
+                        </div>
+                    </div>
+                    <div class="col-sm-2" >
+                        <div class="input-group">
+                            <span class="input-group-addon">编号</span>
+                            <input type="text" name="projectCode" class="form-control input-sm" id="projectCode" placeholder="项目编号">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">客户</span>
+                            <input type="text" name="customer" class="form-control input-sm" id="customer" placeholder="客户名称">
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">类型</span>
+                            <select id="projectType" name="projectType" class="form-control select2 input-sm">
+                                <option selected="selected" value="">全部</option>
+                                <option th:each="dict : ${projectType}" th:value="${dict.value}" th:text="${dict.name}"></option>
+                            </select>
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+                                    <i class="fa fa-search"></i> 查询
+                                </button>
+                            </span>
+                        </div>
+                </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="box box-info" style="border-top: 0px;">
+        <div class="box-body" style="margin-top: -10px;">
+            <table id="listTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>项目编号</th>
+                        <th>项目名称</th>
+                        <th>项目类型</th>
+                        <th>项目经理</th>
+                        <th>客户名称</th>
+                        <th>开始时间</th>
+                        <th>结束时间</th>
+                        <th>合同金额</th>
+                        <th>状态</th>
+                        <th>版本</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</namespace>
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#myproject-list').namespace(),
+			doQuery : function() {
+				page.listTable.ajax.reload();
+			},
+			doView : function(id) {
+				page.namespace.skiphtml("/pms/project/toMyProjectView?id=" + id);
+			},
+			doEdit : function(id) {
+				page.namespace.skiphtml('/pms/project/toMyProjectEdit?id=' + id);
+			},
+            doManage : function() {
+                var selectRows = $('#listTable').getSelectedRow();
+                if (selectRows.length == 0) {
+                    alertTool.warning("请选择要维护的项目!");
+                    return;
+                } else {
+                    if (selectRows.length > 1){
+                        alertTool.warning("只能选择一个项目!");
+                        return;
+                    }
+                }
+                
+                page.namespace.skiphtml('/pms/project/toMyProjectManage?id=' + selectRows[0])
+            }
+		};
+
+		page.listTable = $('#listTable').initDataTable({
+			url : "/pms/project/getMyProjectPage",
+			urlDataFn : function() {
+				return $("#searchForm").serializeJson();
+			},
+			lengthChange : false,
+			checkbox : true,
+			ops : {
+				view : function(id, rowData) {
+					page.doView(id);
+				},
+				edit : function(id, rowData) {
+					page.doEdit(id);
+				}
+			},
+			columns : [
+                {
+                    "data" : "projectCode",
+                    "width" : "10%"
+                }, {
+                    "data" : "projectName",
+                    "width" : "15%"
+                }, {
+                    "data" : "projectType",
+                    "width" : "5%",
+                    "render" : function(data, type, row, meta) {
+                        if(data == '01'){
+                            return '<label class="label label-primary">'+row.projectTypeString+'</label>';
+                        }else if(data == '02'){
+                            return '<label class="label label-success">'+row.projectTypeString+'</label>';
+                        }else if(data == '03'){
+                            return '<label class="label label-info">'+row.projectTypeString+'</label>';
+                        }else if(data == '04'){
+                            return '<label class="label label-warning">'+row.projectTypeString+'</label>';
+                        }else if(data == '05'){
+                            return '<label class="label label-danger">'+row.projectTypeString+'</label>';
+                        }else{
+                            return '<label class="label label-default">'+row.projectTypeString+'</label>';
+                        }
+                    }
+                } , {
+                    "data" : "projectManagerName",
+                    "width" : "15%"
+                } , {
+                    "data" : "customer",
+                    "width" : "10%"
+                } , {
+                    "data" : "beginDate",
+                    "width" : "15%"
+                }, {
+                    "data" : "endDate",
+                    "width" : "15%"
+                },
+                {
+                    "data" : "projectAmt",
+                    "width" : "10%"
+                },
+                {
+                    "data" : "status",
+                    "width" : "15%",
+                    "render" : function(data, type, row, meta) {
+                        if(data == '0'){
+                            return '<label class="label label-warning">'+row.statusString+'</label>';
+                        }else if(data == '1'){
+                            return '<label class="label label-info">'+row.statusString+'</label>';
+                        }else if(data == '2'){
+                            return '<label class="label label-success">'+row.statusString+'</label>';
+                        }else if(data == '3'){
+                            return '<label class="label label-danger">'+row.statusString+'</label>';
+                        }else{
+                            return '<label class="label label-primary">'+row.statusString+'</label>';
+                        }
+                    }
+                } ,
+                {
+                    "data" : "flowVersion",
+                    "width" : "15%"
+                } ]
+		});
+        page.namespace.root.find('#manageBtn').on('click', page.doManage);
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+	});
+</script>

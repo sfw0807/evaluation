@@ -1,0 +1,44 @@
+<div id="evalTargetScore_lv2"
+     style="width: 100%;background-color: white;padding-left: 10px;margin-top: 10px;  text-align: left
+">
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        loadRadarDataLv2();//根据targetId查询数据
+    });
+    function loadRadarDataLv2(){
+        var $params = $_storage.get(VIEW_ROOT + "/front/analysis/analysis_tabs.html");
+        var targetId = $params.targetId;
+        var params = {
+            projectId: $_params.currentProjectId,
+            evalTargetId: targetId
+        };
+        $.get("/web/measureItem/getMeasureItemCompRateLv2",
+            params,
+            function (data) {
+                for(var i = 0; i < data.data.length; i++){
+                    var item = data.data[i];
+                    var reportId = "reportEchars" + i;
+                    var tableId = "reportTable" + i;
+                    addChartElement($("#evalTargetScore_lv2"), reportId, item.lvlItem.name);
+                    addTableElement($("#evalTargetScore_lv2"), tableId);
+                    $("#"+reportId).trigger("create");
+                    $("#"+tableId).trigger("create");
+
+                    loadRadarData(reportId, item.lv2Items);
+                    loadTableData(tableId, item.lv2Items, 1)
+                }
+
+            });
+    }
+    function addGoBackBtn(parent){
+        var btn = '<div style="height:400px; width:10%; float:right"><button class="btn btn-primary btn-sm"  id="r_Btn_lv1">返回</button></div>';
+        $("#r_Btn_lv2").click(function(){
+            var url = VIEW_ROOT + "/front/analysis/analysis-target-select.html" ;
+            $("#frameContainer").load(url, function(){
+
+            }) ;
+        });
+    }
+</script>

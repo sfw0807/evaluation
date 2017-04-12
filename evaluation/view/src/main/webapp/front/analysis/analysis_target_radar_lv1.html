@@ -1,0 +1,47 @@
+<div id="evalTargetScore_C_Any_Con"
+     style="width: 100%;background-color: white;padding-left: 10px;margin-top: 10px;  text-align: left
+">
+    <div>
+        <div id="reportEchars" style="height:400px; width:90%; float:left"></div>
+        <div style="height:400px; width:10%; float:right"><button class="btn btn-primary btn-sm"  id="r_Btn_lv1">返回</button></div>
+    </div>
+
+    <div style="">
+        <table id="reportTable">
+            <thead  class="trThread">
+            <tr>
+                <th>指标</th>
+                <th>总分</th>
+                <th id="evalTargetScoreTable_Any_A" >得分</th>
+                <th>得分率</th>
+                <th  id="evalTargetScoreTable_Any_A_EXP">操作</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        loadRadarDataLv1();//根据targetId查询数据
+    });
+    function loadRadarDataLv1() {
+        var $params = $_storage.get(VIEW_ROOT + "/front/analysis/analysis_tabs.html");
+        var targetId = $params.targetId;
+        var params = {
+            projectId: $_params.currentProjectId,
+            evalTargetId: targetId,
+            measureItemId: '-1'
+        };
+        $.get("/web/measureItem/getMeasureItemCompRate",
+            params,
+            function (data) {
+                loadRadarData("reportEchars", data.data);
+                loadTableData("reportTable", data.data, 1)
+            });
+    }
+    $("#r_Btn_lv1").click(function(){
+        var url = VIEW_ROOT + "/front/analysis/analysis-target-select.html" ;
+        $("#frameContainer").load(url, function(){}) ;
+    });
+</script>

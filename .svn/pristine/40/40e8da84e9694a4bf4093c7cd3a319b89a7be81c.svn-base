@@ -1,0 +1,101 @@
+<namespace id="element-edit">
+    <ol class="breadcrumb">
+        <li><a href="#">元素管理</a></li>
+        <li><a href="#">修改</a></li>
+    </ol>
+	<section class="content" id="editElementSection" ms-controller="element_edit">
+        <div class="box box-info">
+		    <form role="form" id="editElementForm"  class="form-horizontal">
+            <div class="row ">
+                <div class="col-sm-12">
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"></i> 提交
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+      		<div class="box-body">
+      			<div class="form-group">
+      				<label for="name" class="col-sm-1 control-label input-sm requiredMask">元素名称</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="name" type="text" class="form-control input-sm" placeholder="" th:value="${element.name}">
+   			 		</div>
+      			</div>
+      			<div class="form-group">
+      				<label for="funcId" class="col-sm-1 control-label input-sm requiredMask">元素标识</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="funcId" type="text" class="form-control input-sm" placeholder="" th:value="${element.funcId}">
+   			 		</div>
+      			</div>
+      			<div class="form-group">
+	   			 		<label for="menuName" class="col-sm-1 control-label input-sm">所属菜单&nbsp;&nbsp;</label>
+	   			 		<div class="col-sm-5">
+	   			 			<span id="menuName" class="form-control label-form-control input-sm" th:text="${element.menuName}"></span>
+	   			 		</div>
+	   			 	</div>
+   			 	<div class="form-group">
+   			 		<label for="description" class="col-sm-1 control-label input-sm">元素描述&nbsp;&nbsp;</label>
+   			 		<div class="col-sm-5">
+   			 			<textarea name="description" rows="3" class="form-control input-sm" placeholder="" th:text="${element.description}"></textarea>
+   			 		</div>
+   			 	</div>
+      		</div>
+      		<input type="hidden" name="id" th:value="${element.id}" style="width: 100%" />
+		</form>
+        </div>
+	</section>
+</namespace>
+
+<script type="text/javascript">
+$(function() {
+	var page = {
+		namespace : $('#element-edit').namespace(),
+		init : function() {
+			$("#editElementForm").validate({
+				rules : {
+					'name' : {
+						required : true,
+						maxlength : 255
+					},
+					'funcId' : {
+						required : true,
+						maxlength : 255
+					},
+					'description' : {
+						required : false,
+						maxlength : 255
+					}
+				},submitHandler : function(form) {
+					page.doEdit();
+				}
+			});
+		},
+		doCancel : function() {
+			page.namespace.skiphtml("/element/toElementList");
+		},
+		doEdit : function() {
+			var submitSysUserForm = {
+				endpoint : "/element/editElement",
+				formObj : $("#editElementForm"),
+				success : function(data) {
+					alertTool.success("操作成功!");
+					page.doCancel();
+				},
+				failure:function(data) {
+					alertTool.error(data);
+				}
+			};
+			
+			page.namespace.submitForm(submitSysUserForm);
+		}
+	}
+	
+	page.init();
+	
+	page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+});
+</script>

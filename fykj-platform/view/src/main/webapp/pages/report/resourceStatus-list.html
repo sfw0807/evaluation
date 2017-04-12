@@ -1,0 +1,206 @@
+<namespace id="resourceStatus-list">
+	<ol class="breadcrumb">
+        <li><a href="#">资源状态查询</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+    <div class="box box-info" >
+        <form class="form-horizontal" id="searchForm">
+        	<div class="box-body">
+        		<div class="row">
+        			 <div class="col-sm-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">姓名</span>
+                            <input type="text" name="name" class="form-control input-sm" id="name" placeholder="姓名">
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">职位</span>
+                            <select id="title" name="title" class="form-control select2 input-sm">
+                                <option selected="selected" value="">请选择</option>
+                                <option th:each="dict : ${title}" th:value="${dict.value}" th:text="${dict.name}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                    	<div class="input-group">
+                    		<span class="input-group-addon">开始时间</span>
+                    		<input  name="beginDate" readonly type="text" class="form-control input-sm pull-right" id="datepicker1">
+                    	</div>
+                    </div>
+                    <div class="col-sm-3">
+                    	<div class="input-group">
+                    		<span class="input-group-addon">结束时间</span>
+                    		<input  name="endDate" readonly type="text" class="form-control input-sm pull-right" id="datepicker2">
+                    		<span class="input-group-btn">
+                                <button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+                                    <i class="fa fa-search"></i> 查询
+                                </button>
+                            </span>
+                    	</div>
+                    </div>
+        		</div>
+        	</div>
+        </form>
+    </div>
+    <div class="box box-info" style="border-top: 0px;">
+        <div class="box-body" style="margin-top: -10px;">
+            <table id="listTable" class="table dataTable row-border cell-border" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>状态</th>
+                        <th>姓名</th>
+                        <th>职位</th>
+                        <th>性别</th>
+                        <th>email</th>
+                        <th>实际(天)</th>
+                        <th>空闲(天)</th>
+                        <th>空闲占比</th>
+                    </tr>
+                </thead>
+            </table>
+            
+            <table id="childrenTable" class="table dataTable row-border cell-border "
+				cellspacing="0" width="100%" style="display:none;">
+				<thead>
+					<tr>
+						<th>所在项目</th>
+						<th>项目编号</th>
+						<th>项目经理</th>
+						<th>预计开始时间</th>
+						<th>预计结束时间</th>
+						<th>实际开始时间</th>
+						<th>实际结束时间</th>
+						<th>职位</th>
+						<th>状态</th>
+					</tr>
+				</thead>
+			</table>
+        </div>
+    </div>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#resourceStatus-list').namespace(),
+			init : function() {
+				$('#datepicker1').autoBSNyr().on("click", function(ev){
+		            //$("#datepicker1").datetimepicker("setEndDate", $("#datepicker2").val());
+		        });
+				
+		        $('#datepicker2').autoBSNyr().on("click", function(ev){
+		            //$("#datepicker2").datetimepicker("setStartDate", $("#datepicker1").val());
+		        });
+		        
+		        var date = new Date().toLocaleDateString()
+		        
+		        $("#datepicker1").val(date.replace(/\//g, "-"));
+		        $("#datepicker2").val(date.replace(/\//g, "-"));
+			},
+			doQuery : function() {
+				page.listTable.ajax.reload();
+			}
+		};
+		
+		page.init();
+		
+		page.listTable = $('#listTable').initDataTable({
+			url : '/pms_report/getResourcePlanStatus',
+			urlDataFn : function() {
+				return $("#searchForm").serializeJson();
+			},
+			lengthChange : false,
+			paging : false,
+			checkbox : false,
+			/* ops : {
+				view : function(id, rowData) {
+					page.doView(id);
+				}
+			}, */
+			columns : [
+			    {"data" : null, "className" : "details-control", "orderable" : false, "defaultContent" : '', "width" : "5%"},
+				{"data" : "planStatus", "render" : function(data, type, row, meta) {
+                    if(data == '0') {
+                        return '<label class="label label-danger">'+row.planStatusString+'</label>';
+                    }else if(data == '1') {
+                        return '<label class="label label-success">'+row.planStatusString+'</label>';
+                    }else{
+                        return '<label class="label label-default">'+row.planStatusString+'</label>';
+                    }
+                }},
+				{"data" : "name"},
+				{"data" : "titleString"},
+				{"data" : "genderString"},
+				{"data" : "email"},
+				{"data" : "estDays"},
+				{"data" : "relDays"},
+				{"data" : "daysPersent", "render" : function(data, type, row, meta) {
+					return '<div class="progress progress-sm"><div class="progress-bar progress-bar-green"' +
+					       'style="width: '+data+'; line-height:11px;" role="progressbar" >' + data
+					       '</div></div>';
+				}}
+			],
+			callAfterDrawn : function() {
+				$('#listTable tbody').off('click','td.details-control');
+				$('#listTable tbody').on('click', 'td.details-control', function(event) {
+					var $tr = $(this).closest('tr');
+            		var row = page.listTable.row($tr);
+            		
+            		if($tr.hasClass('shown')) {
+            			$tr.next('tr').toggleClass('hidden');
+ 		                $tr.removeClass('shown');
+            		} else {
+            			var childrenTableId = "childrenTable_" + row.data().id;
+            			var childrenTable = $tr.next('tr').find('#' + childrenTableId);
+            			
+            			if(childrenTable.length > 0) {
+            				$tr.next('tr').toggleClass('hidden');
+            				$tr.addClass('shown');
+			            	event.stopPropagation();
+			            	return;
+            			}
+            			
+            			var childrenTableClone = $('#childrenTable').clone(false);
+            			childrenTableClone.attr('id', childrenTableId);
+            			
+            			childrenTableClone.css('display','inline-table');
+            			
+            			row.child(childrenTableClone).show();
+            			$tr.addClass('shown');
+            			
+            			$('#' + childrenTableId).initDataTable({
+            				url : '/pms_report/getProjectByResourceId',
+            				urlDataFn : function() {
+            					return {id:row.data().id};
+            				},
+            				paging: false,
+            				columns:[
+            					{"data" : "projectName"},
+            					{"data" : "projectCode"},
+            					{"data" : "projectManager"},
+            					{"data" : "estBeginDate"},
+            					{"data" : "estEndDate"},
+            					{"data" : "relBeginDate"},
+            					{"data" : "relEndDate"},
+            					{"data" : "titleString"},
+            					{"data" : "status", "render" : function(data, type, row, meta) {
+                                    if(data == 'projecting') {
+                                        return '<label class="label label-danger">'+ row.statusString+'</label>';
+                                    }else if(data == 'processing'){
+                                        return '<label class="label label-info">'+ row.statusString+'</label>';
+                                    }else{
+                                        return '<label class="label label-primary">'+ row.statusString+'</label>';
+                                    }
+                                }}
+            				]
+            			});
+            		}
+				});
+			}
+		});
+		
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+	});
+</script>

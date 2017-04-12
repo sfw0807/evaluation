@@ -1,0 +1,383 @@
+package com.fykj.product.evaluation.modular.evaluating.evaltarget.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Service;
+
+import com.fykj.platform.kernel.BusinessException;
+import com.fykj.platform.kernel._c.model.JPage;
+import com.fykj.platform.kernel._c.model.SimplePageRequest;
+import com.fykj.platform.kernel._c.service.ServiceSupport;
+import com.fykj.platform.kernel._c.service.SingleEntityManager;
+import com.fykj.platform.kernel._c.service.SingleEntityManagerGetter;
+import com.fykj.platform.util.JStringUtils;
+import com.fykj.product.evaluation.modular.evaluating.Codes.Project.EVAL_TARGET;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.model.EvalTarget;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.model.EvalTargetProject;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.model.EvalTargetUser;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.service.EvalTargetService;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.EvalTargetCriteriaInVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.EvalTargetDetailOutVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.UserDetailCriteriaInVO;
+import com.fykj.product.evaluation.modular.evaluating.evaltarget.vo.UserDetailVO;
+
+@Service
+public class EvalTargetServiceImpl extends ServiceSupport 
+implements EvalTargetService {
+
+	private SingleEntityManager<EvalTarget> internalEvalTargetServiceImpl = SingleEntityManagerGetter.get()
+			.getInstance(EvalTarget.class);
+
+	private SingleEntityManager<EvalTargetUser> internalEvalTargetUserServiceImpl = SingleEntityManagerGetter.get()
+			.getInstance(EvalTargetUser.class);
+	
+	private SingleEntityManager<EvalTargetProject> internalEvalTargetProjectServiceImpl = SingleEntityManagerGetter.get()
+			.getInstance(EvalTargetProject.class);
+	
+	
+	@Override
+	public void saveEvalTarget(EvalTarget evalTarget) {
+		
+		validate0(evalTarget);
+		
+		if(exists0(evalTarget.getCode())){
+			throw new BusinessException("编码已经存在");
+		}
+		
+		if(EVAL_TARGET.PERS.equals(evalTarget.getType())){
+			if(JStringUtils.isNotNullOrEmpty(evalTarget.getOrgId())){
+				isOrg0(evalTarget.getOrgId());
+			}
+		}
+		
+		internalEvalTargetServiceImpl.saveOnly(evalTarget);
+	}
+
+	private void validate0(EvalTarget evalTarget) {
+		if (JStringUtils.isNullOrEmpty(evalTarget.getName())) {
+			throw new BusinessException("名称不能为空");
+		}
+		
+		if(EVAL_TARGET.ORG.equals(evalTarget.getType())){
+			if(JStringUtils.isNotNullOrEmpty(evalTarget.getOrgId())){
+				throw new BusinessException("组织不应该有从属组织");
+			}
+		}
+		
+	}
+
+	private boolean isOrg0(String id){
+		EvalTarget evalTarget=internalEvalTargetServiceImpl
+				.singleEntityQuery2()
+				.active(id)
+				.ready().model();
+		if(evalTarget==null){
+			throw new BusinessException("个人所属组织不存在");
+		}
+		return EVAL_TARGET.ORG.equals(evalTarget.getType());
+	}
+	
+	
+//	@Override
+//	public boolean exists(String code) {
+//		EvalTarget param = internalEvalTargetServiceImpl.singleEntityQuery2().conditionDefault().equals("code", code)
+//				.ready().model();
+//		return param != null;
+//	}
+
+	@Override
+	public void updateEvalTarget(EvalTarget evalTarget) {
+
+		validate0(evalTarget);
+		
+		if(EVAL_TARGET.PERS.equals(evalTarget.getType())){
+			if(evalTarget.getId().equals(evalTarget.getOrgId())){
+				throw new BusinessException("所属组织不能为自己");
+			}
+		}
+		
+		EvalTarget dbEvalTarget = getEvalTargetById(evalTarget.getId());
+		
+		
+		if((!evalTarget.getCode().equals(dbEvalTarget.getCode()))
+				&&
+				exists0(evalTarget.getCode())){
+			throw new BusinessException("编码已经存在");
+		}
+		
+		
+		
+		dbEvalTarget.setType(evalTarget.getType());
+		dbEvalTarget.setName(evalTarget.getName());
+		dbEvalTarget.setCode(evalTarget.getCode());
+		
+		if(EVAL_TARGET.PERS.equals(evalTarget.getType())){
+			dbEvalTarget.setOrgId(evalTarget.getOrgId());
+		}else{
+			dbEvalTarget.setOrgId(null);
+		}
+		internalEvalTargetServiceImpl.updateOnly(dbEvalTarget);
+	}
+
+	@Override
+	public void deleteEvalTarget(EvalTarget evalTarget) {
+		internalEvalTargetServiceImpl.delete(evalTarget);
+	}
+
+	@Override
+	public void deleteEvalTargetById(String id) {
+		internalEvalTargetServiceImpl.delete(id);
+	}
+
+	@Override
+	public EvalTarget getEvalTargetById(String id) {
+		return internalEvalTargetServiceImpl.getById(id);
+	}
+
+	@Override
+	public JPage<EvalTarget> getEvalTargets(EvalTargetCriteriaInVO evalTargetCriteriaInVO,
+			SimplePageRequest simplePageRequest) {
+		return internalEvalTargetServiceImpl.singleEntityQuery2().conditionDefault()
+//				.largerAndEquals("startDate", 
+//						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getStartDateStr())?null:
+//						JDateUtils.parseDate(evalTargetCriteriaInVO.getStartDateStr()))
+//				.smallerAndEqual("endDate", 
+//						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getEndDateStr())?null:
+//						JDateUtils.parseDate(evalTargetCriteriaInVO.getEndDateStr()))
+				.likes("name", 
+						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getName())?null:
+							evalTargetCriteriaInVO.getName())
+				.equals("type", 
+						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getType())?null:
+							evalTargetCriteriaInVO.getType())
+				.equals("category", 
+						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getCategory())?null:
+							evalTargetCriteriaInVO.getCategory())
+				.ready().modelPage(simplePageRequest);
+	}
+	
+	@Override
+	public List<EvalTarget> getEvalTargets(EvalTargetCriteriaInVO evalTargetCriteriaInVO) {
+		return internalEvalTargetServiceImpl.singleEntityQuery2().conditionDefault()
+//				.largerAndEquals("startDate", 
+//						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getStartDateStr())?null:
+//						JDateUtils.parseDate(evalTargetCriteriaInVO.getStartDateStr()))
+//				.smallerAndEqual("endDate", 
+//						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getEndDateStr())?null:
+//						JDateUtils.parseDate(evalTargetCriteriaInVO.getEndDateStr()))
+				.likes("name", 
+						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getName())?null:
+							evalTargetCriteriaInVO.getName())
+				.equals("type", 
+						JStringUtils.isNullOrEmpty(evalTargetCriteriaInVO.getType())?null:
+							evalTargetCriteriaInVO.getType())
+				.ready().models();
+	}
+
+	
+	
+	@Override
+	public void deleteEvalTargets(String[] ids) {
+		for (String id : ids) {
+			deleteEvalTargetById(id);
+		}
+	}
+	
+	private boolean exists0(String code){
+		return internalEvalTargetServiceImpl.singleEntityQuery2()
+				.conditionDefault().equals("code", code)
+				.ready().count()>0;
+	}
+	
+	@Override
+	public boolean exists(String code) {
+		return exists0(code);
+	}
+	
+	
+	@Override
+	public JPage<UserDetailVO> getBindUser(UserDetailCriteriaInVO userDetailCriteriaInVO, SimplePageRequest simplePageRequest) {
+		String jpql=" select a.id as id , a.name as name , a.userAccount as userAccount  "
+				+ " from SysUser a where "
+				+ " isAvailable=1 and a.disabled=1 "
+				+ " and a.id in ("
+				+ " select userId from EvalTargetUser "
+				+ " where isAvailable=1 and evalTargetId= :evalTargetId )";
+		Map<String, Object> params=new HashMap<>();
+		params.put("evalTargetId", userDetailCriteriaInVO.getEvalTargetId());
+		return jpqlQuery().setJpql(jpql)
+		.setParams(params)
+		.modelPage(simplePageRequest,UserDetailVO.class);
+	}
+	
+	
+	@Override
+	public JPage<UserDetailVO> getUnbindUser(UserDetailCriteriaInVO userDetailCriteriaInVO, SimplePageRequest simplePageRequest) {
+		String jpql=" select a.id as id , a.name as name , a.userAccount as userAccount  "
+				+ " from SysUser a where "
+				+ " a.isAvailable=1  and a.disabled=1"
+				+ " and a.name like :name "
+				+ " and a.userAccount like :userAccount"
+				+ " and a.id not in ("
+				+ " select userId from EvalTargetUser "
+				+ " where isAvailable=1 "
+				//+ "  and evalTargetId= :evalTargetId "
+				+ " )";
+		Map<String, Object> params=new HashMap<>();
+		params.put("evalTargetId", userDetailCriteriaInVO.getEvalTargetId());
+		params.put("name", "%"+userDetailCriteriaInVO.getName()+"%");
+		params.put("userAccount", "%"+userDetailCriteriaInVO.getUserAccount()+"%");
+		
+		return jpqlQuery().setJpql(jpql)
+		.setParams(params)
+		.modelPage(simplePageRequest,UserDetailVO.class);
+	}
+
+	@Override
+	public void bindEvalTargetUser(String evalTargetId, String[] userIds) {
+		
+		if(isBound(userIds)){
+			throw new BusinessException("用户已经绑定到其他被评对象");
+		}
+		for(String userId : userIds){
+			EvalTargetUser evalTargetUser=new EvalTargetUser();
+			evalTargetUser.setUserId(userId);
+			evalTargetUser.setEvalTargetId(evalTargetId);
+			internalEvalTargetUserServiceImpl.saveOnly(evalTargetUser);
+		}
+	}
+	
+	private boolean isBound(String[] userIds){
+		return false;
+	}
+	
+	
+	public void unbindEvalTargetUser(String evalTargetId, String[] userIds) {
+		String inStr="";
+		for(String userId : userIds){
+			inStr=inStr+",'"+userId+"'";
+		}
+		inStr=inStr.replaceFirst(",", "");
+		String delSql=" delete from EvalTargetUser where  evalTargetId= :evalTargetId "
+				+ " and userId in ("+inStr+")";
+		Map<String, Object> params=new HashMap<>();
+		params.put("evalTargetId", evalTargetId);
+		
+		jpqlQuery().setJpql(delSql)
+		.setParams(params)
+		.setUpdate(true)
+		.model();
+	}
+	
+	@Override
+	public EvalTarget getEvalTargetByUserId(String userId) {
+		Map<String, Object> params=new HashMap<>();
+		params.put("userId", userId);
+		String jpql=
+				internalEvalTargetServiceImpl.selectCause("a")
+				+" from EvalTarget a"
+				+ ", EvalTargetUser b "
+				+ " where a.isAvailable=1 and b.isAvailable=1 "
+				+ " and a.id=b.evalTargetId"
+				+ " and b.userId = :userId";
+		
+		List<EvalTarget> evalTargets = jpqlQuery()
+										.setJpql(jpql)
+										.setParams(params)
+										.models(EvalTarget.class);
+		if(CollectionUtils.isNotEmpty(evalTargets)) {
+			return evalTargets.get(0);
+		}
+		return null ;
+	}
+
+	@Override
+	public JPage<EvalTargetDetailOutVO> getBindEvalTargetOnProject(EvalTargetCriteriaInVO evalTargetCriteriaInVO,
+			SimplePageRequest simplePageRequest) {
+		Map<String, Object> params=new HashMap<>();
+		params.put("projectId", evalTargetCriteriaInVO.getProjectId());
+		String sql=internalEvalTargetServiceImpl.selectCause("a")
+						+" from EvalTarget a "
+						+ " where a.isAvailable=1 "
+						+ " and a.id in ("
+						+ "select b.evalTargetId from EvalTargetProject b "
+						+ " where b.isAvailable=1 "
+						+ " and b.projectId= :projectId"
+						+ ")"; 
+		return jpqlQuery().setJpql(sql)
+				.setParams(params)
+				.modelPage(simplePageRequest, EvalTargetDetailOutVO.class);
+	}
+	
+	@Override
+	public List<EvalTargetDetailOutVO> getBindEvalTargetOnProject(EvalTargetCriteriaInVO evalTargetCriteriaInVO) {
+		Map<String, Object> params=new HashMap<>();
+		params.put("projectId", evalTargetCriteriaInVO.getProjectId());
+		String sql=internalEvalTargetServiceImpl.selectCause("a")
+						+" from EvalTarget a "
+						+ " where a.isAvailable=1 "
+						+ " and a.id in ("
+						+ "select b.evalTargetId from EvalTargetProject b "
+						+ " where b.isAvailable=1 "
+						+ " and b.projectId= :projectId"
+						+ ")"; 
+		return jpqlQuery().setJpql(sql)
+				.setParams(params)
+				.models(EvalTargetDetailOutVO.class);
+	}
+	
+	
+
+	@Override
+	public JPage<EvalTargetDetailOutVO> getUnbindEvalTargetOnProject(EvalTargetCriteriaInVO evalTargetCriteriaInVO,
+			SimplePageRequest simplePageRequest) {
+		Map<String, Object> params=new HashMap<>();
+		params.put("projectId", evalTargetCriteriaInVO.getProjectId());
+		String sql=internalEvalTargetServiceImpl.selectCause("a")
+						+" from EvalTarget a "
+						+ " where a.isAvailable=1 "
+						+ " and a.id not in ("
+						+ "select b.evalTargetId from EvalTargetProject b "
+						+ " where b.isAvailable=1 "
+						+ " and b.projectId= :projectId"
+						+ ")";
+		return jpqlQuery().setJpql(sql) 
+				.setParams(params)
+				.modelPage(simplePageRequest, EvalTargetDetailOutVO.class);
+	}
+
+	@Override
+	public void bindEvalTargetProject(String[] evalTargetIds, String projectId) {
+		for(String evalTargetId : evalTargetIds){
+			EvalTargetProject evalTargetProject=new EvalTargetProject();
+			evalTargetProject.setEvalTargetId(evalTargetId);
+			evalTargetProject.setProjectId(projectId);
+			internalEvalTargetProjectServiceImpl.saveOnly(evalTargetProject);
+		}
+	}
+
+	@Override
+	public void unbindEvalTargetProject(String[] evalTargetIds, String projectId) {
+		String inStr="";
+		for(String evalTargetId : evalTargetIds){
+			inStr=inStr+",'"+evalTargetId+"'";
+		}
+		inStr=inStr.replaceFirst(",", "");
+		String delSql=" delete from EvalTargetProject where  projectId= :projectId "
+				+ " and evalTargetId in ("+inStr+")";
+		Map<String, Object> params=new HashMap<>();
+		params.put("projectId", projectId);
+		jpqlQuery().setJpql(delSql)
+		.setParams(params)
+		.setUpdate(true)
+		.model();
+	}
+	
+	
+	
+	
+	
+}

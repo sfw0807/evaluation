@@ -1,0 +1,207 @@
+<namespace id="fill_project_view"   ms-controller="fill_project_view">
+    <link rel="stylesheet" href="../front-ui/js/bootstrap-table/bootstrap-table.css"/>
+    <script src="../front-ui/js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="../front-ui/js/bootstrap-table/bootstrap-table-export.js"></script>
+    <script src="../front-ui/js/bootstrap-table/tableExport/tableExport.js"></script>
+<ol class="breadcrumb">
+    <li><a href="#">填评项目</a></li>
+    <li><a href="#">明细</a></li>
+</ol>
+<section class="content" id="viewProjectSection"   >
+    <div class="box box-info">
+        <div class="row ">
+            <div class="col-sm-12">
+                <!-- 右对齐的 btn-group -->
+                <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 31px;">
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-body">
+        <form role="form" id="viewProjectForm" class="form-horizontal">
+            <div class="form-group">
+                <label for="name" class="col-sm-1 control-label input-sm">项目名称</label>
+                <div class="col-sm-5">
+                    <span id="name" class="form-control label-form-control input-sm"  >{{@data.name}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="startDateStr" class="col-sm-1 control-label input-sm">开始时间</label>
+                <div class="col-sm-5">
+                    <span id=startDateStr class="form-control label-form-control input-sm"  >{{@data.startDateStr}}</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="endDateStr" class="col-sm-1 control-label input-sm">结束时间</label>
+                <div class="col-sm-5">
+                    <span id="endDateStr" class="form-control label-form-control input-sm"  >{{@data.endDateStr}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="evalTargetsSelected" class="col-sm-1 control-label input-sm">参与对象</label>
+                <div class="col-sm-5">
+                    <select id="evalTargetsSelected" class="form-control"
+                            multiple="multiple" style="width:190px;height:120px;">
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="searchType" class="col-sm-1 control-label input-sm">调查类型</label>
+                <div class="col-sm-5">
+                    <span id="searchType" class="form-control label-form-control input-sm"  >{{@data.searchTypeStr}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="searchType" class="col-sm-1 control-label input-sm">状态</label>
+                <div class="col-sm-5">
+                    <span id="statusName" class="form-control label-form-control input-sm"  >{{@data.statusName}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="minNum" class="col-sm-1 control-label input-sm">最低名额/学校</label>
+                <div class="col-sm-5">
+                    <span id="minNum" class="form-control label-form-control input-sm"  >{{@data.minNum}}</span>
+                </div>
+            </div>
+            <div id="temDiv" style="display: none" class="form-group" >
+                <label for="temNum" class="col-sm-1 control-label input-sm">临时账号数/学校</label>
+                <div class="col-sm-5">
+                    <span id="temNum" class="form-control label-form-control input-sm"  >{{@data.temAccNum}}</span>
+                </div>
+            </div>
+            <div id="tableDiv" style="display: none" class="form-group">
+                <label for="accTable" class="col-sm-1 control-label"></label>
+                <div class="col-sm-5">
+                    <table id="accTable">
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="exportAccount" class="col-sm-1 control-label input-sm"></label>
+                <div class="col-sm-5">
+                    <button id="exportAccount" class="btn btn-success btn-sm" type="button">
+                        导出账号
+                    </button>
+                    <button id="viewNaire" class="btn btn-success btn-sm" type="button">
+                        问卷预览
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#fill_project_view').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "fill_project_view",
+    		        data: {}
+    		    })
+    		},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/fill/fill_project_list.html');
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/fillProject/getFillProjectById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data=data;
+                        if(data.searchType < 3){
+                            if(data.searchType == 2){
+                                $("#temDiv").show();
+                            }
+                            $("#tableDiv").show();
+                            page.initTable();
+                        }
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			},
+            initEvalTarget:function(){
+                $.get("/web/fillProject/getEvalTargetByProjectId",
+                    {"projectId":page.namespace.getParam("id")},
+                    function (data) {
+                        $.each(data.data, function (i, item) {
+                            var ui = "<option value='" + item.evalTargetId + "'>" + item.evalTargetName + "</option>"
+                            $("#evalTargetsSelected").append(ui);
+                        })
+                    });
+            },
+            initTable: function(){
+                $('#accTable').bootstrapTable({
+                    method: 'get',
+                    url: '/web/fillAccount/getCountByProjectId?fillProjectId='+ page.namespace.getParam("id") +　'&_t=' + new Date().getTime(),
+                    cache: false,
+                    striped: true,                      //是否显示行间隔色
+                    columns: [{
+                        field: "schName",
+                        title: "学校名称",
+                        align: "center"
+                    }, {
+                        field: "schAb",
+                        title: "缩略名",
+                        align: "center"
+                    }, {
+                        field: "accNum",
+                        title: "账号数",
+                        align: "center"
+                    }],
+                });
+            },
+            initBtn: function () {
+                page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+                page.namespace.root.find('#exportAccount').on('click', page.exportAccountBtn)
+                page.namespace.root.find('#viewNaire').on('click', page.viewNaire)
+            },
+            exportAccountBtn:function(){
+                var form=$("<form>");//定义一个form表单
+                form.attr("style","display:none");
+                form.attr("target","");
+                form.attr("method","post");
+                form.attr("action","/web/fillAccount/exportAccount");
+
+                var input1=$("<input>");
+                input1.attr("type","hidden");
+                input1.attr("name","fillProjectId");
+                input1.attr("value",page.namespace.getParam("id"));
+                form.append(input1);
+
+                $("body").append(form);//将表单放置在web中
+                form.submit();//表单提交
+            },
+            viewNaire:function () {
+                //TODO 跳转到问卷预览页面
+                page.namespace.skiphtml('/pages/fill/fill_project_list.html');
+            }
+		};
+
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+		page.initEvalTarget();
+        page.initBtn();
+	});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

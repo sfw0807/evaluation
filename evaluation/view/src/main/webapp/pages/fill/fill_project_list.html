@@ -1,0 +1,195 @@
+<namespace id="fill_project_list"    ms-controller="file_project_list">
+    <ol class="breadcrumb">
+        <li><a href="#">填报项目</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+    <section class="content" id="searchProjectSection"  >
+
+        <div class="box box-info">
+            <!-- form start -->
+            <form class="form-horizontal" id="searchProjectForm">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="btn-group">
+                                <a class="btn btn-success btn-sm" id="addBtn" func="sysuser-list-add">
+                                    <span class="glyphicon glyphicon-plus"></span> 添加
+                                </a>
+                            </div>
+                            <button class="btn btn-danger btn-sm" type="button" id="deleteBtn" func="sysuser-list-del">
+                                <span class="glyphicon glyphicon-minus"></span> 删除
+                            </button>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-group">
+                                <span class="input-group-addon">项目名称</span>
+                                <input type="text" name="name" class="form-control input-sm" id="code" placeholder="项目名称">
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-group">
+                                <span class="input-group-addon">状态</span>
+                                <select id="status" name="status" class="form-control select2 input-sm">
+                                    <option value=""></option>
+                                    <option  ms-for="el in @statusNames"  ms-attr="{value:el.value}">
+                                        {{el.name}}
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <span class="input-group-addon">有效期</span>
+                                <div class="col-sm-5">
+                                    <input  name="startDateStr" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right" id="startDateStr">
+                                </div>
+                                <div class="col-sm-1">
+                                    ~
+                                </div>
+                                <div class="col-sm-5">
+                                    <input  name="endDateStr" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right form_datetime" id="endDateStr">
+                                </div>
+                                <span
+                                        class="input-group-btn">
+									<button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+										<i class="fa fa-search"></i> 查询
+									</button>
+								</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="box box-info" style="border-top: 0px;">
+            <div class="box-body" id="fillProjectList" style="margin-top: -10px;">
+                <table id="fillProjectListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>项目名称</th>
+                        <th>有效期</th>
+                        <th>调查形式</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </section>
+</namespace>
+<script type="text/javascript">
+    $_ready(function() {
+        var page = {
+            namespace : $('#fill_project_list').namespace(),
+            model:{
+                vm:avalon.define({
+                    $id: "fill_project_list",
+                    statusNames:{},
+                    data: {}
+                })
+            },
+            init : function() {
+                page.namespace.root.find('#startDateStr').autoBSNyr().on("click", function(ev){
+                    page.namespace.root.find("#startDateStr").datetimepicker("setEndDate", page.namespace.root.find("#endDateStr").val());
+                });
+                page.namespace.root.find('#endDateStr').autoBSNyr().on("click", function(ev){
+                    page.namespace.root.find("#endDateStr").datetimepicker("setStartDate", page.namespace.root.find("#startDateStr").val());
+                });
+                //page.validate();
+            },
+
+            initView:function(){
+                page.namespace.getCodes(function(data){
+                    page.model.vm.statusNames=data;
+                },"P_STATUS");
+            },
+
+            doQuery : function() {
+                page.listTable.ajax.reload();
+            },
+            doAdd : function() {
+                page.namespace.skiphtml("/pages/fill/fill_project_add.html");
+            },
+            doView : function(id) {
+                page.namespace.skiphtml("/pages/fill/fill_project_view.html?id=" + id);
+            },
+            doEdit : function(id, rowData) {
+                page.namespace.skiphtml("/pages/fill/fill_project_edit.html?id=" + id);
+            },
+            doDel : function(id) {
+                var HtmlMenuOpt = {
+                    endpoint : "/fillProject/deleteById",
+                    data : {
+                        'ids' : id
+                    },
+                    success : function(data) {
+                        page.listTable.ajax.reload();
+                    }
+                };
+
+                page.namespace.getRequest(HtmlMenuOpt);
+            },
+            doBatchDel : function() {
+                var selectRows = page.namespace.root.find('#fillProjectListTable').getSelectedRow();
+
+                if (selectRows.length == 0) {
+                    alertTool.warning("请选择要删除的记录!");
+                    return;
+                }
+                page.namespace.confirm(function(){
+                    page.doDel(selectRows.join(","));
+                });
+            },
+            doRefreshCache : function() {
+                var HtmlMenuOpt = {
+                    endpoint : "/project/loadCache"
+                };
+                page.namespace.getRequest(HtmlMenuOpt);
+            }
+        };
+        page.listTable = page.namespace.root.find('#fillProjectListTable').initDataTable({
+            url : "/fillProject/getProjectsByPage",
+            urlDataFn : function() {
+                return page.namespace.root.find("#searchProjectForm").serializeJson();
+            },
+            lengthChange : false,
+            checkbox : true,
+            ops : {
+                view : function(id, rowData) {
+                    page.doView(id);
+                },
+                del : function(id, rowData) {
+                    page.doDel(id);
+                },
+                edit : function(id, rowData) {
+                    page.doEdit(id, rowData);
+                }
+            },
+            columns : [ {
+                "data" : "name",
+                "width" : "20%"
+            }, {
+                "data" : "dateScopeStr",
+                "width" : "25%"
+            }, {
+                "data" : "searchTypeStr",
+                "width" : "25%"
+            },{
+                "data" : "statusName",
+                "width" : "15%"
+            } ]
+        });
+        page.init();
+        avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+        page.initView();
+
+        page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+        page.namespace.root.find('#addBtn').on('click', page.doAdd);
+        page.namespace.root.find('#deleteBtn').on('click', page.doBatchDel);
+
+    });
+</script>

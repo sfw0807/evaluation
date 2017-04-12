@@ -1,0 +1,323 @@
+<style type="text/css">
+    #targetNameList {
+        padding: 0 0 0 0px;
+        margin: 0;
+        color: #0072B3;
+        height: 50px;
+        width: 95%;
+        line-height: 60px;
+    }
+    
+    p{width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+
+    .red {
+        color: red;
+    }
+
+    .blue {
+        color: #2D92BF;
+		font-weight:bold;
+    }
+
+    .scoreContent {
+        height: 50px;
+        margin: 0 30px 0 30px;
+        line-height: 40px;
+    }
+
+    #headInfo h4 {
+        font-weight: 600;
+    }
+
+    #MonitorInformation_list td {
+        border-right: 1px solid #cccccc;
+    }
+
+    #MonitorInformation_list th {
+        border-right: 1px solid #cccccc;
+        background-color: #f1f1f1;
+        font-weight: normal;
+        color: #2D92BF;
+        text-align: center;
+    }
+
+    .bblue {
+        background-color: #F5FAFC;
+        text-align: center;
+        color: #0072B3;
+    }
+
+    .bwhite {
+        background-color: #FFFFFF;
+    }
+
+    th {
+        text-align: center;
+    }
+
+    #TargetScoreMaintain_list td {
+        text-align: center;
+        overflow: hidden;
+    }
+
+    #scoreBody td {
+        overflow: hidden;
+        vertical-align: middle;
+    }
+
+    #AttachmentBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #StudentCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #TeacherCredential_list td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #InspectorMaterialBody td {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<style type="text/css">
+
+
+
+
+.item_finish{
+        background-color: #e2f5a9 !important;
+}
+.th_order{}
+.end_inp{}
+.expert_inp{}
+</style>
+
+<div  id="evalTargetScore_T_Any_A"  style="display: none;">
+<table id="evalTargetScoreTable_Any_A"
+	class="table table-hover table-bordered lead-list" cellspacing="0"
+	width="100%"   style="table-layout: fixed;"  >
+	<thead  class="trThread">
+		<tr>
+			<th>
+				<a  name="exp">展开</a>
+				<input  type="checkbox"   name="shelectAll"  />全选
+			</th>
+			<th id="categoryName">
+								
+			</th>
+		</tr>
+	</thead>
+	<tbody ></tbody>
+</table>
+</div>
+<div id="evalTargetScore_C_Any_Con_A"
+style="width: 100%;background-color: white;padding-left: 10px;margin-top: 10px;  text-align: left
+">
+
+<div  class="listPanel"   style="border: solid 1px #337ab7;">
+
+<div  id="evalTargetScore_C_Any">
+
+<div  id="evalTargetScoreTable_C_Any_A">
+
+</div>
+<div>
+	<button class="btn btn-primary btn-sm"  id="okBtn">确定</button>
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+$(function(){
+try{
+	
+	function error(info){
+		alert(info);
+	}
+	
+	function success(info){
+		alert(info);
+	}
+	
+	function _do(data,fn){
+		if(data.success){
+			fn(data.data);
+		}else{
+			error(data.errorMessage);			
+		}
+	}
+	
+	var $root=$('#evalTargetScore_C_Any_Con_A');
+
+	function _initTemplate(){
+		$root.find('#evalTargetScoreTable_C_Any_A').empty();
+		_ready();
+	}
+	
+	function _clone(){
+		return $('#evalTargetScore_T_Any_A').clone();
+	}
+	
+	function _ready(){
+		
+	}
+	
+	
+	
+	
+	function tdr(lb){
+		return '<td style="    text-align: center;">'+lb+'</td>';
+	}
+	
+	function thr(lb){
+		return '<th class="th_order" >'+lb+'</th>';
+	}
+	
+	function render(data){
+		var $c=$root.find('#evalTargetScoreTable_C_Any_A');
+		for( var i=0;i<data.length;i++){
+			var id="category_item_id_";
+			var v=data[i];
+			id=id+v.category;
+			if($c.find('#'+id).length==0){
+				$c.append('<span id="'+id+'" style="display:none">'+id+'</span>');
+				var $t=_clone();
+				$t.show();
+				$t.find('table').find('#categoryName').text(v.categoryName);
+				$t.find('table > tbody').attr('id',id);
+				$root.find('#evalTargetScoreTable_C_Any_A').append($t);
+			}
+		}
+		
+		var trs='';
+		for( var i=0;i<data.length;i++){
+			var tds='';
+			var v=data[i];
+			var id="category_item_id_"+v.category;
+			trs=trs+'<tr  class="lead-item '
+			+(i%2==0?"":" lead-even ")
+			/*+(isExpert()&&isExpertRole()&&v.expertScore?" item_finish ":"")
+			+(isEnd()&&isEndRole()&&v.endScore?" item_finish ":"")*/
+			+ '">'
+			tds=tds+tdr('<input  type="checkbox" data-id="'+v.id+'"/>');
+			tds=tds+tdr((v.name?v.name:""));
+			trs=trs+tds+'</tr>';
+			$root.find('table').find('#'+id).html(trs);
+		}
+		
+		$root.find('[name="exp"]').on('click',function(){
+			var $t=$(this).parents('table');
+			$t.find('tbody').toggle();
+		});
+		
+		$root.find('[name="shelectAll"]').on('change',function(){
+			if($(this).is(':checked')){
+				$(this).parents('table').find('tbody').find('[type="checkbox"]').prop("checked",true);
+			}else{
+				$(this).parents('table').find('tbody').find('[type="checkbox"]').removeAttr("checked");
+			}
+		});
+		
+		
+		$root.find('[name="next"]').on('click',function(){
+			$root.find('#r_Btn').data('id',measureId());
+			setMeasureId($(this).data('id'));
+			_request(_params());
+		});
+		
+		
+	}
+	
+	function _request(params){
+		
+		_initTemplate();
+		
+		$.get("/web/evalTarget/getBindEvalTargetOnProject",
+				params,
+				function(data){
+					_do(data,function(d){
+						render(d.data);
+					})
+				});
+	}
+
+	function _params(pms){
+		if(!pms){
+			pms={};
+		}
+		return $.extend({},{
+			projectId : $_params.currentProjectId,
+			page : 0,
+			size : 1000000
+		},{ },pms);
+	}
+	
+	_request(_params());
+	
+	var _item={};
+	
+	var modalId=cjs.modal.modalId($root);
+	cjs.modal.registerReturn(modalId,function(){
+		return _selected();
+	});
+	
+	function _selected(){
+		var v=[];
+		var i=0;
+		$root.find('tbody').find('[type="checkbox"]:checked').each(function(){
+			v[i++]=$(this).data('id');
+		});
+		return v;
+	}
+	
+	$root.find('#okBtn').on('click',function(){
+		cjs.modal.close({
+			id : modalId
+		});
+	});
+	
+}catch (e) {
+	console.error(e);
+}
+})
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

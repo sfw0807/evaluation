@@ -1,0 +1,35 @@
+<div style="text-align:right"><button class="btn btn-primary btn-sm"  id="r_Btn_score">返回</button></div>
+<div id="evalTargetScores"
+     style="width: 100%;background-color: white;padding-left: 10px;margin-top: 10px;  text-align: left
+">
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        loadTablesData();//根据targetId查询数据
+    });
+    function loadTablesData(){
+        var $params = $_storage.get(VIEW_ROOT + "/front/analysis/analysis_tabs.html");
+        var targetId = $params.targetId;
+        var params = {
+            projectId: $_params.currentProjectId,
+            evalTargetId: targetId
+        };
+        $.get("/web/measureItem/getMeasureItemCompRateLv2",
+            params,
+            function (data) {
+                for(var i = 0; i < data.data.length; i++){
+                    var item = data.data[i];
+                    var tableId = "scoreTable" + i;
+                    addTableElement($("#evalTargetScores"), tableId);
+                    $("#"+tableId).trigger("create");
+                    loadTableData(tableId, item.lv2Items, -1)
+                }
+
+            });
+    }
+    $("#r_Btn_score").click(function(){
+        var url = VIEW_ROOT + "/front/analysis/analysis-target-select.html" ;
+        $("#frameContainer").load(url, function(){}) ;
+    });
+</script>

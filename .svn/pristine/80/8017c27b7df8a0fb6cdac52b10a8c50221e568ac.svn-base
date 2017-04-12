@@ -1,0 +1,181 @@
+<namespace id="evalTarget-edit"  ms-controller="evalTarget_edit">
+<ol class="breadcrumb">
+    <li><a href="#">组织</a></li>
+    <li><a href="#">编辑</a></li>
+</ol>
+<section class="content" id="editEvalTargetSection">
+    <div class="box box-info">
+	    <form role="form" id="editEvalTargetForm" class="form-horizontal">
+        <div class="row ">
+            <div class="col-sm-12">
+                <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 提交
+                    </button>
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="box-body">
+        <div class="form-group">
+					<label for="type" class="col-sm-1 control-label requiredMask input-sm">类型</label>
+					<div class="col-sm-5">
+						<select id="type" name="type" class="form-control select2 input-sm"
+						ms-attr="{value:@data.type}"
+						>
+									<option  ms-for="el in @typeNames"  ms-attr="{value:el.value}">
+										{{el.name}}
+									</option>
+								</select>
+					</div>
+				</div>
+        
+				<div class="form-group">
+					<label for="name" class="col-sm-1 control-label input-sm requiredMask">
+						名称</label>
+					<div class="col-sm-5">
+						<input name="name" type="text" class="form-control input-sm" placeholder=""   
+                    	ms-attr="{value:@data.name}">
+					</div>
+				</div>
+			
+			<div class="form-group">
+                <label for="code" class="col-sm-1 control-label  input-sm requiredMask">编码</label>
+                <div class="col-sm-5">
+                <input name="code" type="text" class="form-control input-sm" placeholder=""   
+                    	ms-attr="{value:@data.code}">
+                </div>
+            </div>
+            
+            <div class="form-group"  id="perOrgDiv">
+					<label for="name" class="col-sm-1 control-label input-sm">所属组织</label>
+					<div class="col-sm-5">
+						<select id="orgId" name="orgId" class="form-control select2 input-sm"
+						ms-attr="{value:@data.orgId}"
+						>
+									<option value=""></option>
+									<option  ms-for="el in @orgNames"  ms-attr="{value:el.id}">
+										{{el.name}}
+									</option>
+								</select>
+					</div>
+				</div>
+				
+				
+			</div>
+		<input type="hidden"   id="id" name="id"   ms-attr="{value:@data.id}" style="width: 100%" />
+	</form>
+    </div>
+</section>
+</namespace>
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#evalTarget-edit').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "evalTarget_edit",
+    		        data: {},
+    		        typeNames: {},
+    		        orgNames : {}
+    		    })
+    		},
+			init : function() {
+				
+				var $root=page.namespace.root;
+				page.namespace.getCodes(function(data){
+					page.model.vm.typeNames=data;
+				},"EVAL_TARGET");
+				
+				function _c(val){
+					var $select=$root.find('#perOrgDiv').find('select');
+					if('ORG'==val){
+						$select.attr('disabled',true);
+						$root.find('#perOrgDiv').hide();
+					}else{
+						$select.attr('disabled',false);
+						$root.find('#perOrgDiv').show();
+						$select.find('option[value='+$root.find('#id').val()+']').remove();
+					}
+				}
+				
+				$root.find('#type').on('change',function(e){
+					_c($(e.target).val());
+				});
+				
+				page.namespace.getRequest({
+					endpoint : "/evalTarget/getEvalTargets",
+					data : {type : "ORG"},
+					success : function(data) {
+						var defProjectId=data[0].id;
+						page.model.vm.orgNames=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+				
+				page.namespace.getRequest({
+					endpoint : "/evalTarget/getEvalTargetById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data=data;
+						 setTimeout(function(){
+								_c(data.type);
+							},100);
+						 
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+				
+				
+				page.namespace.root.find('#editEvalTargetForm').validate({
+					rules : {
+						'type' : {
+							required : true
+						},
+						'name' : {
+							required : true,
+							maxlength : 64
+						},
+						'code' : {
+							required : true,
+							maxlength : 64
+						}
+					},
+					submitHandler : function(form) {
+						page.doEdit();
+					}
+				});
+			},
+			doEdit : function() {
+				var submitEvalTargetForm = {
+					endpoint : "/evalTarget/updateEvalTarget",
+					formObj : page.namespace.root.find('#editEvalTargetForm'),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				};
+
+				page.namespace.submitForm(submitEvalTargetForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/evalTarget/evalTarget-list.html');
+			}
+		};
+
+		page.init();
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		
+	});
+</script>

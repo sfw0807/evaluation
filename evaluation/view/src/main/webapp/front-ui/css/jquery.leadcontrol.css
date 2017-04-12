@@ -1,0 +1,41 @@
+﻿.lead-pager
+{
+    padding:5px;
+}
+.lead-pagebar a
+{
+    color:#333;
+    border:1px solid  #E8E8E8;
+    padding:4px;
+    margin:1px;
+}
+.lead-pagebar a.unablepager
+{
+    color:#999;
+}
+.lead-pagebar a.selectpager
+{
+    color:#fff;
+    background:#26b;
+}
+.lead-pager .lead-pagedes,.lead-pagego{
+    float:right;
+}
+.lead-pagegoto {
+    width:30px;
+    height:20px;
+    margin:1px 5px 0 2px;
+}
+.lead-dataitem
+{
+    cursor:pointer;
+    border-top:1px solid #ddd;
+    border-bottom:1px solid #ddd;
+}
+.lead-templateitem
+{
+    display: none;
+}
+.friendlyTip {
+    color:#6c6b6b;
+}

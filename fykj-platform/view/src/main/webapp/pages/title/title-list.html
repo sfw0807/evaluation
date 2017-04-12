@@ -1,0 +1,94 @@
+<namespace id="title-list">
+	<ol class="breadcrumb">
+        <li><a href="#">职位信息维护</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+    <div class="box box-info">
+    	<div class="box box-info" style="border-top: 0px;">
+    		<div class="box-header with-border">
+    			<div class="btn-group">
+    				<button class="btn btn-success btn-sm" id="btnAdd" type="button">
+                        <span class="glyphicon glyphicon-plus"></span> 添加
+                    </button>
+                    <!-- <button class="btn btn-danger btn-sm" id="deleteBtn" type="button">
+                        <span class="glyphicon glyphicon-minus"></span> 删除
+                    </button> -->
+    			</div>
+    		</div>
+        	<div class="box-body" style="margin-top: -10px;">
+            	<table id="listTable" class="table dataTable row-border cell-border" cellspacing="0" width="100%">
+            		<thead>
+            			<tr>
+            				<!-- <th></th> -->
+            				<th>职位代码</th>
+            				<th>职位名称</th>
+            				<th>默认成本</th>
+            				<th>描述</th>
+            				<th>操作</th>
+            			</tr>
+            		</thead>
+           		</table>
+        	</div>
+        </div>
+    </div>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#title-list').namespace(),
+			doAdd : function() {
+				page.namespace.skiphtml('/pms/title/toTitleAdd');
+			},
+			doView : function(id) {
+				page.namespace.skiphtml("/pms/title/toTitleView?id=" + id);
+			},
+			doDelete : function(id) {
+				var opt = {
+					endpoint : "/pms/title/delete",
+					data : {
+						'id' : id
+					},
+					success : function(data) {
+						page.listTable.ajax.reload();
+					},
+					failure:function(data) {
+                        alertTool.error(data);
+                    }
+				};
+	
+				page.namespace.getRequest(opt);
+			},
+			doEdit : function(id) {
+				page.namespace.skiphtml("/pms/title/toTitleEdit?id=" + id);
+			} 
+		};
+		
+		page.listTable = $("#listTable").initDataTable({
+			url : "/pms/title/getTitlePageList",
+			urlDataFn : function() {
+				return null;
+			},
+			checkbox : false,
+			ops : {
+				view : function(id, rowData) {
+					page.doView(id);
+				},
+				/* del : function(id, rowData) {
+					page.doDelete(id);
+				}, */
+				edit : function(id, rowData) {
+					page.doEdit(id);
+				}
+			},
+			columns : [
+				{"data" : "code", "width" : "15%"},
+				{"data" : "name", "width" : "15%"},
+				{"data" : "cost", "width" : "15%"},
+				{"data" : "description", "width" : "30%"}
+			]
+		});
+		
+		page.namespace.root.find("#btnAdd").on('click', page.doAdd);
+	});
+</script>

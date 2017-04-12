@@ -1,0 +1,284 @@
+<div>
+	<ol class="breadcrumb">
+		<li><a href="#">项目概要</a></li>
+		<li><a href="#">概要</a></li>
+	</ol>
+	<div class="box box-info">
+		<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+    			<h3 class="panel-title">项目概要</h3>
+    			<div class="btn-group pull-right" style="margin-top: -25px;">
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+    		</div>
+    		<div class="panel-body">
+    			<form class="form-horizontal">
+    				<div class="row col-sm-12">
+    					<div class="form-group">
+	                        <label for="customer" class="col-sm-1 control-label requiredMask input-sm">客户名称</label>
+	                        <div class="col-sm-5">
+	                            <input name="customer" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.customer}">
+	                        </div>
+	                        
+	                        <label for="contractDate" class="col-sm-1 control-label requiredMask input-sm">合同签订日期</label>
+	                        <div class="col-sm-5">
+	                            <input  name="contractDate" disabled="disabled" readonly type="text" class="form-control input-sm pull-right" id="contractDate" th:value="${project.contractDate}">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<label for="isNewCustomer" class="col-sm-1 control-label requiredMask input-sm">是否是新客户</label>
+	                        <div class="col-sm-5">
+	                            <select id="isNewCustomer" disabled="disabled" name="isNewCustomer" class="form-control select2 input-sm" th:field="*{project.isNewCustomer}">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${isNewCustomer}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+	                        
+	                        <label for="contractCode" class="col-sm-1 control-label requiredMask input-sm">合同编号</label>
+	                        <div class="col-sm-5">
+	                            <input name="contractCode" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.contractCode}">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<label for="projectName" class="col-sm-1 control-label requiredMask input-sm">项目名称</label>
+	                        <div class="col-sm-5">
+	                            <input name="projectName" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.projectName}">
+	                        </div>
+	                        
+	                        <label for="projectAmt" class="col-sm-1 control-label requiredMask input-sm">合同金额</label>
+	                        <div class="col-sm-5">
+	                            <input name="projectAmt" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.projectAmt}">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<label for="projectCode" class="col-sm-1 control-label requiredMask input-sm">项目编号</label>
+                        	<div class="col-sm-5">
+                            	<input name="projectCode" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.projectCode}">
+                        	</div>
+                        	
+                        	<label for="beginDateStr" class="col-sm-1 control-label requiredMask input-sm">项目开始时间</label>
+	                        <div class="col-sm-5">
+	                            <input  name="beginDateStr" disabled="disabled" readonly type="text" class="form-control input-sm pull-right" id="beginDateStr" th:value="${project.beginDate}">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<label for="projectType" class="col-sm-1 control-label requiredMask input-sm">项目类型</label>
+	                        <div class="col-sm-5">
+	                            <select id="projectType" disabled="disabled" name="projectType" class="form-control select2 input-sm" th:field="*{project.projectType}">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${projectType}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+	                        
+	                        <label for="endDateStr" class="col-sm-1 control-label requiredMask input-sm">项目结束结束</label>
+	                        <div class="col-sm-5">
+	                            <input  name="endDateStr" disabled="disabled" readonly type="text" class="form-control input-sm pull-right" id="endDateStr" th:value="${project.endDate}">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+             				<label for="department" class="col-sm-1 control-label requiredMask input-sm">部门</label>
+	                        <div class="col-sm-5">
+	                            <input name="department" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.department}">
+	                        </div>
+	                        
+	                        <label for="resourceCount" class="col-sm-1 control-label requiredMask input-sm">估算资源(人数)</label>
+	                        <div class="col-sm-5">
+	                            <input name="resourceCount" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.resourceCounts}">
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+             				<label for="seller" class="col-sm-1 control-label requiredMask input-sm">商务</label>
+	                        <div class="col-sm-5">
+	                            <input name="seller" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.seller}">
+	                        </div>
+	                        
+	                        <label for="workdays" class="col-sm-1 control-label requiredMask input-sm">工作量(人天)</label>
+	                        <div class="col-sm-5">
+	                            <input name="workdays" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.workDays}">
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+	                        <label for="projectManager" class="col-sm-1 control-label requiredMask input-sm">项目经理</label>
+	                        <div class="col-sm-5">
+	                            <input name="projectManager" disabled="disabled" type="text" class="form-control input-sm"  th:value="${project.projectManagerName}" placeholder="" >
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                        <div class="col-sm-6"></div>
+	                        
+	                        <label for="invoiceProp" class="col-sm-1 control-label requiredMask input-sm">到款比例</label>
+	                        <div class="col-sm-5">
+	                            <input name="invoiceProp" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.intoAmtProp}">
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+             				<label for="payment" class="col-sm-1 control-label requiredMask input-sm">支付周期</label>
+	                        <div class="col-sm-5">
+	                            <select id="payment" disabled="disabled" name="payment" class="form-control select2 input-sm" th:field="*{project.payment}">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${payment}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+	                        
+	                        <label for="resourceCost" class="col-sm-1 control-label requiredMask input-sm">全人力成本</label>
+	                        <div class="col-sm-5">
+	                            <input name="resourceCost" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.resourceCost}">
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+             				<label for="paydays" class="col-sm-1 control-label requiredMask input-sm">帐期</label>
+	                        <div class="col-sm-5">
+	                            <select id="paydays" disabled="disabled" name="paydays" class="form-control select2 input-sm" th:field="*{project.paydays}">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${paydays}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+	                        
+	                        <label for="expenseCost" class="col-sm-1 control-label requiredMask input-sm">其他交付费用</label>
+	                        <div class="col-sm-5">
+	                            <input name="expenseCost" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.expenseCost}">
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+             				<label for="bill" class="col-sm-1 control-label requiredMask input-sm">费用结算类型</label>
+	                        <div class="col-sm-5">
+	                            <select id="bill" disabled="disabled" name="bill" class="form-control select2 input-sm" th:field="*{project.bill}">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${bill}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+	                        
+	                        <label for="expenseCost" class="col-sm-1 control-label requiredMask input-sm">交付支出总额</label>
+	                        <div class="col-sm-5">
+	                            <input name="expenseCost" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.resourceCost}">
+	                        </div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<label for="phone" class="col-sm-1 control-label input-sm">说明</label>
+		                    <div class="col-sm-5">
+		                        <textarea name="description" disabled="disabled" rows="1" class="form-control input-sm" placeholder="" th:text="${project.description}"></textarea>
+		                    </div>
+	                    	
+                    		<label for="expenseCost" class="col-sm-1 control-label requiredMask input-sm">交付支出占比</label>
+	                        <div class="col-sm-5">
+	                            <input name="expenseCost" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.resourceProp}">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<div class="col-sm-6"></div>
+	                    	<label for="expenseCost" class="col-sm-1 control-label requiredMask input-sm">净利润</label>
+	                        <div class="col-sm-5">
+	                            <input name="expenseCost" disabled="disabled" type="text" class="form-control input-sm" placeholder="" th:value="${project.profit}">
+	                        </div>
+	                    </div>
+    				</div>
+    				<input type="hidden" id="origin" th:value="${project.origin}" />
+    				<input type="hidden" id="projectId" th:value="${project.id}" />
+    			</form>
+    		</div>
+    	</div>
+    	
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+    			<h3 class="panel-title">&nbsp;</h3>
+    		</div>
+    		<div class="panel-body">
+				<table id="listTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+					<thead>
+						<tr>
+	                        <th>成本类型</th>
+	                        <th>标准占比</th>
+	                        <th>估算占比</th>
+                    	</tr>
+                   	</thead>
+               	</table>
+    		</div>
+    	</div>
+    	
+    	<div class="panel panel-default" style="margin-bottom: 0px; border: none;">
+    		<div class="panel-heading">
+    			<h3 class="panel-title">收款明细</h3>
+    		</div>
+    		<div class="panel-body">
+    			<table id="invoiceListTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                    <thead>
+	                    <tr>
+	                        <th>日期</th>
+	                        <th>发票号</th>
+	                        <th>发票金额</th>
+	                        <th>到款金额</th>
+	                    </tr>
+                    </thead>
+                </table>
+    		</div>
+    	</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		$("#btnCancel").on("click", doCancel);
+		
+		var invoiceListTable = $("#invoiceListTable").initDataTable({
+			url : "/pms/summary/getInvoiceList",
+			urlDataFn : function() {
+				return {id : $("#origin").val()}
+			},
+			paging : false,
+			checkbox : false,
+			columns : [
+				{"data" : "invoiceDate", "width" : "15%"},
+				{"data" : "invoiceCode", "width" : "15%"},
+				{"data" : "invoiceAmt", "width" : "30%"},
+				{"data" : "intoAmt", "width" : "30%"}
+			]
+		});
+		
+		var listTable = $("#listTable").initDataTable({
+			url : "/pms/summary/getCostList",
+			urlDataFn : function() {
+				return {id : $("#projectId").val()}
+			},
+			paging : false,
+			checkbox : false,
+			columns : [
+				{"data" : "type", "width" : "15%"},
+				{"data" : "standardProp", "width" : "15%", "render" : function(data, type, row, meta) {
+					return data + "%";
+				}},
+				{"data" : "estProp", "width" : "30%", "render" : function(data, type, row, meta) {
+					var estProp = row.estProp;
+					if(row.id == "7") {
+						if(estProp*1 > row.standardProp*1) {
+							estProp = "<font color=\"#1cec05\">" + estProp + "%</font>";
+						} else {
+							estProp = "<font color=\"red\">" + estProp + "%</font>";
+						}
+					} else {
+						estProp = estProp + "%";
+					}
+					
+					return estProp;
+				}}
+			]
+		});
+	});
+	
+	function doCancel() {
+		httpservice.htmlEnt.skiphtml("/pms/summary/toProjectSummaryList");
+	}
+</script>

@@ -1,0 +1,135 @@
+<style>
+ li {list-style-type:none;}
+</style>
+<div id="attachFileUploadDiv">
+	文件类型（jpg，gif，png，rar，zip，txt，doc，docx，xls，xlsx，ppt，pptx，pdf），
+	文件大小限制100M
+	<form id ="firstUpdateForm" enctype="multipart/form-data">
+        <div class="modal-body">
+            <div class="form-group">
+            	<label class="control-label">上传文件</label>
+            	<div id="formData">
+            		<input type="file" id="uploadFiles" name="uploadFiles">
+	                <input type="hidden" id="rptAnswerId" name="rptAnswerId" value=""/>
+	                <input type="hidden" id="projectId" name="projectId" value=""/>
+	                <input type="hidden" id="scoreItemId" name="scoreItemId" value=""/>
+	                <input type="hidden" id="targetId" name="targetId" value=""/>
+	                <input type="hidden" id="projectFilePath" name="projectFilePath" value=""/>
+	                <input type="hidden" id="rptQuestionId" name="rptQuestionId" value=""/>
+	                <input type="hidden" id="rptPubAnswerId" name="rptPubAnswerId" value=""/>
+            	</div>
+				
+				<div>
+					<span>附件列表：</span>
+					<ul id="alreadyAttach">
+					</ul>
+				</div>
+        	</div>
+        </div>
+		<div class="modal-footer">
+            <div id="firstUploadSucceed" style="display: none;">
+                <strong>新增成功！</strong><span id="firstUploadSucceedMsg"></span>
+            </div>
+            <div id="firstUploadFailed" style="display: none;">
+                <strong>对不起！新增失败</strong><span id="firstUploadFailedMsg"></span>
+            </div>
+            <button id="saveAttaches" type="button" class="btn btn-default">确定 </button>
+            &nbsp;&nbsp;
+            <button id="cancelAttaches" type="button" class="btn btn-default">取消 </button>
+        </div>
+	</form> 
+</div>
+
+<script type="text/javascript">
+$(function(){
+	var page = {
+			init : function(){
+				var modalId = cjs.modal.modalId($('#attachFileUploadDiv'));
+				cjs.modal.registerReturn(modalId,function(){
+					return { return1 : 'a' , return2 : 'b'};
+				});
+				
+				// 设定初始值
+				// rptAnswerId 初始上传为空,循环遍历附件列表，如果有选中，则获取值设置rptAnswerId
+				$("#projectId").val(window.$_params.currentProjectId) ;// projectId
+				$("#scoreItemId").val(cjs.modal.params(modalId).scoreItemId) ;// scoreItemId
+				$("#targetId").val(window.$_params.currentTargetObj.id) ;// targetId
+				$("#projectFilePath").val(window.$_params.currentProjectDetail.dicLocation) ;// projectFilePath
+				$("#rptQuestionId").val(cjs.modal.params(modalId).rptQueId) ;// rptQuestionId
+				$("#rptPubAnswerId").val(cjs.modal.params(modalId).rptPubAnsId) ;// rptPubAnswerId
+				
+				return modalId ;
+			},
+			getParams : function(modalId) {
+				// console.log(JSON.stringify(cjs.modal.params(modalId)));
+				return cjs.modal.params(modalId) ;
+			},
+			initView : function(rptQueId, rptPubAnsId) {// 初始化回显数据
+				var params = {} ;
+				params.projectId = window.$_params.currentProjectId ;
+				params.targetId = window.$_params.currentTargetObj.id ;
+				params.rptQueId = rptQueId ;
+				params.rptPubAnsId = rptPubAnsId ;
+				
+				$.post(WEB_ROOT + "/fillScoreItem/getAttaches", params, function(data){
+					$("#rptAnswerId").val(data.rptAnswerId) ;
+					var html = "" ;
+					if(data.resList != null) {
+						var res = data.resList ;
+						for(var i = 0; i < res.length; i++) {
+							if(data.checkResIds[res[i].id]) {
+								html += "<li><input type='checkbox' checked='checked' data-id='"+res[i].id+"' name='alreadyAttach'>"+res[i].orgName+"</li>" ;
+							}else {
+								html += "<li><input type='checkbox' data-id='"+res[i].id+"' name='alreadyAttach'>"+res[i].orgName+"</li>" ;
+							}
+						}
+					}
+					$("#alreadyAttach").append(html) ;
+				}, "json") ;
+			},
+			doSaveAttaches : function(){
+				$("input[name=alreadyAttach]").each(function(i){
+					if($(this).prop("checked")) {
+						$("#formData").append("<input type='hidden' id='refResourceIds["+(i)+"]' name='refResourceIds["+(i)+"]' value='"+$(this).attr("data-id")+"'/>") ;
+					}
+				}) ;
+				
+				$("#firstUpdateForm").ajaxSubmit({
+					url : WEB_ROOT + "/resource/upload",
+					type : "post",
+					dataType : "json",
+					success : function(data) {
+						page.doCancel() ;
+					}
+				});
+				// 为了防止普通浏览器进行表单提交和产生页面导航（防止页面刷新？）返回false
+				return false;
+			},
+			doCancel : function(){
+				cjs.modal.close({
+					id : "attachFileUploadModel",
+					skip : false,
+					hidden : function(e){
+						alert('close window ... ');
+					}
+				}) ;
+			},
+			checkBoxInit : function() {
+				// 选中复选框，则拼接表单
+				if($(this).prop("checked")) {
+					//alert("选中附件！") ;
+				} else {// 取消选中状态，则截断相应表单
+					// 
+				}
+			}
+	} ;
+	
+	var modalId = page.init() ;
+	var params = page.getParams(modalId) ;
+	page.initView(params.rptQueId,params.rptPubAnsId) ;
+	
+	$("#saveAttaches").bind("click", page.doSaveAttaches) ;
+	$("#cancelAttaches").bind("click", page.doCancel) ;
+	$("#alreadyAttach").on("click", "input", page.checkBoxInit) ;
+}) ;
+</script>

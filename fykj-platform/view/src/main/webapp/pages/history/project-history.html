@@ -1,0 +1,222 @@
+<namespace id="project-history">
+<ol class="breadcrumb">
+	<li><a href="#">历史项目</a></li>
+	<li><a href="#">列表</a></li>
+</ol>
+<div class="box box-info">
+	<form class="form-horizontal" id="searchForm">
+		<div class="box-body">
+			<div class="row">
+				<div class="col-sm-2">
+					<div class="input-group">
+						<span class="input-group-addon">名称</span> <input type="text"
+							name="projectName" class="form-control input-sm" id="projectName"
+							placeholder="项目名称">
+					</div>
+				</div>
+				<div class="col-sm-2" style="padding-left: 0px;">
+					<div class="input-group">
+						<span class="input-group-addon">编号</span> <input type="text"
+							name="projectCode" class="form-control input-sm" id="projectCode"
+							placeholder="项目编号">
+					</div>
+				</div>
+				<div class="col-sm-2" style="padding-left: 0px;">
+					<div class="input-group">
+						<span class="input-group-addon">经理</span> <input type="text"
+							name="projectManager" class="form-control input-sm"
+							id="projectManager" placeholder="项目经理">
+					</div>
+				</div>
+				<div class="col-sm-3" style="padding-left: 0px;">
+					<div class="input-group">
+						<span class="input-group-addon">客户</span> <input type="text"
+							name="customer" class="form-control input-sm" id="customer"
+							placeholder="客户名称">
+					</div>
+				</div>
+				<div class="col-sm-3" style="padding-left: 0px;">
+					<div class="input-group">
+						<span class="input-group-addon">类型</span> <select id="projectType"
+							name="projectType" class="form-control select2 input-sm">
+							<option selected="selected" value="">全部</option>
+							<option th:each="dict : ${projectType}" th:value="${dict.value}"
+								th:text="${dict.name}"></option>
+						</select> <span class="input-group-btn">
+							<button class="btn btn-primary btn-sm" id="queryBtn"
+								type="button">
+								<i class="fa fa-search"></i> 查询
+							</button>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<div class="box box-info" style="border-top: 0px;">
+	<div class="box-body" style="margin-top: -10px;">
+		<table id="listTable" class="table dataTable row-border cell-border "
+			cellspacing="0" width="100%">
+			<thead>
+				<tr>
+					<th></th>
+					<th>项目编号</th>
+					<th>项目名称</th>
+					<th>项目类型</th>
+					<th>项目经理</th>
+					<!-- <th>客户名称</th>
+					<th>开始时间</th>
+					<th>结束时间</th>
+					<th>合同金额</th>
+					<th>状态</th>
+					<th>版本</th> -->
+					<!-- <th>操作</th> -->
+				</tr>
+			</thead>
+		</table>
+		
+		<table id="childrenTable" class="table dataTable row-border cell-border "
+			cellspacing="0" width="100%" style="display:none;">
+			<thead>
+				<tr>
+					<th>项目编号</th>
+					<th>项目名称</th>
+					<th>项目类型</th>
+					<th>项目经理</th>
+					<th>客户名称</th>
+					<th>开始时间</th>
+					<th>结束时间</th>
+					<th>合同金额</th>
+					<!--<th>状态</th>-->
+					<th>版本</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+</namespace>
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#project-history').namespace(),
+			doQuery : function() {
+				page.listTable.ajax.reload();
+			}
+		};
+		page.listTable = $('#listTable').initDataTable({
+			url : "/pms/project/getAllProjectHasHistory",
+			urlDataFn : function() {
+				return $("#searchForm").serializeJson();
+			},
+			lengthChange : false,
+			checkbox : false,
+			columns : [
+			    {
+				    "className":      'details-control',
+				    "orderable":      false,
+				    "data":           null,
+				    "defaultContent": '',
+				    "width":"5%"
+				}, {
+                    "data" : "projectCode",
+                    "width" : "10%"
+                }, {
+                    "data" : "projectName",
+                    "width" : "15%"
+                } , {
+                    "data" : "projectType",
+                    "width" : "5%",
+                    "render" : function(data, type, row, meta) {
+                        if(data == '01'){
+                            return '<label class="label label-primary">'+row.projectTypeString+'</label>';
+                        }else if(data == '02'){
+                            return '<label class="label label-success">'+row.projectTypeString+'</label>';
+                        }else if(data == '03'){
+                            return '<label class="label label-info">'+row.projectTypeString+'</label>';
+                        }else if(data == '04'){
+                            return '<label class="label label-warning">'+row.projectTypeString+'</label>';
+                        }else if(data == '05'){
+                            return '<label class="label label-danger">'+row.projectTypeString+'</label>';
+                        }else{
+                            return '<label class="label label-default">'+row.projectTypeString+'</label>';
+                        }
+                    }
+                } , {
+                    "data" : "projectManagerName",
+                    "width" : "15%"
+                } ],
+                callAfterDrawn : function(data, opts) {
+                	$('#listTable tbody').off('click','td.details-control');
+                	$('#listTable tbody').on('click', 'td.details-control', function(event) {
+                		var $tr = $(this).closest('tr');
+                		var row = page.listTable.row($tr);
+                		
+                		if($tr.hasClass('shown')) {
+                			$tr.next('tr').toggleClass('hidden');
+     		                $tr.removeClass('shown');
+                		} else {
+                			var childrenTableId = "childrenTable_" + row.data().id;
+                			var childrenTable = $tr.next('tr').find('#' + childrenTableId);
+                			
+                			if(childrenTable.length > 0) {
+                				$tr.next('tr').toggleClass('hidden');
+                				$tr.addClass('shown');
+    			            	event.stopPropagation();
+    			            	return;
+                			}
+                			
+                			var childrenTableClone = $('#childrenTable').clone(false);
+                			childrenTableClone.attr('id', childrenTableId);
+                			
+                			childrenTableClone.css('display','inline-table');
+                			
+                			row.child(childrenTableClone).show();
+                			$tr.addClass('shown');
+                			
+                			$('#' + childrenTableId).initDataTable({
+                				url : '/pms/history/getAllProjectHistoryVersion',
+                				urlDataFn : function() {
+                					return {id:row.data().id};
+                				},
+                				ops : {
+	                                view : function(id, rowData) {
+	                                    page.namespace.skiphtml("/pms/history/toProjectHistoryView?id=" + id);
+	                                }
+                            	},
+                				paging: false,
+                				columns:[
+                					{"data" : "projectCode", "width" : "10%"},
+                					{"data" : "projectName", "width" : "15%"},
+                					{"data" : "projectType", "width" : "5%", "render" : function(data, type, row, meta) {
+                						if(data == '01') {
+      			                            return '<label class="label label-primary">'+row.projectTypeString+'</label>';
+      			                        } else if (data == '02') {
+      			                            return '<label class="label label-success">'+row.projectTypeString+'</label>';
+      			                        } else if (data == '03') {
+      			                            return '<label class="label label-info">'+row.projectTypeString+'</label>';
+      			                        } else if (data == '04') {
+      			                            return '<label class="label label-warning">'+row.projectTypeString+'</label>';
+      			                        } else if (data == '05') {
+      			                            return '<label class="label label-danger">'+row.projectTypeString+'</label>';
+      			                        } else {
+      			                            return '<label class="label label-default">'+row.projectTypeString+'</label>';
+      			                        }
+                					}},
+                					{"data" : "projectManagerName", "width" : "15%"},
+                					{"data" : "customer", "width" : "10%"},
+                					{"data" : "beginDate", "width" : "15%"},
+                					{"data" : "endDate", "width" : "15%"},
+                					{"data" : "projectAmt", "width" : "10%"},
+                					{"data" : "flowVersion", "width" : "15%"}
+                				]
+                			});
+                		}
+                	});
+                }
+		});
+
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+	});
+</script>

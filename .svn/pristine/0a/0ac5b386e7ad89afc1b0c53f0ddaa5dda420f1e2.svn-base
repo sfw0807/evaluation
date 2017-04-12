@@ -1,0 +1,92 @@
+
+<div id="_root_root">
+
+</div>
+
+<script type="text/javascript">
+$(function(){
+try{
+	
+	function error(info){
+		alert(info);
+	}
+	
+	function success(info){
+		alert(info);
+	}
+	
+	function _do(data,fn){
+		if(data.success){
+			fn(data.data);
+		}else{
+			error(data.errorMessage);			
+		}
+	}
+	
+	var $root=$('#_root_root');
+	
+	var $params=$_storage.get(VIEW_ROOT+"/front/analysis/target-test.html");
+	var targetId=$params.targetId;
+	
+	function _request(params){
+		
+		$.get("/web/measureItem/getMeasureItemCompRate",
+				params,
+				function(data){
+					_do(data,function(d){
+						$root.text(JSON.stringify(d));
+					})
+				});
+	}
+
+	function _params(pms){
+		if(!pms){
+			pms={};
+		}
+		return $.extend({},{
+			projectId : $_params.currentProjectId,
+			evalTargetId : targetId,
+			measureItemId : '-1'
+		},{ },pms);
+	}
+	
+	_request(_params());
+	
+}catch (e) {
+	console.error(e);
+}
+})
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

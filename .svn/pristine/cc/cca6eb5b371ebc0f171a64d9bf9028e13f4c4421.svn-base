@@ -1,0 +1,171 @@
+<div>
+	<ol class="breadcrumb">
+        <li><a href="#">收款明细</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+    <div class="box box-info">
+    	<form role="form" id="addForm" class="form-horizontal">
+    		<div class="row">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px; margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"> 提交</i> 
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="box-body">
+    			<div class="form-group">
+                    <label for="projectName" class="col-sm-1 control-label requiredMask input-sm">选择项目</label>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <input id="projectName" name="projectName" type="text" class="form-control input-sm" readonly />
+                            <input id="projectId" name="projectId" type="hidden" class="form-control input-sm" readonly />
+                            <span class="input-group-addon"><i id="btnSelect" class="fa fa-folder" style="cursor:pointer;"></i></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceDateStr" class="col-sm-1 control-label requiredMask input-sm">日期</label>
+                    <div class="col-sm-5">
+                        <input id="invoiceDateStr" name="invoiceDateStr" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceCode" class="col-sm-1 control-label requiredMask input-sm">发票号</label>
+                    <div class="col-sm-5">
+                        <input name="invoiceCode" type="text" class="form-control input-sm" placeholder="" >
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                	<label for="invoiceAmt" class="col-sm-1 control-label requiredMask input-sm">发票金额</label>
+                	<div class="col-sm-5">
+                		<input name="invoiceAmt" type="text" class="form-control input-sm" placeholder="" >
+                   	</div>
+               	</div>
+               	
+               	<div class="form-group">
+                	<label for="intoAmt" class="col-sm-1 control-label requiredMask input-sm">到款金额</label>
+                	<div class="col-sm-5">
+                		<input name="intoAmt" type="text" class="form-control input-sm" placeholder="" >
+                   	</div>
+               	</div>
+    		</div>
+    	</form>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">请选择一个项目</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="listTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>项目编号</th>
+                            <th>项目名称</th>
+                            <th>客户名称</th>
+                            <th>开始日期</th>
+                            <th>结束日期</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="btnConfim" type="button" class="btn btn-primary">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		$("#invoiceDateStr").autoBSNyr();
+		
+		var listTable = $('#listTable').initDataTable({
+            url : "/pms/project/getMyProjectPage",
+            urlDataFn : function() {
+                return {};
+            },
+            paging: true,
+            checkbox : true,
+            columns : [
+				{"data" : "projectCode"},
+            	{"data" : "projectName"},
+            	{"data" : "customer"},
+            	{"data" : "beginDate"},
+            	{"data" : "endDate"}
+            ]
+        });
+		
+		$("#addForm").validate({
+			rules : {
+				'projectId' : { required : true },
+				'invoiceDateStr' : { required : true },
+				'invoiceCode' : { required : true, maxlength : 255 },
+				'invoiceAmt' : { required : true, decimal : true },
+				'intoAmt' : {required : true, decimal : true}
+			},submitHandler : function() {
+				doAdd();
+			}
+		});
+		
+		$("#btnCancel").on("click", doCancel);
+		$("#btnSelect").on("click", doSelect);
+		$("#btnConfim").on("click", doConfirm);
+	});
+	
+	function doCancel() {
+		httpservice.htmlEnt.skiphtml("/pms/summary/toInvoiceList");
+	}
+	
+	function doSelect() {
+		$('#myModal').modal('show');
+	}
+	
+	function doConfirm() {
+		var checkRowData = $('#listTable').getAllClickedRowData();
+        
+        if (checkRowData.length == 0) {
+            alertTool.warning("请选择项目信息!");
+            return;
+        } else {
+            if(checkRowData.length > 1) {
+                alertTool.warning("只能选择一个项目!");
+                return;
+            }
+        }
+        
+        $("#projectId").val(checkRowData[0].id);
+        $("#projectName").val(checkRowData[0].projectName);
+        $('#myModal').modal('hide')
+	}
+	
+	function doAdd() {
+		var submitForm = {
+            endpoint : "/pms/summary/saveInvoice",
+            formObj : $("#addForm"),
+            success : function(data) {
+                alertTool.success("操作成功!");
+                doCancel();
+            },
+            failure:function(data) {
+                alertTool.error(data);
+            }
+        };
+
+		httpservice.ajaxEnt.submitForm(submitForm);
+	}
+</script>

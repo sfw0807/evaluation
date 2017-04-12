@@ -1,0 +1,203 @@
+<namespace id="evalTarget-user-list" ms-controller="evalTarget_user_list">
+	<!--</section>-->
+	<section class="content" id="searchSysUserSection" ms-controller="sysuser_view">
+		<div class="col-sm-5">
+			<div>
+				<form class="form-horizontal" id="searchUnbindUserForm">
+				<div class="row">
+                        <div class="col-sm-12 ">
+                            <div class="input-group">
+                                <span class="input-group-addon">名称</span>
+                                <input type="text" name="name" id="name" class="form-control input-sm" placeholder="用户名称">
+                            	<span class="input-group-btn">
+                                    <button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+                                        <i class="fa fa-search"></i> 查询
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+			</form>
+			</div>
+			<div>
+			<table id="sysuserUnbindListTable"
+					class="table dataTable row-border cell-border" cellspacing="0"
+					width="100%">
+					<thead>
+						<tr>
+							<th></th>
+							<th>用户名称</th>
+							<th>用户类型</th>
+							<th>用户描述</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+		
+		<div class="col-sm-2">
+		<button  id="bindUserBtn"  type="button" 
+							class="btn btn-primary btn-sm" >
+								&gt;
+						</button>
+						<br/>
+						<br/>
+						<br/>
+						<br/>
+						<button  id="unbindUserBtn"  type="button" 
+							class="btn btn-primary btn-sm" >
+								&lt;
+						</button>
+		</div>
+		
+		<div class="col-sm-5">
+		<table id="sysuserBindListTable"
+					class="table dataTable row-border cell-border" cellspacing="0"
+					width="100%">
+					<thead>
+						<tr>
+							<th></th>
+							<th>用户名称</th>
+							<th>用户类型</th>
+							<th>用户描述</th>
+						</tr>
+					</thead>
+				</table>
+		</div>
+		
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#evalTarget-user-list').namespace(),
+			model:{
+				vm:avalon.define({
+			        $id: "evalTarget_user_list",
+			        data: {}
+			    })
+			},
+			doQuery : function() {
+				page.userUnbindTable.ajax.reload();
+			},
+			init : function(){
+				
+				page.namespace.modal.registerParent(page,'evalTargetEntityModal');
+				page.namespace.root.find('#closeEvalTargetEntityBtn').on('click',function(){
+					page.namespace.modal.close(page,{
+						id : "evalTargetEntityModal",
+						skip : false,
+						hidden : function(e){
+							alert('select user ');
+						}
+					});
+				});
+				page.namespace.modal.registerReturn(page,'evalTargetEntityModal',function(){
+					return {id : ' modal page '};
+				});
+				
+				
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/evalTarget/evalTarget-list.html');
+			}
+		}
+		
+		page.init();
+		
+		$root=page.namespace.root;
+		$projectId=page.namespace.modal.param(page,"evalTargetEntityModal","projectId");
+		
+		page.userUnbindTable = $root.find('#sysuserUnbindListTable').initDataTable({
+			url : "/evalTarget/getUnbindEvalTargetOnProject",
+			urlDataFn : function() {
+				var obj= $root.find("#searchUnbindUserForm").serializeJson();
+				obj.disabled=1;
+				obj.projectId=$projectId;
+				return obj;
+			},
+			lengthChange : false,
+			checkbox : true,
+			paging:false,
+			columns : [ {
+				"data" : "name",
+				"orderable" : false,
+				"width" : "15%"
+			}, {
+				"data" : "typeName",
+				"width" : "10%"
+			}, {
+				"data" : "description",
+				"width" : "15%"
+			} ]
+		});
+		
+		
+		page.userBindTable = $root.find('#sysuserBindListTable').initDataTable({
+			url : "/evalTarget/getBindEvalTargetOnProject",
+			urlDataFn : function() {
+				return {projectId : $projectId};
+			},
+			lengthChange : false,
+			checkbox : true,
+			paging:false,
+			columns : [ {
+				"data" : "name",
+				"orderable" : false,
+				"width" : "15%"
+			}, {
+				"data" : "typeName",
+				"width" : "10%"
+			}, {
+				"data" : "description",
+				"width" : "15%"
+			} ]
+		});
+		
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+		
+		$root.find('#bindUserBtn').on('click',function(){
+			var selectRows = $root.find('#sysuserUnbindListTable').getSelectedRow();
+			console.log(selectRows);
+			console.log($projectId);
+			var HtmlMenuOpt = {
+					endpoint : "/evalTarget/bindEvalTargetProject",
+					data : {
+						 'projectId' : $projectId,
+						'evalTargetId' : selectRows.join(',')
+					},
+					success : function(data) {
+						alertTool.success("关联成功");
+						page.userBindTable.ajax.reload();
+						page.userUnbindTable.ajax.reload();
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+		
+		});
+		
+		$root.find('#unbindUserBtn').on('click',function(){
+			var selectRows = $root.find('#sysuserBindListTable').getSelectedRow();
+			var HtmlMenuOpt = {
+					endpoint : "/evalTarget/unbindEvalTargetProject",
+					data : {
+						 'projectId' : $projectId,
+						'evalTargetId' : selectRows.join(',')
+					},
+					success : function(data) {
+						alertTool.success("解绑成功");
+						page.userBindTable.ajax.reload();
+						page.userUnbindTable.ajax.reload();
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+			
+		});
+		
+		$root.find('#btnCancel').on('click', page.doCancel);
+		
+	});
+</script>

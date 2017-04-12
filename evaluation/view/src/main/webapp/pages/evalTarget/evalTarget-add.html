@@ -1,0 +1,249 @@
+<namespace id="evalTarget-add"  ms-controller="evalTarget_add">
+<ol class="breadcrumb">
+    <li><a href="#">组织</a></li>
+    <li><a href="#">新增</a></li>
+</ol>
+<!-- Main content -->
+<section class="content" id="addEvalTargetSection">
+    <div class="box box-info">
+	    <form role="form" id="addEvalTargetForm" class="form-horizontal">
+        <div class="row ">
+            <div class="col-sm-12">
+                <!-- 右对齐的 btn-group -->
+                <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                    <button type="submit"   id="submitBtn"  class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 提交
+                    </button>
+                    
+                    <button type="submit"  id="submitToSelectUserBtn"  class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 提交并选择关联账户
+                    </button>
+                    
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box-body">
+        <div class="form-group">
+					<label for="type" class="col-sm-1 control-label requiredMask input-sm">类型</label>
+					<div class="col-sm-5">
+						<select id="type" name="type" class="form-control select2 input-sm">
+									<option  ms-for="el in @typeNames"  ms-attr="{value:el.value}">
+										{{el.name}}
+									</option>
+								</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="name" class="col-sm-1 control-label requiredMask input-sm">名称</label>
+					<div class="col-sm-5">
+						<input name="name" type="text" class="form-control input-sm" placeholder="">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="code" class="col-sm-1 control-label requiredMask input-sm">编码</label>
+					<div class="col-sm-5">
+						<input name="code" type="text" class="form-control input-sm" placeholder="">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="category" class="col-sm-1 control-label requiredMask input-sm">分类</label>
+					<div class="col-sm-5">
+						<select id="category" name="category" class="form-control select2 input-sm">
+									<option  ms-for="el in @categoryNames"  ms-attr="{value:el.value}">
+										{{el.name}}
+									</option>
+								</select>
+						</div>
+				</div>
+				<div class="form-group"  id="perOrgDiv">
+					<label for="name" class="col-sm-1 control-label input-sm">所属组织</label>
+					<div class="col-sm-5">
+						<select id="orgId" name="orgId" class="form-control select2 input-sm">
+									<option value=""></option>
+									<option  ms-for="el in @orgNames"  ms-attr="{value:el.id}">
+										{{el.name}}
+									</option>
+								</select>
+					</div>
+				</div>
+				<!-- 
+				<div class="form-group">
+					<label for="userTargetEntity" class="col-sm-1 control-label input-sm">关联用户</label>
+					<div class="col-sm-5">
+						<!-- Button trigger modal 
+						<button  id="userTargetEntityBtn"  type="button" 
+							class="btn btn-primary btn-sm" 
+								>
+								选择
+						</button>
+					</div>
+				</div>
+				 -->
+			</div>
+	</form>
+    </div>
+</section>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		
+		var $proxy=function(){
+			return {
+				target : null,				
+				doFn : function(fn){
+					try{
+						if(this.target){
+							this.target();
+						}else{
+							fn();
+						}
+					}catch (e) {
+					}finally{
+						this.target=null;
+					}
+				}
+				
+			}
+		}();
+		
+		var page = {
+			namespace : $('#evalTarget-add').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "evalTarget_add",
+    		        typeNames: {},
+    		        orgNames : {},
+    		        categoryNames:{},
+    		    })
+    		},
+			init : function() {
+				var $root=page.namespace.root;
+				page.namespace.getCodes(function(data){
+					page.model.vm.typeNames=data;
+					setTimeout(function(){
+						_c($root.find('#type').val());
+					},100);
+					
+				},"EVAL_TARGET");
+				
+				page.namespace.getCodes(function(data){
+					page.model.vm.categoryNames=data;
+				},"EVAL_T_CATEGORY");
+				
+				function _c(val){
+					var $select=$root.find('#perOrgDiv').find('select');
+					if('ORG'==val){
+						$select.attr('disabled',true);
+						$root.find('#perOrgDiv').hide();
+					}else{
+						$select.attr('disabled',false);
+						$root.find('#perOrgDiv').show();
+					}
+				}
+				
+				$root.find('#type').on('change',function(e){
+					_c($(e.target).val());
+				});
+				
+				page.namespace.getRequest({
+					endpoint : "/evalTarget/getEvalTargets",
+					data : {type : "ORG"},
+					success : function(data) {
+						var defProjectId=data[0].id;
+						page.model.vm.orgNames=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+				
+				page.namespace.root.find('#userTargetEntityBtn').on('click',function(){
+					page.namespace.modal.open(page,
+							{	id:"userTargetEntityModal",
+								title:"选择关联用户",
+								hidden : function(e,ra){
+									//alert("hide modal  "+ JSON.stringify(ra[0]) );
+								}
+							},'/pages/evalTarget/evalTarget-user.html',{evalTargetId:''});
+				});
+				
+				
+				page.namespace.root.find('#addEvalTargetForm').validate({
+					rules : {
+						'type' : {
+							required : true
+						},
+						'name' : {
+							required : true,
+							maxlength : 64
+						},
+						'code' : {
+							required : true,
+							maxlength : 64
+						}
+					},
+					submitHandler : function(form) {
+						$proxy.doFn();
+					}
+				});
+			},
+			doAdd : function() {
+				var submitsForm = {
+					endpoint : "/evalTarget/saveEvalTarget",
+					formObj : page.namespace.root.find("#addEvalTargetForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				};
+
+				page.namespace.submitForm(submitsForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/evalTarget/evalTarget-list.html');
+			},
+			doAddThen : function(){
+				var submitsForm = {
+						endpoint : "/evalTarget/saveEvalTarget",
+						formObj : page.namespace.root.find("#addEvalTargetForm"),
+						success : function(data) {
+							alertTool.success("操作成功!");
+							page.namespace.skiphtml('/pages/evalTarget/evalTarget-user.html?id='+data);
+						},
+						failure : function(data) {
+							alertTool.error(data);
+						}
+					};
+
+					page.namespace.submitForm(submitsForm);
+			}
+		};
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.init();
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		
+		
+		
+		
+		var $root=page.namespace.root;
+		$root.find('#submitToSelectUserBtn').on('click',function(){
+			$proxy.target=page.doAddThen;
+		});
+		
+		$root.find('#submitBtn').on('click',function(){
+			$proxy.target=page.doAdd;
+		});
+		
+		
+		
+	});
+</script>

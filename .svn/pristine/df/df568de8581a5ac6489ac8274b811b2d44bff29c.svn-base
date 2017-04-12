@@ -1,0 +1,197 @@
+<namespace id="project-list">
+    <ol class="breadcrumb">
+        <li><a href="#">新建项目</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+    <div class="box box-info" >
+        <form class="form-horizontal" id="searchForm">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-1">
+                        <div class="btn-group">
+                            <a class="btn btn-success btn-sm" id="addBtn" >
+                                <span class="glyphicon glyphicon-plus"></span>添加
+                            </a>
+                            <!--<button class="btn btn-danger btn-sm" type="button" id="deleteBtn">-->
+                                <!--<span class="glyphicon glyphicon-minus"></span> 删除-->
+                            <!--</button>-->
+                        </div>
+                    </div>
+                    <div class="col-sm-2" style="padding-left: 0px; ">
+                        <div class="input-group">
+                            <span class="input-group-addon">名称</span>
+                            <input type="text" name="projectName" class="form-control input-sm" id="projectName" placeholder="项目名称">
+                        </div>
+                    </div>
+                    <div class="col-sm-2"  style="padding-left: 0px; ">
+                        <div class="input-group">
+                            <span class="input-group-addon">编号</span>
+                            <input type="text" name="projectCode" class="form-control input-sm" id="projectCode" placeholder="项目编号">
+                        </div>
+                    </div>
+                    <div class="col-sm-2"  style="padding-left: 0px; ">
+                        <div class="input-group">
+                            <span class="input-group-addon">经理</span>
+                            <input type="text" name="projectManager" class="form-control input-sm" id="projectManager" placeholder="项目经理">
+                        </div>
+                    </div>
+                    <div class="col-sm-2"  style="padding-left: 0px; ">
+                        <div class="input-group">
+                            <span class="input-group-addon">客户</span>
+                            <input type="text" name="customer" class="form-control input-sm" id="customer" placeholder="客户名称">
+                        </div>
+                    </div>
+                    <div class="col-sm-3" style="padding-left: 0px;">
+                        <div class="input-group">
+                            <span class="input-group-addon">类型</span>
+                            <select id="projectType" name="projectType" class="form-control select2 input-sm">
+                                <option selected="selected" value="">全部</option>
+                                <option th:each="dict : ${projectType}" th:value="${dict.value}" th:text="${dict.name}"></option>
+                            </select>
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary btn-sm" id="queryBtn" type="button">
+                                    <i class="fa fa-search"></i> 查询
+                                </button>
+                            </span>
+                        </div>
+                </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="box box-info" style="border-top: 0px;">
+        <div class="box-body" style="margin-top: -10px;">
+            <table id="listTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>项目编号</th>
+                        <th>项目名称</th>
+                        <th>项目类型</th>
+                        <th>项目经理</th>
+                        <th>客户名称</th>
+                        <th>开始时间</th>
+                        <th>结束时间</th>
+                        <th>合同金额</th>
+                        <!--<th>状态</th>-->
+                        <th>版本</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</namespace>
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#project-list').namespace(),
+			doQuery : function() {
+				page.listTable.ajax.reload();
+			},
+			doAdd : function() {
+				page.namespace.skiphtml("/pms/project/toProjectAdd");
+			},
+			doView : function(id) {
+				page.namespace.skiphtml("/pms/project/toProjectView?id=" + id);
+			},
+			doEdit : function(id) {
+				page.namespace.skiphtml('/pms/project/toProjectEdit?id=' + id);
+			},
+			doDel : function(id) {
+				var HtmlMenuOpt = {
+					endpoint : "/pms/project/deleteProject",
+					data : {
+						'ids' : id
+					},
+					success : function(data) {
+						page.listTable.ajax.reload();
+					}
+				};
+
+				page.namespace.getRequest(HtmlMenuOpt);
+			},
+			doBatchDel : function() {
+				var selectRows = $('#listTable').getSelectedRow();
+
+				if (selectRows.length == 0) {
+					alertTool.warning("请选择要删除的记录!");
+					return;
+				}
+
+				page.doDel(selectRows.join(","));
+			}
+		};
+
+		page.listTable = $('#listTable').initDataTable({
+			url : "/pms/project/getProjectPage",
+			urlDataFn : function() {
+				return $("#searchForm").serializeJson();
+			},
+			lengthChange : false,
+			checkbox : true,
+			ops : {
+				view : function(id, rowData) {
+					page.doView(id);
+				},
+//				del : function(id, rowData) {
+//					page.doDel(id);
+//				},
+				edit : function(id, rowData) {
+					page.doEdit(id);
+				}
+			},
+			columns : [
+                {
+                    "data" : "projectCode",
+                    "width" : "10%"
+                }, {
+                    "data" : "projectName",
+                    "width" : "15%"
+                }, {
+                    "data" : "projectType",
+                    "width" : "5%",
+                    "render" : function(data, type, row, meta) {
+                        if(data == '01'){
+                            return '<label class="label label-primary">'+row.projectTypeString+'</label>';
+                        }else if(data == '02'){
+                            return '<label class="label label-success">'+row.projectTypeString+'</label>';
+                        }else if(data == '03'){
+                            return '<label class="label label-info">'+row.projectTypeString+'</label>';
+                        }else if(data == '04'){
+                            return '<label class="label label-warning">'+row.projectTypeString+'</label>';
+                        }else if(data == '05'){
+                            return '<label class="label label-danger">'+row.projectTypeString+'</label>';
+                        }else{
+                            return '<label class="label label-default">'+row.projectTypeString+'</label>';
+                        }
+                    }
+                } , {
+                    "data" : "projectManagerName",
+                    "width" : "15%"
+                } , {
+                    "data" : "customer",
+                    "width" : "10%"
+                } , {
+                    "data" : "beginDate",
+                    "width" : "15%"
+                }, {
+                    "data" : "endDate",
+                    "width" : "15%"
+                },
+                {
+                    "data" : "projectAmt",
+                    "width" : "10%"
+                } ,
+                {
+                    "data" : "flowVersion",
+                    "width" : "15%"
+                } ]
+		});
+
+		page.namespace.root.find('#queryBtn').on('click', page.doQuery);
+		page.namespace.root.find('#addBtn').on('click', page.doAdd);
+		page.namespace.root.find('#deleteBtn').on('click', page.doBatchDel);
+        page.namespace.root.find('#addModal').on('click', page.openModal);
+	});
+</script>

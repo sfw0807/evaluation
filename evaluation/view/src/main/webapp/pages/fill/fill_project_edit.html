@@ -1,0 +1,384 @@
+<namespace id="fill_project_edit"  ms-controller="fill_project_edit">
+    <link rel="stylesheet" href="../front-ui/js/bootstrap-table/bootstrap-table.css"/>
+    <script src="../front-ui/js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="../front-ui/js/bootstrap-table/bootstrap-table-export.js"></script>
+    <script src="../front-ui/js/bootstrap-table/tableExport/tableExport.js"></script>
+    <ol class="breadcrumb">
+        <li><a href="#">填报项目</a></li>
+        <li><a href="#">编辑</a></li>
+    </ol>
+    <!-- Main content -->
+    <section class="content" id="editProjectSection">
+        <div class="box box-info">
+            <form role="form" id="editProjectForm" class="form-horizontal">
+                <div class="row ">
+                    <div class="col-sm-12">
+                        <!-- 右对齐的 btn-group -->
+                        <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="fa fa-floppy-o"></i> 提交
+                            </button>
+                            <a class="btn btn-sm btn-default" id="btnCancel">
+                                <i class="fa fa-align-justify"> 返回</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="name" class="col-sm-1 control-label input-sm">
+                            项目名称</label>
+                        <div class="col-sm-5">
+                            <input id="name" name="name" type="text" class="form-control input-sm" ms-attr="{value:@data.name}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="des" class="col-sm-1 control-label input-sm">说明</label>
+                        <div class="col-sm-5">
+                            <textarea id="des" name="des" class="form-control input-sm" rows="2"
+                                      ms-attr="{value:@data.des}"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="startDateStr" class="col-sm-1 control-label requiredMask input-sm">开始时间</label>
+                        <div class="col-sm-5">
+                            <input  name="startDateStr" style="background-color:#fff;"
+                                    readonly type="text" class="form-control input-sm pull-right"
+                                    id="startDateStr"   ms-attr="{value:@data.startDateStr}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDateStr" class="col-sm-1 control-label requiredMask input-sm">结束时间</label>
+                        <div class="col-sm-5">
+                            <input  name="endDateStr" style="background-color:#fff;"
+                                    readonly type="text" class="form-control input-sm pull-right"
+                                    id="endDateStr"  ms-attr="{value:@data.endDateStr}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDateStr" class="col-sm-1 control-label requiredMask input-sm">参与对象</label>
+                        <div class="col-sm-5">
+                            <div style="float:left; width:190px">
+                                <select id="evalTargetAll" class="form-control" multiple="multiple"
+                                        style="height:120px;">
+                                </select>
+                            </div>
+                            <div style="float:left; text-align:center; width:55px; padding-top: 20px">
+                                <button class="btn btn-info btn-sm" type="button" id="addTarget"
+                                        func="sysuser-list-del">
+                                    >>
+                                </button>
+                                <br/><br/>
+                                <button class="btn btn-info btn-sm" type="button" id="delTarget"
+                                        func="sysuser-list-del">
+                                    <<
+                                </button>
+                            </div>
+                            <div style="float:right; width:190px">
+                                <select id="evalTargetsSelected" class="form-control"
+                                        multiple="multiple" style="height:120px;">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="searchType" class="col-sm-1 control-label requiredMask input-sm">调查形式</label>
+                        <div class="col-sm-5">
+                            <select id="searchType" name="searchType" class="form-control select2 input-sm" ms-attr="{value:@data.searchType}">
+                                <option value="0" title="实名调查">实名调查</option>
+                                <option value="1" title="统一账号">统一账号</option>
+                                <option value="2" title="临时账号">临时账号</option>
+                                <option value="3" title="匿名调查">匿名调查</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="minNum" class="col-sm-1 control-label requiredMask  input-sm">最低名额/学校</label>
+                        <div class="col-sm-5">
+                            <input id="minNum" name="minNum" type="number" class="form-control input-sm"
+                                   ms-attr="{value:@data.minNum}">
+                        </div>
+                    </div>
+                    <div id="temDiv" style="display: none;" class="form-group">
+                        <label for="temAccNum" class="col-sm-1 control-label requiredMask  input-sm">临时账号数/学校</label>
+                        <div class="col-sm-5">
+                            <input id="temAccNum" name="temAccNum" type="number" class="form-control input-sm"
+                                   ms-attr="{value:@data.temAccNum}">
+                        </div>
+                    </div>
+                    <div id="tableDiv" style="display: none" class="form-group">
+                        <label for="temAccNum" class="col-sm-1 control-label"></label>
+                        <div class="col-sm-5">
+                            <table id="accTable">
+                            </table>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="temAccNum" class="col-sm-1 control-label input-sm">操作</label>
+                        <div class="col-sm-5">
+                            <button id="chooseAccount" class="btn btn-success btn-sm" type="button">
+                                选择账号
+                            </button>
+                            <button id="createAccount" class="btn btn-success btn-sm" type="button"
+                                    style="display:none">
+                                生成账号
+                            </button>
+                            <button id="exportAccount" class="btn btn-success btn-sm" type="button"
+                                    style="display:none">
+                                导出账号
+                            </button>
+                            <button class="btn btn-success btn-sm" type="button">
+                                编辑问卷
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="id"   ms-attr="{value:@data.id}" style="width: 100%" />
+                <input type="hidden" name="status"   ms-attr="{value:@data.status}" style="width: 100%" />
+            </form>
+        </div>
+    </section>
+</namespace>
+<script type="text/javascript">
+    $(function() {
+        var page = {
+            namespace : $('#fill_project_edit').namespace(),
+            model:{
+                vm:avalon.define({
+                    $id: "fill_project_edit",
+                    data: {}
+                })
+            },
+            init : function() {
+                page.namespace.root.find('#startDateStr').autoBSNyr().on("click", function (ev) {
+                    page.namespace.root.find("#startDateStr").datetimepicker("setEndDate", page.namespace.root.find("#endDateStr").val());
+                });
+                page.namespace.root.find('#endDateStr').autoBSNyr().on("click", function (ev) {
+                    page.namespace.root.find("#endDateStr").datetimepicker("setStartDate", page.namespace.root.find("#startDateStr").val());
+                });
+                page.namespace.root.find('#editProjectForm').validate({
+                    rules : {
+                        'name' : {
+                            required : true,
+                            maxlength : 64
+                        }
+                    },
+                    submitHandler : function(form) {
+                        page.doEdit();
+                    }
+                });
+            },
+            initEvalTarget:function(){
+                var params = {
+                    "typeName": "ORG",
+                };
+                $.get("/web/evalTarget/getEvalTargets",
+                    params,
+                    function (data) {
+                        $.each(data.data, function (i, item) {
+                            var ui = "<option value='" + item.id + "'>" + item.name + "</option>"
+                            $("#evalTargetAll").append(ui);
+                        })
+                    });
+                $.get("/web/fillProject/getEvalTargetByProjectId",
+                    {"projectId":page.namespace.getParam("id")},
+                    function (data) {
+                        $.each(data.data, function (i, item) {
+                            var ui = "<option value='" + item.evalTargetId + "'>" + item.evalTargetName + "</option>"
+                            $("#evalTargetsSelected").append(ui);
+                        })
+                    });
+            },
+            initTable: function(){
+                $('#accTable').bootstrapTable({
+                    method: 'get',
+                    url: '/web/fillAccount/getCountByProjectId?fillProjectId='+ page.namespace.getParam("id") +　'&_t=' + new Date().getTime(),
+                    cache: false,
+                    striped: true,                      //是否显示行间隔色
+                    columns: [{
+                        field: "schName",
+                        title: "学校名称",
+                        align: "center"
+                    }, {
+                        field: "schAb",
+                        title: "缩略名",
+                        align: "center"
+                    }, {
+                        field: "accNum",
+                        title: "账号数",
+                        align: "center"
+                    }],
+                });
+            },
+            doEdit : function(opt) {
+                if($("#evalTargetsSelected").find("option").length > 0){
+                    var formObj = page.namespace.root.find("#editProjectForm");
+                    formObj.append('<input type="hidden" name="evalTargetsStr" value="' + page.getEvalTargetsStr() + '" />')
+                    var submitsForm = {
+                        endpoint: "/fillProject/updateProject",
+                        formObj: formObj,
+                        success: function (data) {
+                            if(opt == "createAccount"){
+
+                            }
+                            else{
+                                alertTool.success("操作成功!");
+                                page.doCancel();
+                            }
+                            page.doCancel();
+                        },
+                        failure: function (data) {
+                            alertTool.error(data);
+                        }
+                    };
+                    page.namespace.submitForm(submitsForm);
+                }
+                else{
+                    alert("必须要选择参与对象！");
+                }
+            },
+            getEvalTargetsStr: function(){
+                var str = '';
+                var i =0;
+                $("#evalTargetsSelected option").each(function () {
+                    var value = $(this).val();
+                    if(i != 0){
+                        str += ",";
+                    }
+                    str += value;
+                    i++
+                });
+                return str;
+            },
+            doCancel : function() {
+                page.namespace.skiphtml('/pages/fill/fill_project_list.html');
+            },
+            initView:function(){
+                page.namespace.getRequest({
+                    endpoint : "/fillProject/getFillProjectById",
+                    data : {"id":page.namespace.getParam("id")},
+                    success : function(data) {
+                        page.model.vm.data=data;
+                        if(data.searchType < 3){
+                            $("#tableDiv").show();
+                            page.initTable();
+                        }
+                        page.searchTypeBtn();
+                    },
+                    failure : function(data) {
+                        alertTool.error(data);
+                    }
+                });
+            },
+            initBtn:function(){
+                page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+                page.namespace.root.find('#chooseAccount').on('click', page.chooseAccount);
+                page.namespace.root.find('#searchType').on('click', page.searchTypeBtn);
+                page.namespace.root.find('#createAccount').on('click', page.createAccount);
+                page.namespace.root.find('#exportAccount').on('click', page.exportAccountBtn);
+            },
+            searchTypeBtn: function(){
+                var type = $("#searchType").val();
+                if(type == "0"){
+                    $("#chooseAccount").show();
+                    $("#temDiv").hide();
+                    $("#createAccount").hide();
+                    $("#tableDiv").show();
+                    $("#exportAccount").show();
+                }
+                else if (type == "1") {
+                    $("#chooseAccount").hide();
+                    $("#temDiv").hide();
+                    $("#createAccount").show();
+                    $("#tableDiv").show();
+                    $("#exportAccount").show();
+                }
+                else if (type == "2") {
+                    $("#chooseAccount").hide();
+                    $("#temDiv").show();
+                    $("#createAccount").show();
+                    $("#tableDiv").show();
+                    $("#exportAccount").show();
+                }
+                else {
+                    $("#chooseAccount").hide();
+                    $("#temDiv").hide();
+                    $("#createAccount").hide();
+                    $("#tableDiv").hide();
+                }
+            },
+            exportAccountBtn:function(){
+                var form=$("<form>");//定义一个form表单
+                form.attr("style","display:none");
+                form.attr("target","");
+                form.attr("method","post");
+                form.attr("action","/web/fillAccount/exportAccount");
+
+                var input1=$("<input>");
+                input1.attr("type","hidden");
+                input1.attr("name","fillProjectId");
+                input1.attr("value",page.namespace.getParam("id"));
+                form.append(input1);
+
+                $("body").append(form);//将表单放置在web中
+                form.submit();//表单提交
+            },
+            initWin:function(){
+                var opt = page.namespace.getParam("opt");
+                if(opt == "chooseAccount"){
+                   page.chooseAccount();
+                }
+                else if(opt == "createAccount"){
+                    page.createAccount();
+                }
+            },
+            chooseAccount:function(){
+                page.namespace.modal.open(page,
+                    {	id:"evalTargetEntityModal",
+                        title:"选择账号",
+                        hidden : function(e,ra){
+                            //alert("hide modal  "+ JSON.stringify(ra[0]) );
+                        }
+                    },'/pages/fill/fill_project_choose_account.html',{projectId : page.namespace.getParam("id")});
+            },
+            createAccount: function(){
+                $.get("/web/fillAccount/createAccount",
+                    {"fillProjectId" : page.namespace.getParam("id")},
+                    function (data) {
+                        $('#accTable').bootstrapTable("load", data.data);
+                    });
+            }
+        };
+
+        page.init();
+        page.initEvalTarget();
+
+        avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+        page.initView();
+        page.initWin();
+        page.initBtn();
+
+        $("#addTarget").click(function () {
+            $("#evalTargetAll option:selected").each(function () {
+                var value = $(this).val();
+                var text = this.text;
+                var exsit = $("#evalTargetsSelected option[value='" + value + "']");
+                if (exsit.length == 0) {
+                    var ui = "<option value='" + value + "'>" + text + "</option>"
+                    $("#evalTargetsSelected").append(ui);
+                }
+            });
+        });
+        $("#delTarget").click(function () {
+            $("#evalTargetsSelected option:selected").each(function () {
+                var value = $(this).val();
+                $("#evalTargetsSelected option[value=" + value + "]").remove();
+            });
+        });
+
+    });
+
+</script>

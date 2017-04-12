@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.fykj.platform</groupId>
+		<artifactId>fykj-platform</artifactId>
+		<version>1.7.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>fykj-platform-view</artifactId>
+	<packaging>war</packaging>
+	<name>web</name>
+	<url>http://maven.apache.org</url>
+
+	<build>
+		<finalName>view</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<warName>view</warName>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.2.18.v20160721</version>
+				<configuration>
+					<scanIntervalSeconds>3</scanIntervalSeconds>
+					<stopKey>foo</stopKey>
+					<stopPort>9999</stopPort>
+					<webApp>
+						<contextPath>/</contextPath>
+						<descriptor>${basedir}/src/main/webapp/WEB-INF/web.xml</descriptor>
+					</webApp>
+					<httpConnector>
+						<port>80</port>
+					</httpConnector>
+					<systemProperties>
+				      <systemProperty>
+				        <name>org.eclipse.jetty.util.URI.charset</name>
+				        <value>UTF-8</value>
+				      </systemProperty>
+				    </systemProperties>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

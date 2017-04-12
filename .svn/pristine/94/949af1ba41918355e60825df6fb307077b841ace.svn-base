@@ -1,0 +1,103 @@
+<div>
+	<ol class="breadcrumb">
+        <li><a href="#">收款明细</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+    <div class="box box-info">
+    	<form role="form" id="editForm" class="form-horizontal">
+    		<div class="row">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px; margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"> 提交</i> 
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="box-body">
+    			<div class="form-group">
+                    <label for="projectName" class="col-sm-1 control-label requiredMask input-sm">选择项目</label>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <input id="projectName" disabled="disabled" name="projectName" type="text" class="form-control input-sm" th:value="${invoice.projectName}" />
+                            <span class="input-group-addon"><i id="btnSelect" class="fa fa-folder" style="cursor:pointer;"></i></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceDateStr" class="col-sm-1 control-label requiredMask input-sm">日期</label>
+                    <div class="col-sm-5">
+                        <input id="invoiceDateStr" th:value="${invoice.invoiceDate}" name="invoiceDateStr" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceCode" class="col-sm-1 control-label requiredMask input-sm">发票号</label>
+                    <div class="col-sm-5">
+                        <input name="invoiceCode" type="text" class="form-control input-sm" placeholder="" th:value="${invoice.invoiceCode}">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                	<label for="invoiceAmt" class="col-sm-1 control-label requiredMask input-sm">发票金额</label>
+                	<div class="col-sm-5">
+                		<input name="invoiceAmt" type="text" class="form-control input-sm" placeholder="" th:value="${invoice.invoiceAmt}">
+                   	</div>
+               	</div>
+               	
+               	<div class="form-group">
+                	<label for="intoAmt" class="col-sm-1 control-label requiredMask input-sm">到款金额</label>
+                	<div class="col-sm-5">
+                		<input name="intoAmt" type="text" class="form-control input-sm" placeholder="" th:value="${invoice.intoAmt}" >
+                   	</div>
+               	</div>
+    		</div>
+    		<input type="hidden" name="id" th:value="${invoice.id}" />
+    	</form>
+    </div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		$("#invoiceDateStr").autoBSNyr();
+		
+		$("#editForm").validate({
+			rules : {
+				'invoiceDateStr' : { required : true },
+				'invoiceCode' : { required : true, maxlength : 255 },
+				'invoiceAmt' : { required : true, decimal : true },
+				'intoAmt' : {required : true, decimal : true}
+			},submitHandler : function() {
+				doUpdate();
+			}
+		});
+		
+		$("#btnCancel").on("click", doCancel);
+	});
+	
+	function doCancel() {
+		httpservice.htmlEnt.skiphtml("/pms/summary/toInvoiceList");
+	}
+	
+	function doUpdate() {
+		var submitForm = {
+            endpoint : "/pms/summary/updateInvoice",
+            formObj : $("#editForm"),
+            success : function(data) {
+                alertTool.success("操作成功!");
+                doCancel();
+            },
+            failure:function(data) {
+                alertTool.error(data);
+            }
+        };
+
+		httpservice.ajaxEnt.submitForm(submitForm);
+	}
+</script>

@@ -1,0 +1,318 @@
+<namespace id="project-add">
+	<ol class="breadcrumb">
+        <li><a href="#">新建项目</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+    <section class="content">
+    	<div class="box box-info">
+    		<form role="form" id="addForm"  class="form-horizontal">
+    			<div class="row">
+                    <div class="col-sm-12">
+                        <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="fa fa-floppy-o"></i> 提交
+                            </button>
+                            <a class="btn btn-sm btn-default" id="btnCancel">
+                                <i class="fa fa-align-justify"> 返回</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+             	<div class="box-body">
+             		<div class="box box-info">
+             			<div class="row" style="margin-top:15px;"></div>
+             			<div class="form-group">
+	                        <label for="customer" class="col-sm-1 control-label requiredMask input-sm">客户名称</label>
+	                        <div class="col-sm-5">
+	                            <input name="customer" type="text" class="form-control input-sm" placeholder="" >
+	                        </div>
+	                        
+	                        <label for="contractDate" class="col-sm-1 control-label requiredMask input-sm">合同签订日期</label>
+	                        <div class="col-sm-5">
+	                            <input  name="contractDate" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right" id="contractDate">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<label for="isNewCustomer" class="col-sm-1 control-label requiredMask input-sm">是否是新客户</label>
+	                        <div class="col-sm-5">
+	                            <select id="isNewCustomer" name="isNewCustomer" class="form-control select2 input-sm">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${isNewCustomer}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+	                        
+	                        <label for="contractCode" class="col-sm-1 control-label requiredMask input-sm">合同编号</label>
+	                        <div class="col-sm-5">
+	                            <input name="contractCode" type="text" class="form-control input-sm" placeholder="" >
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<label for="projectName" class="col-sm-1 control-label requiredMask input-sm">项目名称</label>
+	                        <div class="col-sm-5">
+	                            <input name="projectName" type="text" class="form-control input-sm" placeholder="" >
+	                        </div>
+	                        
+	                        <label for="projectAmt" class="col-sm-1 control-label requiredMask input-sm">合同金额</label>
+	                        <div class="col-sm-5">
+	                            <input name="projectAmt" type="text" class="form-control input-sm" placeholder="" >
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<label for="projectCode" class="col-sm-1 control-label requiredMask input-sm">项目编号</label>
+                        	<div class="col-sm-5">
+                            	<input name="projectCode" type="text" class="form-control input-sm" placeholder="" >
+                        	</div>
+                        	
+                        	<label for="beginDateStr" class="col-sm-1 control-label requiredMask input-sm">项目开始时间</label>
+	                        <div class="col-sm-5">
+	                            <input  name="beginDateStr" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right" id="beginDateStr">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                    	<label for="projectType" class="col-sm-1 control-label requiredMask input-sm">项目类型</label>
+	                        <div class="col-sm-5">
+	                            <select id="projectType" name="projectType" class="form-control select2 input-sm">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${projectType}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+	                        
+	                        <label for="endDateStr" class="col-sm-1 control-label requiredMask input-sm">项目结束结束</label>
+	                        <div class="col-sm-5">
+	                            <input  name="endDateStr" style="background-color:#fff;" readonly type="text" class="form-control input-sm pull-right" id="endDateStr">
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="form-group">
+             				<label for="department" class="col-sm-1 control-label requiredMask input-sm">部门</label>
+	                        <div class="col-sm-5">
+	                            <input name="department" type="text" class="form-control input-sm" placeholder="" >
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+             				<label for="seller" class="col-sm-1 control-label requiredMask input-sm">商务</label>
+	                        <div class="col-sm-5">
+	                            <input name="seller" type="text" class="form-control input-sm" placeholder="" >
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+	                        <label for="phone" class="col-sm-1 control-label requiredMask input-sm">项目经理</label>
+	                        <div class="col-sm-5">
+	                            <div class="input-group">
+	                                <input id="projectManagerName" name="projectManagerName" type="text" class="form-control input-sm"  readonly />
+	                                <input id="projectManager" name="projectManager" type="hidden" class="form-control input-sm" placeholder="" >
+	                                <span class="input-group-addon"><i id="btnSelect" class="fa fa-folder" style="cursor:pointer;"></i></span>
+	                            </div>
+	                        </div>
+	                    </div>
+             		</div>
+             		
+             		<div class="box box-info">
+             			<div class="row" style="margin-top:15px;"></div>
+             			<div class="form-group">
+             				<label for="payment" class="col-sm-1 control-label requiredMask input-sm">支付周期</label>
+	                        <div class="col-sm-5">
+	                            <select id="payment" name="payment" class="form-control select2 input-sm">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${payment}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+             				<label for="paydays" class="col-sm-1 control-label requiredMask input-sm">帐期</label>
+	                        <div class="col-sm-5">
+	                            <select id="paydays" name="paydays" class="form-control select2 input-sm">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${paydays}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+             				<label for="bill" class="col-sm-1 control-label requiredMask input-sm">费用结算类型</label>
+	                        <div class="col-sm-5">
+	                            <select id="bill" name="bill" class="form-control select2 input-sm">
+	                            	<option selected="selected" value="-1">请选择</option>
+	                                <option th:each="dict : ${bill}" th:value="${dict.value}" th:text="${dict.name}"></option>
+	                            </select>
+	                        </div>
+             			</div>
+             			
+             			<div class="form-group">
+	                        <label for="phone" class="col-sm-1 control-label input-sm">说明</label>
+	                        <div class="col-sm-5">
+	                            <textarea name="description" rows="3" class="form-control input-sm" placeholder=""></textarea>
+	                        </div>
+	                    </div>
+             		</div>
+             	</div>
+    		</form>
+    	</div>
+    </section>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">选择项目经理</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="listTable" class="table dataTable row-border cell-border " cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>姓名</th>
+                            <th>性別</th>
+                            <th>职位</th>
+                            <th>成本</th>
+                            <!-- <th>部门</th>
+                            <th>电话</th> -->
+                            <th>email</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button id="btnConfim" type="button" class="btn btn-primary">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#project-add').namespace(),
+			init : function() {
+				$('#beginDateStr').autoBSNyr().on("click", function(ev){
+		            $("#beginDateStr").datetimepicker("setEndDate", $("#endDateStr").val());
+		        });
+		        $('#endDateStr').autoBSNyr().on("click", function(ev){
+		            $("#endDateStr").datetimepicker("setStartDate", $("#beginDateStr").val());
+		        });
+		        $("#contractDate").autoBSNyr();
+		        
+		        page.validate();
+			},
+			validate : function() {
+				$("#addForm").validate({
+                    rules : {
+                        'customer' : { required : true, maxlength : 255 },
+                        'contractDate' : { required :  true },
+                        'isNewCustomer' : { required : true, valueNotEquals : '-1' },
+                        'contractCode' : { required : true, alnum : true },
+                        'projectName' : { required : true, maxlength : 255 },
+                        'projectAmt' : { required : true, decimal : true },
+                        'projectCode' : { required : true, alnum : true },
+                        'beginDateStr' : { required : true },
+                        'projectType' : { required : true, valueNotEquals : '-1' },
+                        'endDateStr' : { required : true },
+                        'department' : { required : true },
+                        'seller' : { required : true },
+                        'payment' : { required : true, valueNotEquals : '-1'},
+                        'paydays' : { required : true, valueNotEquals : '-1'},
+                        'bill' : { required : true, valueNotEquals : '-1'}
+                    },submitHandler : function(form) {
+                    	page.doAdd();
+                    }
+                });
+			},
+			doAdd : function() {
+				var projectManagerName = $("#projectManagerName").val();
+				
+				if(projectManagerName == "" || projectManagerName == null ||　projectManagerName　== undefined) {
+					alertTool.warning("请选择项目经理!");
+                    return;
+				}
+				
+				var submitForm = {
+                    endpoint : "/pms/project/saveProject",
+                    formObj : $("#addForm"),
+                    success : function(data) {
+                        alertTool.success("操作成功!");
+                        page.doCancel();
+                    },
+                    failure:function(data) {
+                        alertTool.error(data);
+                    }
+                };
+				
+				page.namespace.submitForm(submitForm);
+			},
+			doSelect : function() {
+				$('#myModal').modal('show');
+			},
+			doConfim : function() {
+                var checkRowData = $('#listTable').getAllClickedRowData();
+                
+                if (checkRowData.length == 0) {
+                    alertTool.warning("请选择项目经理!");
+                    return;
+                } else {
+                    if(checkRowData.length > 1) {
+                        alertTool.warning("只能选择一个项目经理!");
+                        return;
+                    }
+                }
+                
+                $("#projectManagerName").val(checkRowData[0].name);
+                $("#projectManager").val(checkRowData[0].id);
+                $('#myModal').modal('hide')
+            },
+			doCancel : function() {
+				page.namespace.skiphtml("/pms/project/toProjectList");
+			}
+		};
+		
+		page.listTable = $('#listTable').initDataTable({
+            url : "/pms/project/getProjectManager",
+            urlDataFn : function() {
+                return {};
+            },
+            paging: false,
+            checkbox : true,
+            columns : [
+                {
+                    "data" : "name",
+                    "width" : "10%"
+                }, {
+                    "data" : "genderString",
+                    "width" : "5%"
+                } , {
+                    "data" : "titleString",
+                    "width" : "15%"
+                }, {
+                    "data" : "cost",
+                    "width" : "15%"
+                }, /* {
+                    "data" : "dept",
+                    "width" : "15%"
+                } , {
+                    "data" : "phone",
+                    "width" : "15%"
+                },  */{
+                    "data" : "email",
+                    "width" : "15%"
+                } ]
+        });
+		
+		page.init();
+		page.namespace.root.find("#btnCancel").on('click', page.doCancel);
+		page.namespace.root.find('#btnSelect').on('click', page.doSelect);
+		page.namespace.root.find('#btnConfim').on('click', page.doConfim);
+	});
+</script>

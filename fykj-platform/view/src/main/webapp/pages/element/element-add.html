@@ -1,0 +1,175 @@
+<namespace id="element-add">
+    <ol class="breadcrumb">
+        <li><a href="#">元素管理</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+	<section class="content" id="addElementSection" ms-controller="element_add">
+        <div class="box box-info">
+		    <form role="form" id="addElementForm" class="form-horizontal">
+            <div class="row ">
+                <div class="col-sm-12">
+                    <!-- 右对齐的 btn-group -->
+                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fa fa-floppy-o"></i> 提交
+                        </button>
+                        <a class="btn btn-sm btn-default" id="btnCancel">
+                            <i class="fa fa-align-justify"> 返回</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+      		<div class="box-body">
+      			<div class="form-group">
+      				<label for="name" class="col-sm-1 control-label input-sm requiredMask">元素名称</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="name" type="text" class="form-control input-sm" placeholder="" >
+   			 		</div>
+      			</div>
+      			<div class="form-group">
+   			 		<label for="funcId" class="col-sm-1 control-label input-sm requiredMask">元素标识</label>
+   			 		<div class="col-sm-5">
+   			 			<input name="funcId" type="text" class="form-control input-sm" placeholder="" >
+   			 		</div>
+   			 	</div>
+   			 	<div class="form-group">
+   			 		<label for=description class="col-sm-1 control-label input-sm">元素描述&nbsp;&nbsp;</label>
+   			 		<div class="col-sm-5">
+   			 			<textarea contenteditable="false" name="description" rows="3" class="form-control input-sm" placeholder=""></textarea>
+   			 		</div>
+   			 	</div>
+                <div class="form-group">
+                    <label for="menuName" class="col-sm-1 control-label input-sm requiredMask">所在菜单</label>
+                    <div class="col-sm-5 input-sm">
+                        <div id="menu" class="input-group input-sm" style="margin-left: -6px;margin-right: -6px;">
+                            <input id="menuName" name="menuName" type="text" class="form-control input-sm" placeholder="请选择" readonly />
+                            <input id="menuId" name="menuId" type="hidden" class="form-control input-sm" placeholder="" >
+                            <span class="input-group-addon"><i id="btnSelect" class="fa fa-folder" style="cursor:pointer;"></i></span>
+                        </div>
+                    </div>
+                </div>
+      		</div>
+		</form>
+        </div>
+	</section>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#element-add').namespace(),
+			init : function() {
+				$("#addElementForm").validate({
+					rules : {
+						'name' : {
+							required : true,
+							maxlength : 255
+						},
+						'funcId' : {
+							required : true,
+							maxlength : 255
+						},
+						'menuName' : {
+							required : true
+						},
+						'menuId' : {
+							required : true,
+							maxlength : 36
+						},
+						'description' : {
+							required : false,
+							maxlength : 255
+						}
+					},submitHandler : function(form) {
+						page.doAdd();
+					}
+				});
+			},
+			doSelect : function() {
+				if(!!page.namespace.root.find('#menuTree')) {
+					page.namespace.root.find('#menuTree').remove();
+				}
+				
+				var html = "<div id='menuTree' style='z-index:999;margin-top:1px;height:300px; border:1px solid #d2d6de; overflow:auto;margin-top: -5px;margin-left: 4px;MARGIN-RIGHT: 4PX;'></div>";
+				page.namespace.root.find('#menu').after(html);
+				
+				page.namespace.root.find('#menuTree').on('mouseleave', function(){
+					page.namespace.root.find('#menuTree').remove();
+				});
+				
+				var labelTree = $('#menuTree').jstree({
+					core : {
+						'multiple':false,
+						"animation" : 0,
+						"check_callback" : true,
+						"themes" : {
+							"stripes" : true,
+							"responsive" : false
+						},
+						data : function(obj, callback) {
+							var opt = {};
+							opt = {
+								success : function(msg) {
+									callback.call(this, msg);
+								},
+								data : {},
+								endpoint : "/sysmenu/loadMenuTree"
+							};
+							
+							page.namespace.getRequest(opt);
+						}
+					},
+					"types" : {
+						"default" : {
+							"draggable" : false,
+							"icon" : "fa fa-folder icon-state-warning icon-lg"
+						}
+					},
+					"plugins" : [ "types", "wholerow", "dnd" ]
+				}).on("load_node.jstree", function() {
+					$('#menuTree').jstree("open_all");
+				}).on("select_node.jstree", function() {
+					var node = $('#menuTree').jstree(true).get_selected(true);
+					
+					if(node.length > 1) {
+						alertTool.warning("只能选择一个菜单叶子节点");
+						return;
+					}
+					
+					if(node[0].children.length > 0) {
+						alertTool.warning("只能选择一个菜单叶子节点");
+						return;
+					}
+					
+					$('#menuName').val(node[0].text);
+					$('#menuId').val(node[0].id);
+					
+					$('#menuTree').remove();
+				});
+			},
+			doAdd : function() {
+				var submitSysUserForm = {
+					endpoint : "/element/saveElement",
+					formObj : $("#addElementForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure:function(data) {
+						alertTool.error(data);
+					}
+				};
+				
+				page.namespace.submitForm(submitSysUserForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml("/element/toElementList");
+			}
+		}
+		
+		page.init();
+		
+		page.namespace.root.find("#btnCancel").on('click', page.doCancel);
+		page.namespace.root.find('#btnSelect').on('click', page.doSelect);
+	});
+</script>

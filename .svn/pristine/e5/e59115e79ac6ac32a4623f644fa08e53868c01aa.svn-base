@@ -1,0 +1,97 @@
+<namespace id="measureItem-tree"    ms-controller="measureItem_tree">
+	<ol class="breadcrumb">
+		<li><a href="#">项目</a></li>
+		<li><a href="#">列表</a></li>
+	</ol>
+	<div>
+	<div  class="col-sm-3">
+	<section class="content  sidebar   skin-blue-light  " id="searchMeasureItemSection"  >
+		<ul class="measureItem-menu" id="measureItem-menu">
+				</ul>
+				
+	</section>
+	</div>
+	<div  class="col-sm-9">
+	-=kkkkkkkkkkkkkk
+	</div>
+	</div>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#measureItem-tree').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "measureItem_tree",
+    		        statusNames:{},
+    		        data: {}
+    		    })
+    		},
+    		init : function() {
+				page.loadData();
+			},
+			loadData : function() {
+				var HtmlMenuOpt = {
+					endpoint : "/measureItem/getMeasureItemTree?projectId=1",
+					success : function(data) {
+						page.createMenu(data);
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+			},
+			createMenu : function(data) {
+				for ( var o in data) {
+					page.namespace.root.find("#measureItem-menu").append(page.getMenuHtml(data[o]));
+				}
+			},
+			getMenuHtml : function(data) {
+				var html = "<li class='" + (!!data.expand ? "active" : "") + " treeview'>" + "<a href='#'>" + "<i class='fa fa-folder'></i> <span>"
+				/* + data.entity.name */
+				+ data.text + "</span> <i class='fa fa-angle-left pull-right'></i></a>";
+
+				html += page.getChildHtml(data);
+
+				return html;
+			},
+			getChildHtml : function(data) {
+				var html = " <ul class=\"treeview-menu\">";
+				var _l_html;
+
+				/* for ( var o in data.childrens) { */
+				for ( var o in data.children) {
+
+					/* var children = data.childrens[o]; */
+					var children = data.children[o];
+
+					/* if(!!children.childrens) { */
+					if (!!children.children) {
+						_l_html = "<li style='border-top:1px dotted #ccc; line-height:30px;'><a href='#'><i class=\"fa fa-folder\"></i> " + children.text + "</a>"
+								+ page.getChildHtml(children) + "</li>";
+					} else {
+						_l_html = " <li style='border-top:1px dotted #ccc; line-height:30px;'><a href='javascript:void(0)' href-htmlUrl='" + children.entity.url
+								+ "' href-layoutId='" + children.entity.layout + "' onclick='page.menuhref(this)'><i class=\"fa fa-files-o\"></i> "
+								/* + children.entity.name + "</a></li>" */
+								+ children.text + "</a></li>"
+					}
+
+					html += _l_html;
+				}
+
+				html += "</ul>";
+				return html;
+			},
+			menuhref : function(obj) {
+				$(obj).parent().addClass("active")
+				$(obj).parent().siblings().removeClass("active");
+				var url = $(obj).attr("href-htmlUrl");
+				var layoutId = $(obj).attr("href-layoutId");
+				page.namespace.skiphtml(url)
+			}
+		};
+
+		page.init();
+		
+		
+		
+	});
+</script>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <title>风云问卷填报</title>
+    <link href="../../front-ui/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../front-ui/css/select2.min.css" rel="stylesheet">
+    <link href="../../front-ui/css/bootstrapValidator.min.css" rel="stylesheet">
+    <link href="../../front-ui/css/ui-dialog.css" rel="stylesheet">
+    <link href="../../front-ui/css/popupTip.css" rel="stylesheet">
+    <link href="../../front-ui/css/jquery.leadcontrol.css" rel="stylesheet">
+    <link href="../../front-ui/css/default.css" rel="stylesheet">
+    <link href="../../front-ui/css/WdatePicker.css" rel="stylesheet" type="text/css">
+
+    <script src="../../front-ui/js/jquery-1.9.1.min.js"></script>
+    <script src="../../front-ui/self/_base.js"></script>
+</head>
+<body style="background:#e1f3ff;font-size: 15px">
+    <style>
+        body {
+            background: #fff;
+            font-size: 17px;
+            font-family: 'Microsoft YaHei',Arial;
+            color: #404d5b;
+        }
+
+        .starter-template {
+            /*padding: 2rem 1.5rem;
+                text-align: center;*/
+        }
+
+        .patitle {
+            padding: 10px 0 7px 0;
+        }
+
+        .pahead {
+            text-align: center;
+        }
+
+        .pahead-bar {
+            font: normal 15px normal;
+            padding-left: 15px;
+            border-bottom: 1px dashed #000;
+        }
+
+        .pahead-bar-tip {
+            background-color: #fff;
+            position: relative;
+            top: 8px;
+        }
+
+        .pabody {
+            padding-right: 12px;
+        }
+
+        .pafoot {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        [name=question] {
+            /*font-size: 15px;*/
+            padding-top: 10px;
+        }
+
+        [name=num] {
+            background-color: #81BCF6;
+            color: #fff;
+            width: 30px;
+            text-align: center;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        label {
+            font-weight: normal;
+            font-size: 16px;
+            line-height: 26px;
+        }
+
+        .tdCheckOption {
+            vertical-align: top;
+        }
+
+        [name=oname] {
+            padding: 5px;
+        }
+
+        .agreementPanel {
+            text-align: center;
+            padding-top: 10px;
+            font-size: 15px;
+        }
+
+        .agreementfoot {
+            padding: 30px;
+        }
+
+        .acceptSchoolPanel {
+            text-align: center;
+            padding-top: 10px;
+            font-size: 15px;
+        }
+
+        .paperTemplateSchool {
+            margin: auto;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .paperTemplateSchool tr {
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .paperTemplateSchool td {
+            padding: 2px 5px 2px 5px;
+        }
+
+        .paperTemplateSchool_logo {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #d3d3d3;
+        }
+
+        .paperTemplateSchool th {
+            background-color: #E4EDF4;
+            line-height: 30px;
+            text-align: center;
+        }
+
+        .acceptSchoolPanel th {
+            background-color: #E4EDF4;
+            line-height: 30px;
+        }
+
+        .acceptSchoolPanelSearchTitle {
+            display: inline-block;
+            width: 60px;
+            text-align: right;
+            padding-right: 5px;
+        }
+
+        .paperTemplateSearch_School td {
+            padding: 5px;
+        }
+
+        .row {
+            margin-left: 0px;
+            margin-right: 10px;
+        }
+
+        .acceptSchoolPanelSearchContainer {
+            background-color: #fff;
+            padding-top: 10px;
+        }
+        .lead-dataitem
+        {
+            cursor:pointer;
+        }
+    </style>
+
+    <!-- 头部区域 -->
+    <div class="header" style="background: url(../../front-ui/Images/paper/paperTop_new.jpg) center; min-height: 269px; position: relative; text-align: center;">
+        <div class="container" style="padding-top:80px;">
+            <div style="color:#fff0bc; font-size:36px;">调查问卷</div>
+            <!--<div style="color:#fff; font-size:36px;" id="PaperName">满意度测评问卷</div>-->
+        </div>
+    </div>
+
+    <!-- 问卷说明 -->
+    <div style="background:#e8e8e8;">
+        <div class="container" style="margin-bottom:20px;">
+            <div class="row" style="font-size:16px;">
+                <div class="hidden-xs col-md-1 col-sm-1" style="background:#00b941;  height:110px; float:left; color:#fff; font-weight:bold; font-size:20px; text-align:center; vertical-align:middle;">
+                    <table style="width:100%" border="0" cellspacing="0" cellpadding="0">
+                        <tbody><tr>
+                            <td height="110">
+                                问卷<br>
+                                说明
+                            </td>
+                        </tr>
+                        </tbody></table>
+                </div>
+                <div class="col-md-11 col-sm-11" style="padding-left:25px; float:left; padding-top:20px;">
+
+                    <div style="font-weight:bold; float: left">尊敬的用户，您好！</div>
+                    <div id="Content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="background-color:#e1f3ff;line-height: 28px;margin-top: 10px">
+        <div style="background:url(../../front-ui/Images/paper/paperBar.jpg); height:47px; width:314px; margin:0 auto; color:#fff; text-align:center; font-size:22px; padding-top:10px;">问卷填报</div>
+
+        <div style="background-color:#fff;">
+            <div id="PaperPublishDeatilsView_ListContainer">
+                <div id="PaperPublishDeatilsView_list" class="lead-list">
+                    <div class="lead-dataitem lead-templateitem" style="margin-left: 30px; ">
+                        <table>
+                            <tbody><tr>
+                                <td>
+                                    <div style="padding-left: 10px;margin-top: 40px">
+                                        <div style="background-color:  #81BCF6;  font-size: 15px;color: white; margin-right: 10px; width: 30px;text-align: center;     display: inline-block;">
+                                            <span data-options="field:&#39;ContentNum&#39;"></span>
+
+                                        </div>
+                                        <span data-options="field:&#39;Content&#39;"></span>
+                                    </div>
+                                </td></tr>
+                            <tr>
+                                <td>
+                                    <div style="padding-left: 20px; margin-top: 10px">
+                                        <span data-options="field:&#39;optionSubject&#39;"></span>
+                                    </div>
+                                    <div style=" margin-bottom:  10px">
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- ***********************  数据区域  start  ******************** -->
+                    <!--<div class="lead-dataitem lead-item" style="margin-left: 30px; ">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="padding-left: 10px;margin-top: 40px">
+                                            <div style="background-color:  #81BCF6;  font-size: 15px;color: white; margin-right: 10px; width: 30px;text-align: center;     display: inline-block;">
+                                                <span data-options="field:&#39;ContentNum&#39;">1.</span>
+
+                                            </div>
+                                            <span data-options="field:&#39;Content&#39;">性别：</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="padding-left: 20px; margin-top: 10px">
+                                            <span data-options="field:&#39;optionSubject&#39;"><input type="radio">&nbsp;&nbsp;A.&nbsp;男<br><input type="radio">&nbsp;&nbsp;B.&nbsp;女<br></span>
+                                        </div>
+                                        <div style=" margin-bottom:  10px">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="lead-dataitem lead-item lead-even" style="margin-left: 30px; ">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="padding-left: 10px;margin-top: 40px">
+                                            <div style="background-color:  #81BCF6;  font-size: 15px;color: white; margin-right: 10px; width: 30px;text-align: center;     display: inline-block;">
+                                                <span data-options="field:&#39;ContentNum&#39;">2.</span>
+
+                                            </div>
+                                            <span data-options="field:&#39;Content&#39;">年龄：</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="padding-left: 20px; margin-top: 10px">
+                                            <span data-options="field:&#39;optionSubject&#39;"><input type="radio">&nbsp;&nbsp;A.&nbsp;18-25岁<br><input type="radio">&nbsp;&nbsp;B.&nbsp;26-35岁<br><input type="radio">&nbsp;&nbsp;C.&nbsp;36-45岁<br><input type="radio">&nbsp;&nbsp;D.&nbsp;46岁及以上<br></span>
+                                        </div>
+                                        <div style=" margin-bottom:  10px">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>-->
+                    <!-- ***********************  数据区域  end  ******************** -->
+                </div>
+                <!--  分页设置点 -->
+            </div>
+        </div>
+
+        <!--  关闭 -->
+        <div class="modal-footer" style="text-align: center">
+            <button type="button" class="btn btn-primary">提交</button>
+            <button type="button" class="btn btn-primary" onclick="window.close()">关闭</button>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    $(function(){
+        var page = {
+            init : function() {
+                $.post(WEB_ROOT + "/fillQuestionnaire/getQuestionnaireList", {"projectId" : "2a1271e0-b59b-4fc4-9cac-29035b72baed"},function(data){
+                    if(data != null && data.length > 0) {
+                        var html = "" ;
+                        for(var i = 0; i < data.length; i++) {
+                            // 拼接试题
+                            html += "<div class='lead-dataitem lead-item' style='margin-left: 30px; ' data-id='"+ data[i].id +"'>" ;
+                            html += "<table>" ;
+                            html += "<tbody>" ;
+                            html += "<tr>" ;
+                            html += "<td>" ;
+                            html += "<div style='padding-left: 10px;margin-top: 40px'>" ;
+                            html += "<div style='background-color:#81BCF6;font-size:15px;color:white;margin-right:10px;width:30px;text-align: center;display: inline-block;'>" ;
+                            html += "<span data-options='field:&#39;ContentNum&#39;'>"+data[i].questionCode+".</span>" ;
+                            html += "</div>" ;
+                            html += "<span data-options='field:&#39;Content&#39;'>"+data[i].questionContent+"</span>" ;
+                            html += "</div>" ;
+                            html += "</td>" ;
+                            html += "</tr>" ;
+
+                            html += "<tr>" ;
+                            html += "<td>" ;
+                            html += "<div style='padding-left: 20px; margin-top: 10px'>" ;
+                            html += "<span data-options='field:&#39;optionSubject&#39;'>" ;
+                            if(data[i].questionType === "1") {
+                                var ops = data[i].options ;
+                                if(ops != null && ops.length > 0){
+                                    for(var j = 0; j < ops.length; j++) {
+                                        html += "<input type='radio' name='singleOps' data-opsId='"+ops[j].id+"'>&nbsp;&nbsp;"+ops[j].optName+".&nbsp;"+ops[j].optContent+"<br>" ;
+                                    }
+                                }
+                            } else if(data[i].questionType === "2") {
+                                var ops = data[i].options ;
+                                if(ops != null && ops.length > 0){
+                                    for(var j = 0; j < ops.length; j++) {
+                                        html += "<input type='checkbox' name='doubleOps' data-opsId='"+ops[j].id+"'>&nbsp;&nbsp;"+ops[j].optName+".&nbsp;"+ops[j].optContent+"<br>" ;
+                                    }
+                                }
+                            } else if(data[i].questionType === "3") {
+                                html += "<textarea name='answerOps' rows='5' cols='6' style='margin: 0px; width: 430px; height: 160px;' placeholder='请输入答案...' data-hasIntervalScores='"+data[i].hasIntervalScores+"'></textarea>" ;
+                            }else {
+                                // 附件上传
+                            }
+                            html += "</span>" ;
+                            html += "</div>" ;
+                            html += "<div style='margin-bottom:10px'>" ;
+                            html += "</div>" ;
+                            html += "</td>" ;
+                            html += "</tr>" ;
+
+                            html += "</tbody>" ;
+                            html += "</table>" ;
+                            html += "</div>" ;
+                        }
+                    }
+
+                    $("#PaperPublishDeatilsView_list").append(html) ;
+                }, "json") ;
+            }
+        } ;
+
+        page.init() ;
+    }) ;
+</script>
+</html>

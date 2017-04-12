@@ -1,0 +1,233 @@
+<namespace id="project-edit"  ms-controller="project_edit">
+<ol class="breadcrumb">
+    <li><a href="#">项目</a></li>
+    <li><a href="#">编辑</a></li>
+</ol>
+<section class="content" id="editProjectSection">
+    <div class="box box-info">
+	    <form role="form" id="editProjectForm" class="form-horizontal">
+        <div class="row ">
+            <div class="col-sm-12">
+                <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 提交
+                    </button>
+                    <a class="btn btn-sm btn-default" id="btnCancel">
+                        <i class="fa fa-align-justify"> 返回</i>
+                    </a>
+                    <button type="button"  id="publishBtn" class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 发布
+                    </button>
+                    <button type="button"  id="expertBtn" class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 专家评
+                    </button>
+                    <button type="button"  id="endBtn" class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 终评
+                    </button>
+                    <button type="button"  id="archiveBtn" class="btn btn-sm btn-primary">
+                        <i class="fa fa-floppy-o"></i> 归档
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="box-body">
+				<div class="form-group">
+					<label for="name" class="col-sm-1 control-label input-sm">
+						项目名称</label>
+					<div class="col-sm-5">
+						<span id="name" class="form-control label-form-control input-sm"  >
+						{{@data.name}}</span>
+					</div>
+				</div>
+			
+			<div class="form-group">
+                <label for="startDateStr" class="col-sm-1 control-label requiredMask input-sm">开始时间</label>
+                <div class="col-sm-5">
+                    <input  name="startDateStr" style="background-color:#fff;" 
+                    readonly type="text" class="form-control input-sm pull-right" 
+                    id="startDateStr"   ms-attr="{value:@data.startDateStr}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="endDateStr" class="col-sm-1 control-label requiredMask input-sm">结束时间</label>
+                <div class="col-sm-5">
+		                <input  name="endDateStr" style="background-color:#fff;" 
+		                readonly type="text" class="form-control input-sm pull-right" 
+		                id="endDateStr"  ms-attr="{value:@data.endDateStr}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="score" class="col-sm-1 control-label requiredMask input-sm">
+                	总分时间</label>
+                <div class="col-sm-5">
+                    <input name="score" type="text" class="form-control input-sm" placeholder=""   
+                    ms-attr="{value:@data.score}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="statusName" class="col-sm-1 control-label input-sm">状态</label>
+                <div class="col-sm-5">
+                    <span id="statusName" class="form-control label-form-control input-sm"  >{{@data.statusName}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="dicLocation" class="col-sm-1 control-label requiredMask input-sm">
+                	附件目录</label>
+                <div class="col-sm-5">
+                    <input name="dicLocation" type="text" class="form-control input-sm" placeholder=""   
+                    ms-attr="{value:@data.dicLocation}">
+                </div>
+            </div>
+				<div class="form-group">
+					<label for="description" class="col-sm-1 control-label requiredMask input-sm">
+						备注</label>
+					<div class="col-sm-5">
+						<textarea name="description" class="form-control input-sm" rows="3" 
+							placeholder=" ..."  >{{@data.description}}</textarea>
+					</div>
+				</div>
+			</div>
+		<input type="hidden" name="id"   ms-attr="{value:@data.id}" style="width: 100%" />
+	</form>
+    </div>
+</section>
+</namespace>
+<script type="text/javascript">
+	$_ready(function() {
+		var page = {
+			namespace : $('#project-edit').namespace(),
+			model:{
+    			vm:avalon.define({
+    		        $id: "project_edit",
+    		        data: {}
+    		    })
+    		},
+			init : function() {
+				page.namespace.root.find('#startDateStr').autoBSNyrt().on("click", function(ev){
+					page.namespace.root.find("#startDateStr").datetimepicker("setEndDate", page.namespace.root.find("#endDateStr").val());
+		        });
+				page.namespace.root.find('#endDateStr').autoBSNyrt().on("click", function(ev){
+					page.namespace.root.find("#endDateStr").datetimepicker("setStartDate", page.namespace.root.find("#startDateStr").val());
+		        });
+				
+				page.namespace.root.find('#editProjectForm').validate({
+					rules : {
+						'name' : {
+							required : true,
+							maxlength : 64
+						},
+						'startDateStr' : {
+							required : true,
+							dateISO:true 
+						},
+						'endDateStr' : {
+							required : true,
+							dateISO:true 
+						},
+						'score' : {
+							required : true,
+							number : true
+						}
+					},
+					submitHandler : function(form) {
+						page.doEdit() ;
+					}
+				});
+			},
+			doEdit : function() {
+				var submitSysUserForm = {
+					endpoint : "/project/updateProject",
+					formObj : $("#editProjectForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				};
+
+				page.namespace.submitForm(submitSysUserForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml('/pages/project/project-list.html');
+			},
+			initView:function(){
+				page.namespace.getRequest({
+					endpoint : "/project/getProjectById",
+					data : {"id":page.namespace.getParam("id")},
+					success : function(data) {
+						 page.model.vm.data=data;
+ 					},
+					failure : function(data) {
+						alertTool.error(data);
+					}
+				});
+			}
+		};
+
+		page.init();
+		page.namespace.root.find('#btnCancel').on('click', page.doCancel);
+		
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.initView();
+		
+		page.namespace.root.find('#publishBtn').on('click',function(){
+			var HtmlMenuOpt = {
+					endpoint : "/project/publish",
+					data : {
+						 'id' : page.namespace.root.find('[name="id"]').val()
+					},
+					success : function(data) {
+						alertTool.success("PUBLISH OK");
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+		});
+		
+		
+		page.namespace.root.find('#expertBtn').on('click',function(){
+			var HtmlMenuOpt = {
+					endpoint : "/project/next2Expert",
+					data : {
+						 'id' : page.namespace.root.find('[name="id"]').val()
+					},
+					success : function(data) {
+						alertTool.success("IS EXPERT OK");
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+		});
+		
+		
+		page.namespace.root.find('#endBtn').on('click',function(){
+			var HtmlMenuOpt = {
+					endpoint : "/project/next2End",
+					data : {
+						 'id' : page.namespace.root.find('[name="id"]').val()
+					},
+					success : function(data) {
+						alertTool.success("IS END OK");
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+		});
+		
+		page.namespace.root.find('#archiveBtn').on('click',function(){
+			var HtmlMenuOpt = {
+					endpoint : "/project/next2Archive",
+					data : {
+						 'id' : page.namespace.root.find('[name="id"]').val()
+					},
+					success : function(data) {
+						alertTool.success("IS ARCHIVE OK");
+					}
+				};
+				page.namespace.getRequest(HtmlMenuOpt);
+		});
+		
+		
+	});
+</script>

@@ -1,0 +1,109 @@
+<div>
+	<ol class="breadcrumb">
+        <li><a href="#">收款明细</a></li>
+        <li><a href="#">列表</a></li>
+    </ol>
+    <div class="box box-info">
+    	<div class="box box-info" style="border-top: 0px;">
+    		<div class="box-header with-border">
+    			<div class="btn-group">
+    				<button class="btn btn-success btn-sm" id="btnAdd" type="button">
+                        <span class="glyphicon glyphicon-plus"></span> 添加
+                    </button> 
+                    <button class="btn btn-danger btn-sm" id="deleteBtn" type="button">
+                        <span class="glyphicon glyphicon-minus"></span> 删除
+                    </button>
+    			</div>
+    		</div>
+        	<div class="box-body" style="margin-top: -10px;">
+            	<table id="listTable" class="table dataTable row-border cell-border" cellspacing="0" width="100%">
+            		<thead>
+            			<tr>
+            				<th></th>
+            				<th>项目名称</th>
+            				<th>日期</th>
+            				<th>发票号</th>
+            				<th>发票金额</th>
+            				<th>到款金额</th>
+            				<th></th>
+            			</tr>
+            		</thead>
+           		</table>
+        	</div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	var listTable;
+	
+	$(function() {
+		listTable = $("#listTable").initDataTable({
+			url : "/pms/summary/getInvoicePageList",
+			urlDataFn : function() {
+				return null;
+			},
+			checkbox : true,
+			ops : {
+				view : function(id, rowData) {
+					toInvoiceView(id);
+				},
+				del : function(id, rowData) {
+					deleteInvoice(id);
+				},
+				edit : function(id, rowData) {
+					toInvoiceEdit(id);
+				}
+			},
+			columns : [
+				{"data" : "projectName", "width" : "15%"},
+				{"data" : "invoiceDate", "width" : "15%"},
+				{"data" : "invoiceCode", "width" : "15%"},
+				{"data" : "invoiceAmt", "width" : "30%"},
+				{"data" : "intoAmt", "width" : "30%"}
+			]
+		});
+		
+		$("#btnAdd").on("click", toInvoiceAdd);
+		$("#deleteBtn").on("click", doDeleteInvoices);
+	});
+	
+	function toInvoiceAdd() {
+		httpservice.htmlEnt.skiphtml("/pms/summary/toInvoiceAdd");
+	}
+	
+	function toInvoiceView(id) {
+		httpservice.htmlEnt.skiphtml("/pms/summary/toInvoiceView?id=" + id);
+	}
+	
+	function deleteInvoice(id) {
+		var opt = {
+			endpoint : "/pms/summary/deleteInvoice",
+			data : {
+				'ids' : id
+			},
+			success : function(data) {
+				listTable.ajax.reload();
+			},
+	        failure:function(data) {
+	            alertTool.error(data);
+	        }
+		}
+		
+		httpservice.ajaxEnt.getRequest(opt);
+	}
+	
+	function toInvoiceEdit(id) {
+		httpservice.htmlEnt.skiphtml("/pms/summary/toInvoiceEdit?id=" + id);
+	}
+	
+	function doDeleteInvoices() {
+		var selectRows = $('#listTable').getSelectedRow();
+
+		if (selectRows.length == 0) {
+			alertTool.warning("请选择要删除的记录!");
+			return;
+		}
+
+		deleteInvoice(selectRows.join(","));
+	}
+</script>
