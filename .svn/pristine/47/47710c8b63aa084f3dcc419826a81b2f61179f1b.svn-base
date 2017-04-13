@@ -1,0 +1,56 @@
+﻿body {
+            margin: 0;
+            padding: 0;
+            font-family: "微软雅黑";
+            background: url(../Images/login/loginBg.gif) repeat;
+            font-size: 14px;
+        }
+        a:link, a:visited, a:hover {
+            color: #666;
+            text-decoration: none;
+        }
+        input:focus {
+            outline: none;
+        }
+        .inputUser {
+            background: url(../Images/login/inputbox.gif) 0px -151px;
+            height: 41px;
+            width: 274px;
+            border: 0;
+            padding-right: 34px;
+            padding-left: 10px;
+            /*display: block;*/
+            margin-bottom: 15px;
+        }
+            .inputUser:focus {
+                background: url(../Images/login/inputbox.gif) 0px -21px;
+            }
+        .inputPs {
+            background: url(../Images/login/inputbox.gif) 0px -83px;
+            height: 41px;
+            width: 274px;
+            border: 0;
+            padding-right: 34px;
+            padding-left: 10px;
+            /*display: block;*/
+            margin-bottom: 15px;
+        }
+            .inputPs:focus {
+                background: url(../Images/login/inputbox.gif) 0px -213px;
+            }
+        .loginBtn {
+            display: block;
+            border: 0;
+            background: #f5a01a;
+            color: #fff;
+            border-radius: 10px;
+            width: 275px;
+            height: 44px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+            .loginBtn:hover {
+                background: #e39213;
+            }

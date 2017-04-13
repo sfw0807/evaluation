@@ -1,0 +1,41 @@
+﻿@charset "utf-8";
+/* CSS Document */
+
+
+body  {
+	padding: 0;/* 最好将 body 元素的边距和填充设置为 0 以覆盖不同的浏览器默认值 */
+	text-align: left; 
+	color: #333;
+	font-size:12px;
+	font-family: "微软雅黑";
+	margin:0 auto;
+}
+a:focus{ outline:none;}
+
+.dl-horizontal dt{ text-align:center; line-height:35px; border-radius:3px; font-size:16px;}
+.dl-horizontal dd{margin-left:50px; color:#555; font-size:18px; }
+.inputUser{background: url(../Images/login/inputbox.jpg) 0px -149px no-repeat; height:45px; width:275px; border:1px solid #9c9591; padding-right:34px; padding-left:10px; 
+           /*display:block; */
+           margin-bottom:15px; font-size:1.2em;}
+.inputUser:focus{  background: url(../Images/login/inputbox.jpg) 0px -19px no-repeat;}
+.inputPs{background: url(../Images/login/inputbox.jpg) 0px -81px no-repeat; height:45px; width:275px; border:1px solid #9c9591; padding-right:34px; padding-left:10px;  
+         display:block; 
+         margin-bottom:15px; font-size:1.2em;}
+.inputPs:focus{  background: url(../Images/login/inputbox.jpg) 0px -211px no-repeat;}
+.inputSchool{background: url(../Images/login/inputbox.jpg) 0px -269px no-repeat; height:45px; width:275px; border:1px solid #9c9591; padding-right:34px; padding-left:10px; 
+             /*display:block; */
+             margin-bottom:15px; font-size:1.2em;}
+.inputSchool:focus{  background: url(../Images/login/inputbox.jpg) 0px -330px no-repeat;}
+a:link{text-decoration:none;}
+a:hover{ text-decoration:none;}
+.textM{ text-align:center;}
+a.loginSchool{background:#0f95ee; border:1px solid #0f95ee; display:inline-block; font-size:1.4em; padding:0.7em; color:#fff;}
+a.loginAccount{background:#fff; border:1px solid #ccc; display:inline-block; font-size:1.4em; padding:0.7em; color:#333;}
+.loginTab{background:url(../Images/login/loginTabBg.gif) no-repeat center; height:65px; text-align:center; color:#0f95ee; font-size:1.8em;}
+
+a.loginNormal{background:#fff; border:1px solid #ccc; display:inline-block; font-size:1.4em; padding:0.7em; color:#333;width:136px;}
+a.loginSelect{background:#0f95ee; border:1px solid #0f95ee; display:inline-block; font-size:1.4em; padding:0.7em; color:#fff;}
+.loginNarea{position:absolute; z-index:1; top:35%; width:100%;}
+.loginNdis{padding:0 10%;}
+.loginNdis input.user{background: url(../Images/login/inputIcon.jpg) no-repeat 0 -16px #fff; border:1px solid #b6b6b6; border-radius:10px; height:2.8em; width:100%; font-size:1.3em; color:#999; font-family:'微软雅黑'; padding-left:50px; margin-bottom:1em;}
+.loginNdis input.password{background: url(../Images/login/inputIcon.jpg) no-repeat 0 -102px #fff; border:1px solid #b6b6b6; border-radius:10px; height:2.8em; width:100%; font-size:1.3em; color:#999; font-family:'微软雅黑'; padding-left:50px; margin-bottom:2em;}

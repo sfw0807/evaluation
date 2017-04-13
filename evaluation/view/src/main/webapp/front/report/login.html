@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <title>易加评价调查问卷</title>
+    <link href="../../front-ui/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../front-ui/css/login.css" rel="stylesheet" />
+    <link href="../../front-ui/css/default.css" rel="stylesheet">
+    <link href="../../front-ui/css/paper.css" rel="stylesheet" />
+    <script src="../../front-ui/js/jquery-1.9.1.min.js"></script>
+    <script src="../../front-ui/self/_base.js"></script>
+    <script src="../../front-ui/js/bootstrap.min.js"></script>
+
+
+    <link href="../../front-ui/css/ui-dialog.css" rel="stylesheet">
+    <script src="../../front-ui/js/dialog-min.js"></script>
+
+    <link href="../../front-ui/css/popupTip.css" rel="stylesheet">
+
+    <script src="../../front-ui/js/popupTip.js"></script>
+
+    <link href="../../front-ui/css/jquery.leadcontrol.css" rel="stylesheet">
+
+    <script src="../../front-ui/js/jquery.leadcontrol.js"></script>
+
+    <script src="../../front-ui/js/core-min.js"></script>
+
+    <script src="../../front-ui/js/base64.js"></script>
+
+    <script src="../../front-ui/js/JSCommon.js"></script>
+    <script src="../../front-ui/js/respond.js"></script>
+    <style>
+        .inputPs {
+            display:inline-block;
+        }
+        .txtMessage {
+            font-size: 13px;
+            margin-top: 10px;
+            display: block;
+        }
+    </style >
+</head>
+<body style="background:#e1f3ff;">
+<div class="header" style="background: url(../../front-ui/Images/paper/paperTop_new.jpg) center; min-height: 269px; position: relative; text-align: center;">
+    <div class="container" style="padding-top:75px;">
+        <div style="color: #fff; font-size: 2.3em; margin-bottom: 0.2em;">问卷评价</div>
+        <div style="color:#fff0bc; font-size: 2.3em;">调查问卷</div>
+    </div>
+</div>
+<div style="background:#e8e8e8;">
+    <div class="container" style="margin-bottom:20px;">
+        <div class="row" style="font-size:1.3em;">
+            <div class="hidden-xs col-md-1 col-sm-1" style="background:#00b941;  height:110px; float:left; color:#fff; font-weight:bold; font-size:1.5em; text-align:center; vertical-align:middle;">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td height="110">
+                            问卷<br>
+                            说明
+                        </td>
+                    </tr>
+                </table>
+            </div><div class="col-md-11 col-sm-11" style="padding-left:25px; float:left; padding-top:20px;"><div style="font-weight:bold;">尊敬的用户，您好！</div><div>为了进一步了解您对学校工作的意见，帮助我们进一步提升服务质量。诚邀您参加我们以下的问卷调查。提出您的宝贵建议。感谢您的配合和支持！</div></div>
+        </div>
+    </div>
+</div>
+<div class="container" style="background:#fff; padding:20px;height:34em;">
+    <div class="loginTab">选择登录方式</div>
+    <div class="textM" style="margin-bottom:30px;">
+        <a href="#" class="loginNormal loginSelect" onclick="selectSurveyType(0,this)">学校代码登录</a><a href="#" class="loginNormal" onclick="selectSurveyType(1,this)">实名账号登录</a><a href="#" class="loginNormal" onclick="selectSurveyType(2,this)">临时账号登录</a>
+
+    </div>
+    <form class="form-horizontal">
+        <div class="form-group">
+            <div id="selType0">
+
+                <div class="textM">
+                    <input id="txtSchoolAccount" type="text" class="inputSchool" placeholder="学校代码" />
+                </div>
+            </div>
+
+            <div id="selType1" style="display:none;padding-left:10px;">
+                <div class="form-group">
+
+                    <div class="textM">
+                        <input id="realLoginAccount" type="text" class="inputUser" placeholder="登录名">
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="textM">
+                        <input id="password" type="password" class="inputPs" placeholder="密码">
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="selType2" style="display:none;padding-left:10px;">
+                <div class="form-group">
+
+                    <div class="textM">
+                        <input id="txtLoginCode" type="text" class="inputUser" placeholder="登录名">
+                    </div>
+                </div>
+              <!--  <div class="form-group">
+
+                    <div class="textM">
+                        <input id="txtUserAccount" type="password" class="inputPs" placeholder="校验码">
+                    </div>
+                </div>-->
+            </div>
+
+
+        </div>
+
+
+
+        <div class="form-group">
+            <div class="textM">
+                <button type="button" class="btn btn-success btn-lg" style="width: 275px;" onclick="login()">点击登录</button>
+            </div>
+            <div class="textM">
+                <span class="txtMessage"></span>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var surveyType = 0;
+
+    function buildParams() {
+        var params = {"userAccount":"",
+                        "password":"",
+                        "loginType":surveyType
+                     };
+        var useAccount = "";
+        var password = "";
+        //0 统一账号登录  1 实名账号登录  2 临时账号登录
+        if (surveyType == 0) {
+            useAccount = $.trim($("#txtSchoolAccount").val());
+        } else if(surveyType == 1){
+            useAccount = $.trim($("#realLoginAccount").val());
+            password = $.trim($("#password").val());
+        } else if (surveyType == 2) {
+            useAccount = $.trim($("#txtLoginCode").val());
+        }
+        params.userAccount = useAccount;
+        params.password = password;
+
+        //return JSON.stringify(params);
+        return JSON.stringify(params);
+    }
+
+    function login() {
+
+        var data = buildParams();
+        $.post(WEB_ROOT + "/rpt/userLogin", {"jsonParams" : data}, function (res) {
+            console.info(res);
+        });
+        alert("11");
+
+
+    }
+    function selectSurveyType(n, o) {
+        $(".txtMessage").html("");
+        $(".loginNormal").removeClass("loginSelect");
+        $(o).addClass(" loginSelect");
+        surveyType = n;
+        var selTypeId = "#selType" + n;
+        $("div[id^='selType']").each(function(i){console.info(this);$(this).hide()});
+        $(selTypeId).show();
+        /*if (n == "2") {
+            $("#selType2").show();
+            $("#selType3").hide();
+        }
+        else {
+            $("#selType2").hide();
+            $("#selType3").show();
+        }*/
+        //if ($("#selSurveyType").val() == "1") {
+        //    location.href = 'SSOLogin';
+        //}
+    }
+    document.onkeydown = function (e) {
+        var ev = document.all ? window.event : e;
+        if (ev.keyCode == 13) {
+            login();
+        }
+    }
+</script>
+
+
+</body>
+</html>
